@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — NLEM Drug Guide</title>
+<style>
+:root {
+  --teal: #1D9E75; --teal-bg: #E1F5EE; --teal-text: #085041;
+  --red-bg: #FAECE7; --red-text: #712B13;
+  --border: #e5e5e3; --text: #1c1c1a; --muted: #6b6b68;
+  --gray: #f5f5f4; --font: 'Sarabun', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: #fafaf9; color: var(--text); font-size: 14px; }
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap');
+
+/* Login */
+#login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.login-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 2rem; width: 340px; }
+.login-card h2 { font-size: 16px; margin-bottom: 1rem; }
+.login-card input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: var(--font); margin-bottom: 10px; }
+.login-card input:focus { outline: none; border-color: var(--teal); }
+.login-card button { width: 100%; padding: 9px; background: var(--teal); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-family: var(--font); cursor: pointer; }
+.login-error { color: var(--red-text); font-size: 12px; margin-top: 6px; display: none; }
+
+/* App */
+#app { display: none; }
+header { background: #fff; border-bottom: 1px solid var(--border); padding: .75rem 1.5rem; display: flex; align-items: center; gap: 1rem; justify-content: space-between; }
+header h1 { font-size: 16px; font-weight: 600; color: var(--teal); }
+.tabs { display: flex; gap: 4px; }
+.tab { padding: 6px 14px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; font-family: var(--font); font-size: 13px; background: none; color: var(--muted); }
+.tab.active { background: var(--teal-bg); color: var(--teal-text); border-color: var(--teal); }
+.tab:hover:not(.active) { background: var(--gray); }
+.logout-btn { font-size: 12px; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; cursor: pointer; font-family: var(--font); }
+
+main { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* Table */
+.table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+.table-title { font-size: 15px; font-weight: 600; }
+.add-btn { padding: 7px 14px; background: var(--teal); color: #fff; border: none; border-radius: 7px; font-size: 13px; font-family: var(--font); cursor: pointer; }
+.filter-input { padding: 7px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: var(--font); width: 200px; }
+.filter-input:focus { outline: none; border-color: var(--teal); }
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+th { background: var(--gray); padding: 9px 12px; text-align: left; font-size: 12px; color: var(--muted); font-weight: 500; white-space: nowrap; }
+td { padding: 8px 12px; border-top: 1px solid var(--border); font-size: 13px; }
+tr:hover td { background: #fafaf9; }
+.inactive { opacity: .45; }
+.act-btn { font-size: 11px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); background: none; cursor: pointer; font-family: var(--font); }
+.act-btn.edit { color: #185FA5; border-color: #B5D4F4; }
+.act-btn.del  { color: var(--red-text); border-color: #F5C4B3; }
+.act-btn.restore { color: var(--teal-text); border-color: var(--teal); }
+.badge-cat { font-size: 11px; padding: 2px 7px; border-radius: 4px; background: var(--teal-bg); color: var(--teal-text); font-weight: 500; }
+
+/* Modal */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; align-items: center; justify-content: center; }
+.modal-bg.open { display: flex; }
+.modal { background: #fff; border-radius: 14px; padding: 1.5rem; width: 480px; max-width: 95vw; }
+.modal h3 { font-size: 15px; margin-bottom: 1rem; }
+.form-row { margin-bottom: 10px; }
+.form-row label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 3px; }
+.form-row input, .form-row select, .form-row textarea {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px;
+  font-size: 13px; font-family: var(--font); }
+.form-row input:focus, .form-row select:focus { outline: none; border-color: var(--teal); }
+.form-row textarea { resize: vertical; min-height: 60px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+.modal-actions button { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-family: var(--font); cursor: pointer; border: 1px solid var(--border); }
+.btn-save   { background: var(--teal); color: #fff; border-color: var(--teal); }
+.btn-cancel { background: none; }
+.toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1c1c1a; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 200; display: none; }
+/* Multi-URL list */
+.url-list { display: flex; flex-direction: column; gap: 6px; }
+.url-item { display: flex; gap: 6px; align-items: center; }
+.url-item input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: var(--font); }
+.url-item input:focus { outline: none; border-color: var(--teal); }
+.url-remove { width: 28px; height: 28px; border: 1px solid #F5C4B3; border-radius: 6px; background: none; color: var(--red-text); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.url-add-btn { margin-top: 6px; font-size: 12px; color: var(--teal-text); background: var(--teal-bg); border: 1px solid var(--teal); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: var(--font); }
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="login-screen">
+  <div class="login-card">
+    <h2>Admin — NLEM Drug Guide</h2>
+    <input type="password" id="api-key-input" placeholder="กรอก Admin API Key..." onkeydown="if(event.key==='Enter')login()">
+    <button onclick="login()">เข้าสู่ระบบ</button>
+    <p class="login-error" id="login-error">API Key ไม่ถูกต้อง</p>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <header>
+    <h1>Admin — NLEM Drug Guide</h1>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'tab-drugs')">รายการยา</button>
+      <button class="tab" onclick="switchTab(this,'tab-groups')">กลุ่มยา</button>
+      <button class="tab" onclick="switchTab(this,'tab-links')">ลิงก์อ้างอิง</button>
+      <button class="tab" onclick="switchTab(this,'tab-cats')">บัญชียา</button>
+    </div>
+    <div>
+      <a href="index.html" style="font-size:12px;color:var(--muted);text-decoration:none;margin-right:8px">← หน้าหลัก</a>
+      <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB: Drugs -->
+    <div class="section active" id="tab-drugs">
+      <div class="table-header">
+        <span class="table-title">รายการยา</span>
+        <div style="display:flex;gap:8px">
+          <input class="filter-input" placeholder="ค้นหาชื่อยา..." oninput="filterTable('drugs-tbody',this.value)">
+          <button class="add-btn" onclick="openDrugModal()">+ เพิ่มยา</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>บัญชี</th><th>ชื่อยา (EN)</th><th>ชื่อยา (TH)</th><th>กลุ่มยา</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody id="drugs-tbody"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Drug Groups -->
+    <div class="section" id="tab-groups">
+      <div class="table-header">
+        <span class="table-title">กลุ่มยา</span>
+        <button class="add-btn" onclick="openGroupModal()">+ เพิ่มกลุ่มยา</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>ชื่อกลุ่มยา</th><th>ลำดับ</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody id="groups-tbody"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Links -->
+    <div class="section" id="tab-links">
+      <div class="table-header">
+        <span class="table-title">ลิงก์อ้างอิง</span>
+        <button class="add-btn" onclick="openLinkModal()">+ เพิ่มลิงก์</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>บัญชี</th><th>ชื่อลิงก์</th><th>URL</th><th>คำอธิบาย</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody id="links-tbody"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Categories -->
+    <div class="section" id="tab-cats">
+      <div class="table-header">
+        <span class="table-title">บัญชียา (metadata)</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>ชื่อ TH</th><th>ชื่อ EN</th><th>สิทธิ</th><th>เอกสาร</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody id="cats-tbody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Drug Modal -->
+<div class="modal-bg" id="drug-modal">
+  <div class="modal">
+    <h3 id="drug-modal-title">เพิ่มยาใหม่</h3>
+    <input type="hidden" id="drug-id">
+    <div class="form-row">
+      <label>บัญชี *</label>
+      <select id="drug-cat"></select>
+    </div>
+    <div class="form-row"><label>ชื่อยา (EN) *</label><input id="drug-name-en" placeholder="Paracetamol"></div>
+    <div class="form-row"><label>ชื่อยา (TH)</label><input id="drug-name-th" placeholder="พาราเซตามอล"></div>
+    <div class="form-row">
+      <label>กลุ่มยา</label>
+      <select id="drug-group">
+        <option value="">— ไม่ระบุ —</option>
+      </select>
+    </div>
+    <div class="form-row"><label>หมายเหตุ</label><textarea id="drug-notes"></textarea></div>
+    <div class="form-row" id="drug-doc-url-row" style="display:none">
+      <label>📄 Link เอกสาร / แบบฟอร์ม</label>
+      <div class="url-list" id="drug-url-list"></div>
+      <button type="button" class="url-add-btn" onclick="addDocUrl()">+ เพิ่ม link</button>
+    </div>
+    <div class="form-row"><label>ลำดับ</label><input type="number" id="drug-order" value="0"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('drug-modal')">ยกเลิก</button>
+      <button class="btn-save" onclick="saveDrug()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Link Modal -->
+<div class="modal-bg" id="link-modal">
+  <div class="modal">
+    <h3 id="link-modal-title">เพิ่มลิงก์ใหม่</h3>
+    <input type="hidden" id="link-id">
+    <div class="form-row">
+      <label>บัญชี (เว้นว่างถ้าเป็นลิงก์ทั่วไป)</label>
+      <select id="link-cat"><option value="">— ทั่วไป —</option></select>
+    </div>
+    <div class="form-row"><label>ชื่อลิงก์ *</label><input id="link-title"></div>
+    <div class="form-row"><label>URL *</label><input id="link-url" placeholder="https://..."></div>
+    <div class="form-row"><label>คำอธิบาย</label><textarea id="link-desc"></textarea></div>
+    <div class="form-row"><label>ลำดับ</label><input type="number" id="link-order" value="0"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('link-modal')">ยกเลิก</button>
+      <button class="btn-save" onclick="saveLink()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Drug Group Modal -->
+<div class="modal-bg" id="group-modal">
+  <div class="modal">
+    <h3 id="group-modal-title">เพิ่มกลุ่มยาใหม่</h3>
+    <input type="hidden" id="group-id">
+    <div class="form-row"><label>ชื่อกลุ่มยา *</label><input id="group-name" placeholder="เช่น ยาต้านเชื้อ / Carbapenem"></div>
+    <div class="form-row"><label>ลำดับ</label><input type="number" id="group-order" value="0"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('group-modal')">ยกเลิก</button>
+      <button class="btn-save" onclick="saveGroup()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal-bg" id="cat-modal">
+  <div class="modal">
+    <h3 id="cat-modal-title">แก้ไขบัญชียา</h3>
+    <input type="hidden" id="cat-id">
+    <div class="form-row">
+      <label>คำอธิบาย</label>
+      <textarea id="cat-desc" rows="3"></textarea>
+    </div>
+    <div class="form-row">
+      <label>🔗 Link เอกสาร / แบบฟอร์ม (Google Drive หรือ URL อื่นๆ)</label>
+      <input id="cat-doc-url" type="url" placeholder="https://drive.google.com/...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('cat-modal')">ยกเลิก</button>
+      <button class="btn-save" onclick="saveCat()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let API_KEY = '';
+let cats = [], drugs = [], links = [], groups = [];
+
+function login() {
+  API_KEY = document.getElementById('api-key-input').value.trim();
+  if (!API_KEY) return;
+  // Test the key by calling admin endpoint
+  fetch('/api/admin/categories', { headers: { 'X-Admin-Key': API_KEY } })
+    .then(r => {
+      if (r.ok) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        loadAll();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    })
+    .catch(() => { document.getElementById('login-error').style.display = 'block'; });
+}
+
+function logout() {
+  API_KEY = '';
+  location.reload();
+}
+
+function api(path, method = 'GET', body) {
+  return fetch(path, {
+    method,
+    headers: { 'X-Admin-Key': API_KEY, 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  }).then(r => r.json());
+}
+
+async function loadAll() {
+  [cats, drugs, links, groups] = await Promise.all([
+    api('/api/admin/categories'),
+    api('/api/admin/drugs'),
+    api('/api/admin/links'),
+    api('/api/admin/drug-groups'),
+  ]);
+  renderDrugs(); renderLinks(); renderCats(); renderGroups();
+  // Populate category selects
+  const opts = cats.map(c => `<option value="${c.id}" data-doc="${c.doc_level||'none'}">${c.id} — ${c.name_th}</option>`).join('');
+  const drugCat = document.getElementById('drug-cat');
+  drugCat.innerHTML = opts;
+  drugCat.addEventListener('change', updateDocUrlVisibility);
+  document.getElementById('link-cat').innerHTML =
+    '<option value="">— ทั่วไป —</option>' + opts;
+  // Populate drug group dropdown
+  populateGroupSelect();
+}
+
+function updateDocUrlVisibility() {
+  const sel = document.getElementById('drug-cat');
+  const opt = sel.options[sel.selectedIndex];
+  const docLevel = opt?.dataset?.doc || 'none';
+  const show = docLevel === 'partial' || docLevel === 'required';
+  document.getElementById('drug-doc-url-row').style.display = show ? '' : 'none';
+}
+
+function addDocUrl(value = '') {
+  const list = document.getElementById('drug-url-list');
+  const item = document.createElement('div');
+  item.className = 'url-item';
+  item.innerHTML = `
+    <input type="url" placeholder="https://drive.google.com/..." value="${value}">
+    <button type="button" class="url-remove" onclick="this.parentElement.remove()" title="ลบ">✕</button>`;
+  list.appendChild(item);
+  item.querySelector('input').focus();
+}
+
+function getDocUrls() {
+  const inputs = document.querySelectorAll('#drug-url-list .url-item input');
+  const urls = [...inputs].map(i => i.value.trim()).filter(Boolean);
+  if (urls.length === 0) return null;
+  if (urls.length === 1) return urls[0];
+  return JSON.stringify(urls);
+}
+
+function setDocUrls(raw) {
+  document.getElementById('drug-url-list').innerHTML = '';
+  if (!raw) return;
+  let urls = [];
+  try { urls = JSON.parse(raw); if (!Array.isArray(urls)) urls = [raw]; }
+  catch { urls = [raw]; }
+  urls.forEach(u => addDocUrl(u));
+}
+
+// ---- Drug Groups ----
+function populateGroupSelect(currentVal = '') {
+  const sel = document.getElementById('drug-group');
+  const prev = currentVal || sel.value;
+  sel.innerHTML = '<option value="">— ไม่ระบุ —</option>' +
+    groups.filter(g => g.active).map(g =>
+      `<option value="${g.name}" ${g.name === prev ? 'selected' : ''}>${g.name}</option>`
+    ).join('');
+}
+
+function renderGroups() {
+  const tbody = document.getElementById('groups-tbody');
+  tbody.innerHTML = groups.map(g => `
+    <tr class="${g.active ? '' : 'inactive'}">
+      <td>${g.name}</td>
+      <td>${g.sort_order}</td>
+      <td>${g.active ? 'ใช้งาน' : 'ปิดใช้'}</td>
+      <td style="white-space:nowrap">
+        <button class="act-btn edit" onclick="openGroupModal(${g.id})">แก้ไข</button>
+        ${g.active
+          ? `<button class="act-btn del" onclick="toggleGroup(${g.id},0)">ปิด</button>`
+          : `<button class="act-btn restore" onclick="toggleGroup(${g.id},1)">เปิด</button>`}
+      </td>
+    </tr>`).join('');
+}
+
+function openGroupModal(id) {
+  document.getElementById('group-id').value = '';
+  document.getElementById('group-name').value = '';
+  document.getElementById('group-order').value = 0;
+  document.getElementById('group-modal-title').textContent = 'เพิ่มกลุ่มยาใหม่';
+  if (id) {
+    const g = groups.find(x => x.id === id);
+    if (g) {
+      document.getElementById('group-id').value = g.id;
+      document.getElementById('group-name').value = g.name;
+      document.getElementById('group-order').value = g.sort_order;
+      document.getElementById('group-modal-title').textContent = 'แก้ไขกลุ่มยา';
+    }
+  }
+  document.getElementById('group-modal').classList.add('open');
+}
+
+async function saveGroup() {
+  const id   = document.getElementById('group-id').value;
+  const name = document.getElementById('group-name').value.trim();
+  const sort_order = parseInt(document.getElementById('group-order').value) || 0;
+  if (!name) { alert('กรุณากรอกชื่อกลุ่มยา'); return; }
+  if (id) {
+    await api(`/api/admin/drug-groups?id=${id}`, 'PUT', { name, sort_order });
+  } else {
+    await api('/api/admin/drug-groups', 'POST', { name, sort_order });
+  }
+  closeModal('group-modal');
+  groups = await api('/api/admin/drug-groups');
+  renderGroups();
+  populateGroupSelect();
+  showToast('บันทึกสำเร็จ');
+}
+
+async function toggleGroup(id, active) {
+  await api(`/api/admin/drug-groups?id=${id}`, 'PUT', { active });
+  groups = await api('/api/admin/drug-groups');
+  renderGroups();
+  populateGroupSelect();
+  showToast(active ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว');
+}
+
+// ---- Drugs ----
+function renderDrugs() {
+  const tbody = document.getElementById('drugs-tbody');
+  tbody.innerHTML = drugs.map(d => `
+    <tr class="${d.active ? '' : 'inactive'}">
+      <td><span class="badge-cat">${d.category_id}</span></td>
+      <td>${d.name_en}</td>
+      <td>${d.name_th || '—'}</td>
+      <td>${d.drug_group || '—'}</td>
+      <td>${d.active ? 'ใช้งาน' : 'ปิดใช้'}</td>
+      <td style="white-space:nowrap">
+        <button class="act-btn edit" onclick="openDrugModal(${d.id})">แก้ไข</button>
+        ${d.active
+          ? `<button class="act-btn del" onclick="toggleDrug(${d.id},0)">ปิด</button>`
+          : `<button class="act-btn restore" onclick="toggleDrug(${d.id},1)">เปิด</button>`}
+      </td>
+    </tr>`).join('');
+}
+
+function filterTable(tbodyId, q) {
+  document.querySelectorAll(`#${tbodyId} tr`).forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function openDrugModal(id) {
+  document.getElementById('drug-id').value = '';
+  document.getElementById('drug-name-en').value = '';
+  document.getElementById('drug-name-th').value = '';
+  document.getElementById('drug-group').value = '';
+  document.getElementById('drug-notes').value = '';
+  setDocUrls('');
+  document.getElementById('drug-order').value = 0;
+  document.getElementById('drug-modal-title').textContent = 'เพิ่มยาใหม่';
+  if (id) {
+    const d = drugs.find(x => x.id === id);
+    if (d) {
+      document.getElementById('drug-id').value = d.id;
+      document.getElementById('drug-cat').value = d.category_id;
+      document.getElementById('drug-name-en').value = d.name_en;
+      document.getElementById('drug-name-th').value = d.name_th || '';
+      populateGroupSelect(d.drug_group || '');
+      document.getElementById('drug-notes').value = d.notes || '';
+      setDocUrls(d.doc_url || '');
+      document.getElementById('drug-order').value = d.sort_order;
+      document.getElementById('drug-modal-title').textContent = 'แก้ไขยา';
+    }
+  }
+  updateDocUrlVisibility();
+  document.getElementById('drug-modal').classList.add('open');
+}
+
+async function saveDrug() {
+  const id      = document.getElementById('drug-id').value;
+  const payload = {
+    category_id: document.getElementById('drug-cat').value,
+    name_en:     document.getElementById('drug-name-en').value.trim(),
+    name_th:     document.getElementById('drug-name-th').value.trim() || null,
+    drug_group:  document.getElementById('drug-group').value || null,
+    notes:       document.getElementById('drug-notes').value.trim() || null,
+    doc_url:     getDocUrls(),
+    sort_order:  parseInt(document.getElementById('drug-order').value) || 0,
+  };
+  if (!payload.name_en) { alert('กรุณากรอกชื่อยา (EN)'); return; }
+  if (id) {
+    await api(`/api/admin/drugs?id=${id}`, 'PUT', payload);
+  } else {
+    await api('/api/admin/drugs', 'POST', payload);
+  }
+  closeModal('drug-modal');
+  drugs = await api('/api/admin/drugs');
+  renderDrugs();
+  showToast('บันทึกสำเร็จ');
+}
+
+async function toggleDrug(id, active) {
+  await api(`/api/admin/drugs?id=${id}`, 'PUT', { active });
+  drugs = await api('/api/admin/drugs');
+  renderDrugs();
+  showToast(active ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว');
+}
+
+// ---- Links ----
+function renderLinks() {
+  const tbody = document.getElementById('links-tbody');
+  tbody.innerHTML = links.map(l => `
+    <tr class="${l.active ? '' : 'inactive'}">
+      <td>${l.category_id ? `<span class="badge-cat">${l.category_id}</span>` : 'ทั่วไป'}</td>
+      <td>${l.title}</td>
+      <td><a href="${l.url}" target="_blank" style="color:var(--teal);font-size:11px">${l.url.substring(0,40)}${l.url.length>40?'…':''}</a></td>
+      <td style="max-width:200px;font-size:11px;color:var(--muted)">${l.description || '—'}</td>
+      <td>${l.active ? 'ใช้งาน' : 'ปิดใช้'}</td>
+      <td style="white-space:nowrap">
+        <button class="act-btn edit" onclick="openLinkModal(${l.id})">แก้ไข</button>
+        ${l.active
+          ? `<button class="act-btn del" onclick="toggleLink(${l.id},0)">ปิด</button>`
+          : `<button class="act-btn restore" onclick="toggleLink(${l.id},1)">เปิด</button>`}
+      </td>
+    </tr>`).join('');
+}
+
+function openLinkModal(id) {
+  document.getElementById('link-id').value = '';
+  document.getElementById('link-cat').value = '';
+  document.getElementById('link-title').value = '';
+  document.getElementById('link-url').value = '';
+  document.getElementById('link-desc').value = '';
+  document.getElementById('link-order').value = 0;
+  document.getElementById('link-modal-title').textContent = 'เพิ่มลิงก์ใหม่';
+  if (id) {
+    const l = links.find(x => x.id === id);
+    if (l) {
+      document.getElementById('link-id').value = l.id;
+      document.getElementById('link-cat').value = l.category_id || '';
+      document.getElementById('link-title').value = l.title;
+      document.getElementById('link-url').value = l.url;
+      document.getElementById('link-desc').value = l.description || '';
+      document.getElementById('link-order').value = l.sort_order;
+      document.getElementById('link-modal-title').textContent = 'แก้ไขลิงก์';
+    }
+  }
+  document.getElementById('link-modal').classList.add('open');
+}
+
+async function saveLink() {
+  const id      = document.getElementById('link-id').value;
+  const payload = {
+    category_id: document.getElementById('link-cat').value || null,
+    title:       document.getElementById('link-title').value.trim(),
+    url:         document.getElementById('link-url').value.trim(),
+    description: document.getElementById('link-desc').value.trim() || null,
+    sort_order:  parseInt(document.getElementById('link-order').value) || 0,
+  };
+  if (!payload.title) { alert('กรุณากรอกชื่อลิงก์'); return; }
+  if (!payload.url)   { alert('กรุณากรอก URL'); return; }
+  if (id) {
+    await api(`/api/admin/links?id=${id}`, 'PUT', payload);
+  } else {
+    await api('/api/admin/links', 'POST', payload);
+  }
+  closeModal('link-modal');
+  links = await api('/api/admin/links');
+  renderLinks();
+  showToast('บันทึกสำเร็จ');
+}
+
+async function toggleLink(id, active) {
+  await api(`/api/admin/links?id=${id}`, 'PUT', { active });
+  links = await api('/api/admin/links');
+  renderLinks();
+  showToast(active ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว');
+}
+
+// ---- Categories ----
+function renderCats() {
+  const tbody = document.getElementById('cats-tbody');
+  tbody.innerHTML = cats.map(c => `
+    <tr class="${c.active ? '' : 'inactive'}">
+      <td><strong>${c.id}</strong></td>
+      <td>${c.name_th}</td>
+      <td style="font-size:12px;color:var(--muted)">${c.name_en}</td>
+      <td style="font-size:11px">${c.rights || '—'}</td>
+      <td style="font-size:11px">${c.doc_level}</td>
+      <td>${c.active ? 'ใช้งาน' : 'ปิดใช้'}</td>
+      <td>
+        <button class="act-btn edit" onclick="editCat('${c.id}')">แก้ไข</button>
+      </td>
+    </tr>`).join('');
+}
+
+function editCat(id) {
+  const c = cats.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('cat-id').value = c.id;
+  document.getElementById('cat-modal-title').textContent = `แก้ไขบัญชี ${c.id} — ${c.name_th}`;
+  document.getElementById('cat-desc').value = c.description || '';
+  document.getElementById('cat-doc-url').value = c.doc_url || '';
+  document.getElementById('cat-modal').classList.add('open');
+}
+
+async function saveCat() {
+  const id      = document.getElementById('cat-id').value;
+  const desc    = document.getElementById('cat-desc').value.trim();
+  const doc_url = document.getElementById('cat-doc-url').value.trim() || null;
+  await api(`/api/admin/categories?id=${id}`, 'PUT', { description: desc, doc_url });
+  closeModal('cat-modal');
+  cats = await api('/api/admin/categories');
+  renderCats();
+  showToast('บันทึกสำเร็จ');
+}
+
+// ---- Utils ----
+function switchTab(btn, sectionId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(sectionId).classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2500);
+}
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
+});
+</script>
+</body>
+</html>

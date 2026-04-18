@@ -1,0 +1,13 @@
+# Secrets / local env
+.dev.vars
+.env.local
+
+# Wrangler build cache
+.wrangler/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
