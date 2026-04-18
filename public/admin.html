@@ -197,7 +197,7 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
             <option value="">— ทุกสถานะคลัง —</option>
             <option value="in_stock">🟢 มีในคลัง</option>
             <option value="non_formulary">🔴 ต้องขออนุมัติ</option>
-            <option value="special_order">🟠 สั่งพิเศษ</option>
+            <option value="special_order">🟠 สั่งฉุกเฉิน</option>
           </select>
           <input class="filter-input" id="drug-search" placeholder="ค้นหาชื่อยา..." oninput="applyDrugFilters()">
           <button class="add-btn" onclick="openDrugModal()">+ เพิ่มยา</button>
@@ -217,7 +217,7 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
         <span class="table-title">ยานอกบัญชีคลัง — รายการขออนุมัติ</span>
         <button class="add-btn" onclick="switchTabById('tab-drugs');openDrugModal()">+ เพิ่มยาใหม่</button>
       </div>
-      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">ยาที่มีสถานะ 🔴 ต้องขออนุมัติ หรือ 🟠 สั่งพิเศษ — คลิก "แก้ไข" เพื่อเพิ่ม link แบบฟอร์ม รพ.สงฆ์</p>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">ยาที่มีสถานะ 🔴 ต้องขออนุมัติ หรือ 🟠 สั่งฉุกเฉิน — คลิก "แก้ไข" เพื่อเพิ่ม link แบบฟอร์ม รพ.สงฆ์</p>
       <div id="nform-list"></div>
     </div>
 
@@ -288,7 +288,7 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
       <select id="drug-formulary" onchange="updateApprovalVisibility()">
         <option value="in_stock">🟢 มีในคลัง รพ.สงฆ์</option>
         <option value="non_formulary">🔴 ไม่มีในคลัง — ต้องขออนุมัติ</option>
-        <option value="special_order">🟠 สั่งพิเศษ — ต้องรอคลัง</option>
+        <option value="special_order">🟠 สั่งฉุกเฉิน — ต้องรอคลัง</option>
       </select>
     </div>
 
@@ -388,7 +388,7 @@ const FONT = { min: 13, max: 22, def: 15 };
 const FSTATUS = {
   in_stock:      { label: '🟢 มีในคลัง',    cls: 'fstatus-in',      icon: '🟢' },
   non_formulary: { label: '🔴 ขออนุมัติ',   cls: 'fstatus-non',     icon: '🔴' },
-  special_order: { label: '🟠 สั่งพิเศษ',   cls: 'fstatus-special', icon: '🟠' },
+  special_order: { label: '🟠 สั่งฉุกเฉิน',   cls: 'fstatus-special', icon: '🟠' },
 };
 
 function getFontPx() {

@@ -191,7 +191,7 @@ html.dark .chip { background: var(--gray); border-color: var(--border); color: v
   <button class="pill active" onclick="setStock(this,'ALL')">ทั้งหมด</button>
   <button class="pill" onclick="setStock(this,'in_stock')">🟢 มีในคลัง</button>
   <button class="pill" onclick="setStock(this,'non_formulary')">🔴 ต้องขออนุมัติ</button>
-  <button class="pill" onclick="setStock(this,'special_order')">🟠 สั่งพิเศษ</button>
+  <button class="pill" onclick="setStock(this,'special_order')">🟠 สั่งฉุกเฉิน</button>
 </div>
 <div class="filter-row">
   <span class="filter-label">กรองกลุ่มยา:</span>
@@ -344,7 +344,7 @@ function buildDrugChip(d) {
   if (fs === 'special_order') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
     const btn   = d.approval_doc_url
-      ? `<a class="approval-btn" href="${d.approval_doc_url}" target="_blank" rel="noopener">📋 ใบสั่งพิเศษ</a>`
+      ? `<a class="approval-btn" href="${d.approval_doc_url}" target="_blank" rel="noopener">📋 ใบสั่งฉุกเฉิน</a>`
       : '';
     return `<span class="chip chip-special"${title}>🟠 ${label}${btn}</span>`;
   }
@@ -452,15 +452,22 @@ function toggleDrugs(btn) {
 }
 
 function setRight(el, val) {
+  if (val !== 'ALL' && activeRight === val) {
+    val = 'ALL';
+    el = el.closest('.filter-row').querySelector('.pill');
+  }
   activeRight = val;
-  document.querySelectorAll('.filter-row:first-of-type .pill').forEach(p => p.classList.remove('active'));
+  el.closest('.filter-row').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   filterCards();
 }
 
 function setStock(el, val) {
+  if (val !== 'ALL' && activeStock === val) {
+    val = 'ALL';
+    el = el.closest('.filter-row').querySelector('.pill');
+  }
   activeStock = val;
-  // reset all stock pills then activate clicked one
   const stockRow = el.closest('.filter-row');
   stockRow.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
