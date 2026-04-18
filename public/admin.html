@@ -303,8 +303,8 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
         ⚠️ ยานอกบัญชีคลัง — กรอกข้อมูลด้านล่างเพื่อให้แพทย์ทราบขั้นตอนการขออนุมัติ
       </div>
       <div class="form-row">
-        <label>เลขทะเบียน อย.</label>
-        <input id="drug-fda-reg" placeholder="เช่น 1A 23/2564">
+        <label>เลขทะเบียน อย. <span style="font-size:0.75rem;color:var(--muted);font-weight:400">(ไม่บังคับ)</span></label>
+        <input id="drug-fda-reg" placeholder="เช่น 1A 23/2564 — เว้นว่างได้">
       </div>
       <div class="form-row">
         <label>🔗 Link แบบฟอร์ม / เอกสาร (หลายลิงก์ได้)</label>
@@ -324,7 +324,11 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
       <div class="url-list" id="drug-url-list"></div>
       <button type="button" class="url-add-btn" onclick="addDocUrl()">+ เพิ่ม link</button>
     </div>
-    <div class="form-row"><label>ลำดับ</label><input type="number" id="drug-order" value="0"></div>
+    <div class="form-row">
+      <label>ลำดับในบัญชี</label>
+      <input type="number" id="drug-order" min="0" step="1" placeholder="ว่าง = ต่อท้ายอัตโนมัติ">
+      <p style="font-size:0.75rem;color:var(--muted);margin-top:3px">เมื่อ<strong>เพิ่มยาใหม่</strong> เว้นช่องนี้ว่าง ระบบจะใส่ลำดับถัดจากรายการสุดท้ายในบัญชีเดียวกัน — ต้องการแทรกตำแหน่งใส่เลขเองได้</p>
+    </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('drug-modal')">ยกเลิก</button>
       <button class="btn-save" onclick="saveDrug()">บันทึก</button>
@@ -739,7 +743,7 @@ function openDrugModal(id) {
   setApprovalUrls('');
   document.getElementById('drug-approval-criteria').value = '';
   setDocUrls('');
-  document.getElementById('drug-order').value = 0;
+  document.getElementById('drug-order').value = '';
   document.getElementById('drug-modal-title').textContent = 'เพิ่มยาใหม่';
   if (id) {
     const d = drugs.find(x => x.id === id);
@@ -755,7 +759,8 @@ function openDrugModal(id) {
       document.getElementById('drug-approval-criteria').value = d.approval_criteria || '';
       document.getElementById('drug-notes').value = d.notes || '';
       setDocUrls(d.doc_url || '');
-      document.getElementById('drug-order').value = d.sort_order;
+      document.getElementById('drug-order').value =
+        d.sort_order != null && d.sort_order !== '' ? String(d.sort_order) : '';
       document.getElementById('drug-modal-title').textContent = 'แก้ไขยา';
     }
   }
@@ -765,6 +770,7 @@ function openDrugModal(id) {
 }
 async function saveDrug() {
   const id      = document.getElementById('drug-id').value;
+  const orderRaw = document.getElementById('drug-order').value.trim();
   const payload = {
     category_id:      document.getElementById('drug-cat').value,
     name_en:          document.getElementById('drug-name-en').value.trim(),
@@ -776,8 +782,17 @@ async function saveDrug() {
     approval_criteria:document.getElementById('drug-approval-criteria').value.trim() || null,
     notes:            document.getElementById('drug-notes').value.trim() || null,
     doc_url:          getDocUrls(),
-    sort_order:       parseInt(document.getElementById('drug-order').value) || 0,
   };
+  if (!id) {
+    if (orderRaw === '') payload.sort_order = null;
+    else {
+      const n = parseInt(orderRaw, 10);
+      if (!Number.isFinite(n)) { alert('ลำดับต้องเป็นจำนวนเต็ม'); return; }
+      payload.sort_order = n;
+    }
+  } else {
+    payload.sort_order = orderRaw === '' ? 0 : (parseInt(orderRaw, 10) || 0);
+  }
   if (!payload.name_en) { alert('กรุณากรอกชื่อยา (EN)'); return; }
   if (id) { await api(`/api/admin/drugs?id=${id}`, 'PUT', payload); }
   else    { await api('/api/admin/drugs', 'POST', payload); }

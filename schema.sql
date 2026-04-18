@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS drugs (
   formulary_status TEXT NOT NULL DEFAULT 'in_stock', -- 'in_stock'|'non_formulary'|'special_order'
   approval_doc_url TEXT,   -- URL เดียว (เดิม) หรือ JSON array [{title,url},...] หลายลิงก์
   approval_criteria TEXT,  -- เกณฑ์/เงื่อนไขการอนุมัติ
-  fda_reg_no       TEXT,   -- เลขทะเบียน อย.
+  fda_reg_no       TEXT,   -- เลขทะเบียน อย. (ไม่บังคับ)
   active           INTEGER DEFAULT 1,
   sort_order       INTEGER DEFAULT 0
 );

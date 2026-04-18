@@ -3,13 +3,26 @@ import { turso, json, err } from '../../_utils/db.js';
 /** POST /api/admin/drugs — เพิ่มยาใหม่ */
 export async function onRequestPost({ request, env }) {
   try {
+    const body = await request.json();
     const {
-      category_id, name_en, name_th, drug_group, notes, sort_order = 0, doc_url,
+      category_id, name_en, name_th, drug_group, notes, doc_url,
       formulary_status = 'in_stock', approval_doc_url, approval_criteria, fda_reg_no,
-    } = await request.json();
+    } = body;
+    let { sort_order } = body;
 
     if (!category_id) return err('category_id is required');
     if (!name_en)     return err('name_en is required');
+
+    if (sort_order === undefined || sort_order === null) {
+      const maxRows = await turso(env,
+        'SELECT COALESCE(MAX(sort_order), 0) + 1 AS n FROM drugs WHERE category_id = ?',
+        [category_id]
+      );
+      sort_order = maxRows[0]?.n ?? 1;
+    } else {
+      sort_order = parseInt(sort_order, 10);
+      if (!Number.isFinite(sort_order)) sort_order = 0;
+    }
 
     const rows = await turso(env,
       `INSERT INTO drugs
