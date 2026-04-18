@@ -329,23 +329,54 @@ function renderLinks() {
   }).join('');
 }
 
+/** อ่าน approval_doc_url: URL เดียว หรือ JSON [{title,url}] */
+function parseApprovalDocLinks(raw) {
+  if (!raw || !String(raw).trim()) return [];
+  const s = String(raw).trim();
+  try {
+    const j = JSON.parse(s);
+    if (Array.isArray(j)) {
+      return j.map(item => {
+        if (typeof item === 'string' && item.trim()) return { title: '', url: item.trim() };
+        if (item && typeof item === 'object' && typeof item.url === 'string' && item.url.trim())
+          return { title: (item.title != null ? String(item.title) : '').trim(), url: item.url.trim() };
+        return null;
+      }).filter(Boolean);
+    }
+  } catch (_) { /* URL เดี่ยว */ }
+  return [{ title: '', url: s }];
+}
+function escChipText(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function approvalBtnLabel(fs, idx, title) {
+  if (title) return escChipText(title);
+  if (fs === 'special_order') return idx === 0 ? '📋 ใบสั่งฉุกเฉิน' : '📋 เอกสาร ' + (idx + 1);
+  return idx === 0 ? '📋 แบบฟอร์ม รพ.สงฆ์' : '📋 เอกสาร ' + (idx + 1);
+}
+function buildApprovalBtns(d, fs) {
+  const pairs = parseApprovalDocLinks(d.approval_doc_url);
+  if (!pairs.length) return '';
+  return pairs.map((p, i) => {
+    const lab = approvalBtnLabel(fs, i, p.title);
+    const href = p.url.replace(/"/g, '%22');
+    return `<a class="approval-btn" href="${href}" target="_blank" rel="noopener">${lab}</a>`;
+  }).join('');
+}
+
 function buildDrugChip(d) {
   const label = d.name_th ? `${d.name_en} (${d.name_th})` : d.name_en;
   const fs    = d.formulary_status || 'in_stock';
 
   if (fs === 'non_formulary') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
-    const btn   = d.approval_doc_url
-      ? `<a class="approval-btn" href="${d.approval_doc_url}" target="_blank" rel="noopener">📋 แบบฟอร์ม รพ.สงฆ์</a>`
-      : '';
+    const btn   = buildApprovalBtns(d, fs);
     return `<span class="chip chip-nonform"${title}>🔴 ${label}${btn}</span>`;
   }
 
   if (fs === 'special_order') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
-    const btn   = d.approval_doc_url
-      ? `<a class="approval-btn" href="${d.approval_doc_url}" target="_blank" rel="noopener">📋 ใบสั่งฉุกเฉิน</a>`
-      : '';
+    const btn   = buildApprovalBtns(d, fs);
     return `<span class="chip chip-special"${title}>🟠 ${label}${btn}</span>`;
   }
 

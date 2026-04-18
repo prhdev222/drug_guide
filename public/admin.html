@@ -124,6 +124,11 @@ html.dark .fstatus-special { background: #3d2e10; color: #fac775; }
 .url-item { display: flex; gap: 6px; align-items: center; }
 .url-item input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.867rem; font-family: var(--font); background: var(--input-bg); color: var(--text); }
 .url-item input:focus { outline: none; border-color: var(--teal); }
+.approval-url-item { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.approval-url-item:last-child { border-bottom: none; }
+.approval-url-item .approval-title { flex: 1 1 140px; min-width: 100px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.8rem; font-family: var(--font); background: var(--input-bg); color: var(--text); }
+.approval-url-item .approval-url { flex: 2 1 200px; min-width: 0; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.867rem; font-family: var(--font); background: var(--input-bg); color: var(--text); }
+.approval-url-item .approval-title:focus, .approval-url-item .approval-url:focus { outline: none; border-color: var(--teal); }
 .url-remove { width: 28px; height: 28px; border: 1px solid #F5C4B3; border-radius: 6px; background: none; color: var(--red-text); cursor: pointer; font-size: 0.933rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .url-add-btn { margin-top: 6px; font-size: 0.8rem; color: var(--teal-text); background: var(--teal-bg); border: 1px solid var(--teal); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: var(--font); }
 
@@ -302,9 +307,10 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
         <input id="drug-fda-reg" placeholder="เช่น 1A 23/2564">
       </div>
       <div class="form-row">
-        <label>🔗 Link แบบฟอร์มขออนุมัติ รพ.สงฆ์</label>
-        <input id="drug-approval-url" type="url" placeholder="https://drive.google.com/file/...">
-        <p style="font-size:0.75rem;color:var(--muted);margin-top:3px">ลิงก์ Google Drive, SharePoint หรือ URL อื่น ๆ ของ รพ.สงฆ์</p>
+        <label>🔗 Link แบบฟอร์ม / เอกสาร (หลายลิงก์ได้)</label>
+        <div class="url-list" id="drug-approval-url-list"></div>
+        <button type="button" class="url-add-btn" onclick="addApprovalUrlItem()">+ เพิ่ม link</button>
+        <p style="font-size:0.75rem;color:var(--muted);margin-top:3px">ระบุชื่อลิงก์สั้น ๆ (เช่น แบบฟอร์ม รพ.สงฆ์, เอกสารยาพิเศษ บัญชี จ2) แล้ววาง URL — Google Drive, SharePoint ฯลฯ</p>
       </div>
       <div class="form-row">
         <label>เกณฑ์ / เงื่อนไขการอนุมัติ</label>
@@ -390,6 +396,9 @@ const FSTATUS = {
   non_formulary: { label: '🔴 ขออนุมัติ',   cls: 'fstatus-non',     icon: '🔴' },
   special_order: { label: '🟠 สั่งฉุกเฉิน',   cls: 'fstatus-special', icon: '🟠' },
 };
+function escMini(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+}
 
 function getFontPx() {
   const raw = localStorage.getItem('nlem-font-px');
@@ -516,6 +525,62 @@ function setDocUrls(raw) {
   urls.forEach(u => addDocUrl(u));
 }
 
+/** อ่าน approval_doc_url: URL เดียว หรือ JSON [{title,url}] */
+function parseApprovalDocLinks(raw) {
+  if (!raw || !String(raw).trim()) return [];
+  const s = String(raw).trim();
+  try {
+    const j = JSON.parse(s);
+    if (Array.isArray(j)) {
+      return j.map(item => {
+        if (typeof item === 'string' && item.trim()) return { title: '', url: item.trim() };
+        if (item && typeof item === 'object' && typeof item.url === 'string' && item.url.trim())
+          return { title: (item.title != null ? String(item.title) : '').trim(), url: item.url.trim() };
+        return null;
+      }).filter(Boolean);
+    }
+  } catch (_) { /* single URL */ }
+  return [{ title: '', url: s }];
+}
+function addApprovalUrlItem(title = '', url = '') {
+  const list = document.getElementById('drug-approval-url-list');
+  const row = document.createElement('div');
+  row.className = 'approval-url-item';
+  const ti = document.createElement('input');
+  ti.type = 'text';
+  ti.className = 'approval-title';
+  ti.placeholder = 'เช่น แบบฟอร์ม รพ.สงฆ์ / เอกสารยาพิเศษ จ2';
+  ti.value = title;
+  const ui = document.createElement('input');
+  ui.type = 'url';
+  ui.className = 'approval-url';
+  ui.placeholder = 'https://...';
+  ui.value = url;
+  const rm = document.createElement('button');
+  rm.type = 'button';
+  rm.className = 'url-remove';
+  rm.title = 'ลบแถว';
+  rm.textContent = '✕';
+  rm.onclick = () => row.remove();
+  row.append(ti, ui, rm);
+  list.appendChild(row);
+  ui.focus();
+}
+function getApprovalUrls() {
+  const rows = [...document.querySelectorAll('#drug-approval-url-list .approval-url-item')];
+  const pairs = rows.map(row => ({
+    title: row.querySelector('.approval-title')?.value.trim() || '',
+    url: row.querySelector('.approval-url')?.value.trim() || '',
+  })).filter(p => p.url);
+  if (!pairs.length) return null;
+  if (pairs.length === 1 && !pairs[0].title) return pairs[0].url;
+  return JSON.stringify(pairs);
+}
+function setApprovalUrls(raw) {
+  document.getElementById('drug-approval-url-list').innerHTML = '';
+  parseApprovalDocLinks(raw).forEach(p => addApprovalUrlItem(p.title, p.url));
+}
+
 // ---- Drug Groups ----
 function populateGroupSelect(currentVal = '') {
   const sel  = document.getElementById('drug-group');
@@ -589,7 +654,18 @@ function renderDrugs() {
   });
   tbody.innerHTML = list.map(d => {
     const fs = FSTATUS[d.formulary_status] || FSTATUS.in_stock;
-    const hasForm = !!d.approval_doc_url;
+    const apprLinks = parseApprovalDocLinks(d.approval_doc_url);
+    const hasForm = apprLinks.length > 0;
+    let formCell = '—';
+    if (hasForm) {
+      if (apprLinks.length === 1) {
+        formCell = `<a href="${apprLinks[0].url}" target="_blank" rel="noopener" style="font-size:0.733rem;color:var(--teal)">📋 ดูลิงก์</a>`;
+      } else {
+        formCell = `<span style="font-size:0.733rem;color:var(--teal)">📋 ${apprLinks.length} ลิงก์</span>`;
+      }
+    } else if (d.formulary_status !== 'in_stock') {
+      formCell = '<span style="font-size:0.733rem;color:var(--muted)">ยังไม่มี link</span>';
+    }
     return `
     <tr class="${d.active ? '' : 'inactive'}">
       <td><span class="badge-cat">${d.category_id}</span></td>
@@ -597,9 +673,7 @@ function renderDrugs() {
       <td>${d.name_th || '—'}</td>
       <td>${d.drug_group || '—'}</td>
       <td><span class="fstatus ${fs.cls}">${fs.label}</span></td>
-      <td>${hasForm
-        ? `<a href="${d.approval_doc_url}" target="_blank" style="font-size:0.733rem;color:var(--teal)">📋 ดูแบบฟอร์ม</a>`
-        : (d.formulary_status !== 'in_stock' ? '<span style="font-size:0.733rem;color:var(--muted)">ยังไม่มี link</span>' : '—')}
+      <td>${formCell}
       </td>
       <td>${d.active ? 'ใช้งาน' : 'ปิดใช้'}</td>
       <td style="white-space:nowrap">
@@ -642,9 +716,9 @@ function renderNformList() {
           ${d.approval_criteria ? `<small style="margin-top:2px;color:var(--muted)">${d.approval_criteria.substring(0,80)}${d.approval_criteria.length>80?'…':''}</small>` : ''}
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-          ${d.approval_doc_url
-            ? `<a class="nform-link" href="${d.approval_doc_url}" target="_blank" rel="noopener">📋 แบบฟอร์ม</a>`
-            : `<span style="font-size:0.733rem;color:var(--muted)">ยังไม่มี link</span>`}
+          ${parseApprovalDocLinks(d.approval_doc_url).map((p, i) =>
+            `<a class="nform-link" href="${p.url}" target="_blank" rel="noopener">${p.title ? escMini(p.title) : ('ลิงก์ ' + (i + 1))}</a>`
+          ).join('') || `<span style="font-size:0.733rem;color:var(--muted)">ยังไม่มี link</span>`}
           <button class="act-btn edit" onclick="openDrugModal(${d.id})">แก้ไข</button>
         </div>
       </div>`;
@@ -662,7 +736,7 @@ function openDrugModal(id) {
   document.getElementById('drug-notes').value = '';
   document.getElementById('drug-formulary').value = 'in_stock';
   document.getElementById('drug-fda-reg').value = '';
-  document.getElementById('drug-approval-url').value = '';
+  setApprovalUrls('');
   document.getElementById('drug-approval-criteria').value = '';
   setDocUrls('');
   document.getElementById('drug-order').value = 0;
@@ -677,7 +751,7 @@ function openDrugModal(id) {
       populateGroupSelect(d.drug_group || '');
       document.getElementById('drug-formulary').value = d.formulary_status || 'in_stock';
       document.getElementById('drug-fda-reg').value = d.fda_reg_no || '';
-      document.getElementById('drug-approval-url').value = d.approval_doc_url || '';
+      setApprovalUrls(d.approval_doc_url || '');
       document.getElementById('drug-approval-criteria').value = d.approval_criteria || '';
       document.getElementById('drug-notes').value = d.notes || '';
       setDocUrls(d.doc_url || '');
@@ -698,7 +772,7 @@ async function saveDrug() {
     drug_group:       document.getElementById('drug-group').value || null,
     formulary_status: document.getElementById('drug-formulary').value,
     fda_reg_no:       document.getElementById('drug-fda-reg').value.trim() || null,
-    approval_doc_url: document.getElementById('drug-approval-url').value.trim() || null,
+    approval_doc_url: getApprovalUrls(),
     approval_criteria:document.getElementById('drug-approval-criteria').value.trim() || null,
     notes:            document.getElementById('drug-notes').value.trim() || null,
     doc_url:          getDocUrls(),
