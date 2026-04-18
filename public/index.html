@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+(function(){try{var t=localStorage.getItem('nlem-theme');if(t==='dark')document.documentElement.classList.add('dark');var px=localStorage.getItem('nlem-font-px');if(px)document.documentElement.style.fontSize=parseInt(px,10)+'px';}catch(e){}})();
+</script>
 <title>บัญชียาหลักแห่งชาติ (NLEM) — โรงพยาบาลสงฆ์</title>
 <style>
 :root {
@@ -14,87 +17,165 @@
   --coral:  #D85A30; --coral-bg:  #FAECE7; --coral-text:  #712B13;
   --gray: #f5f5f4; --border: #e5e5e3; --text: #1c1c1a; --muted: #6b6b68;
   --font: 'Sarabun', sans-serif;
+  --page-bg: #fafaf9;
+  --surface: #ffffff;
+  --input-bg: #ffffff;
+  color-scheme: light;
+}
+html { font-size: 15px; }
+html.dark {
+  color-scheme: dark;
+  --page-bg: #141413;
+  --surface: #1e1e1c;
+  --input-bg: #2a2927;
+  --gray: #2a2927;
+  --border: #40403c;
+  --text: #f4f4f2;
+  --muted: #a8a8a5;
+  --teal-bg: #134032;
+  --teal-text: #9fe1cb;
+  --blue-bg: #1a3050;
+  --blue-text: #b5d4f4;
+  --purple-bg: #2d2850;
+  --purple-text: #cecbf6;
+  --amber-bg: #4a3a1a;
+  --amber-text: #fac775;
+  --green-bg: #2a3d1f;
+  --green-text: #c0dd97;
+  --coral-bg: #4a2a22;
+  --coral-text: #f5c4b3;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font); background: #fafaf9; color: var(--text); font-size: 15px; }
+body { font-family: var(--font); background: var(--page-bg); color: var(--text); font-size: 1rem; }
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap');
 
-header { background: #fff; border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; }
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; }
 .header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-header h1 { font-size: 18px; font-weight: 600; color: var(--teal); }
-header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.admin-link { font-size: 12px; color: var(--muted); text-decoration: none; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; }
+.header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.font-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.font-tools button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: var(--gray);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  font-family: inherit;
+  line-height: 1;
+}
+.font-tools button:hover:not(:disabled) { opacity: 0.85; }
+.font-tools button:disabled { opacity: 0.35; cursor: not-allowed; }
+.font-label { font-size: 0.75rem; color: var(--muted); min-width: 3rem; text-align: center; }
+.theme-btn {
+  width: 40px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.theme-btn:hover { border-color: var(--teal); }
+header h1 { font-size: 1.2rem; font-weight: 600; color: var(--teal); }
+header p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+.admin-link { font-size: 0.8rem; color: var(--muted); text-decoration: none; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); }
 .admin-link:hover { color: var(--text); border-color: #aaa; }
 
 .controls { max-width: 900px; margin: 1.25rem auto; padding: 0 1rem; display: flex; gap: 10px; flex-wrap: wrap; }
-.controls input { flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: var(--font); background: #fff; }
+.controls input { flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.933rem; font-family: var(--font); background: var(--input-bg); color: var(--text); }
 .controls input:focus { outline: none; border-color: var(--teal); }
 
 .filter-row { max-width: 900px; margin: 0 auto .5rem; padding: 0 1rem; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.filter-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
-.pill { font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: #fff; color: var(--muted); cursor: pointer; transition: all .15s; font-family: var(--font); }
+.filter-label { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.pill { font-size: 0.8rem; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all .15s; font-family: var(--font); }
 .pill.active { background: var(--teal); color: #fff; border-color: var(--teal); }
 .pill:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
-.group-select { font-size: 12px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: #fff; color: var(--muted); font-family: var(--font); cursor: pointer; outline: none; max-width: 220px; }
+.group-select { font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--input-bg); color: var(--muted); font-family: var(--font); cursor: pointer; outline: none; max-width: 220px; }
 .group-select:focus { border-color: var(--teal); color: var(--text); }
 .group-select.active { border-color: var(--teal); background: var(--teal-bg); color: var(--teal-text); }
 
 .grid { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-.card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.25rem; transition: border-color .15s; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.25rem; transition: border-color .15s; }
 .card:hover { border-color: #bbb; }
 .card.hidden { display: none; }
 .card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-.badge { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; flex-shrink: 0; }
-.card-title { font-size: 15px; font-weight: 600; }
-.card-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.card-desc  { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 10px; }
+.badge { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 600; flex-shrink: 0; }
+.card-title { font-size: 1rem; font-weight: 600; }
+.card-sub   { font-size: 0.733rem; color: var(--muted); margin-top: 2px; }
+.card-desc  { font-size: 0.867rem; color: var(--muted); line-height: 1.55; margin-bottom: 10px; }
 .rights-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
-.right-tag  { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+.right-tag  { font-size: 0.733rem; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
 .rt-uc    { background: var(--teal-bg);   color: var(--teal-text); }
 .rt-sso   { background: var(--blue-bg);   color: var(--blue-text); }
 .rt-csmbs { background: var(--purple-bg); color: var(--purple-text); }
 .divider  { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
-.doc-badge  { display: inline-flex; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
+.doc-badge  { display: inline-flex; font-size: 0.733rem; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
 .doc-none     { background: var(--green-bg);  color: var(--green-text); }
 .doc-partial  { background: var(--amber-bg);  color: var(--amber-text); }
 .doc-required { background: var(--coral-bg);  color: var(--coral-text); }
 .doc-form-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.doc-form-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 4px 10px; border-radius: 6px; border: 1px solid; text-decoration: none; font-weight: 500; transition: opacity .15s; }
+.doc-form-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 0.733rem; padding: 4px 10px; border-radius: 6px; border: 1px solid; text-decoration: none; font-weight: 500; transition: opacity .15s; }
 .doc-form-btn:hover { opacity: .75; }
 .doc-form-btn.pdf { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
 .doc-form-btn.forms { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
-.toggle-btn { font-size: 12px; background: none; border: none; cursor: pointer; color: var(--muted); margin-top: 6px; padding: 0; font-family: var(--font); }
+.toggle-btn { font-size: 0.8rem; background: none; border: none; cursor: pointer; color: var(--muted); margin-top: 6px; padding: 0; font-family: var(--font); }
 .toggle-btn:hover { color: var(--text); }
 .drug-list { display: none; margin-top: 8px; }
 .drug-list.open { display: block; }
-.drug-group-label { font-size: 11px; color: var(--muted); margin: 6px 0 3px; }
+.drug-group-label { font-size: 0.733rem; color: var(--muted); margin: 6px 0 3px; }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
-.chip { font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--gray); }
-.chip-link { font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; text-decoration: none; transition: opacity .15s; }
+.chip { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--gray); }
+.chip-link { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; text-decoration: none; transition: opacity .15s; }
 .chip-link:hover { opacity: .75; }
-.chip-multi { font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-.multi-doc-link { font-size: 10px; padding: 1px 6px; border-radius: 10px; background: #1D4ED8; color: #fff; text-decoration: none; transition: opacity .15s; }
+.chip-multi { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.multi-doc-link { font-size: 0.667rem; padding: 1px 6px; border-radius: 10px; background: #1D4ED8; color: #fff; text-decoration: none; transition: opacity .15s; }
 .multi-doc-link:hover { opacity: .8; }
-.level-tag { font-size: 11px; color: var(--muted); margin-top: 6px; }
-.count-label { max-width: 900px; margin: 0 auto .5rem; padding: 0 1rem; font-size: 12px; color: var(--muted); }
+.level-tag { font-size: 0.733rem; color: var(--muted); margin-top: 6px; }
+.count-label { max-width: 900px; margin: 0 auto .5rem; padding: 0 1rem; font-size: 0.8rem; color: var(--muted); }
 .no-result { text-align: center; padding: 3rem; color: var(--muted); grid-column: 1/-1; display: none; }
 
 
 .loading { text-align: center; padding: 3rem; color: var(--muted); grid-column: 1/-1; }
-.error-msg { background: var(--coral-bg); color: var(--coral-text); padding: 1rem; border-radius: 8px; font-size: 13px; grid-column: 1/-1; }
+.error-msg { background: var(--coral-bg); color: var(--coral-text); padding: 1rem; border-radius: 8px; font-size: 0.867rem; grid-column: 1/-1; }
 
 .links-section { max-width: 900px; margin: 0 auto 2.5rem; padding: 0 1rem; }
 .links-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.links-title { font-size: 14px; font-weight: 600; color: var(--text); }
-.links-subtitle { font-size: 12px; color: var(--muted); }
+.links-title { font-size: 0.933rem; font-weight: 600; color: var(--text); }
+.links-subtitle { font-size: 0.8rem; color: var(--muted); }
 .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
-.link-card { display: flex; align-items: flex-start; gap: 10px; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; text-decoration: none; transition: border-color .15s; }
+.link-card { display: flex; align-items: flex-start; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; text-decoration: none; transition: border-color .15s; }
 .link-card:hover { border-color: var(--teal); }
-.link-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--teal-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 15px; }
+.link-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--teal-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
 .link-body { min-width: 0; }
-.link-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; line-height: 1.4; }
-.link-host { font-size: 11px; color: var(--teal); }
-.link-desc { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+.link-title { font-size: 0.867rem; font-weight: 500; color: var(--text); margin-bottom: 2px; line-height: 1.4; }
+.link-host { font-size: 0.733rem; color: var(--teal); }
+.link-desc { font-size: 0.733rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+html.dark .chip-link {
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+  border-color: #3b82f6;
+}
+html.dark .chip-multi {
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+  border-color: #3b82f6;
+}
+html.dark .doc-form-btn.pdf { background: #3f1f1f; color: #fecaca; border-color: #991b1b; }
+html.dark .doc-form-btn.forms { background: #1e3a5f; color: #bfdbfe; border-color: #1d4ed8; }
+html.dark .chip { background: var(--gray); border-color: var(--border); color: var(--muted); }
 </style>
 </head>
 <body>
@@ -105,7 +186,15 @@ header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
       <h1>บัญชียาหลักแห่งชาติ (NLEM)</h1>
       <p>ข้อมูลสิทธิการรักษา · เอกสารที่ต้องใช้ · รายการยาแต่ละบัญชี — โรงพยาบาลสงฆ์</p>
     </div>
-    <a href="admin.html" class="admin-link">Admin</a>
+    <div class="header-actions">
+      <div class="font-tools" title="ขนาดตัวอักษร">
+        <button type="button" class="font-down" onclick="adjustFont(-1)" aria-label="ลดขนาดตัวอักษร">A−</button>
+        <span class="font-label font-pct">100%</span>
+        <button type="button" class="font-up" onclick="adjustFont(1)" aria-label="เพิ่มขนาดตัวอักษร">A+</button>
+      </div>
+      <button type="button" class="theme-btn" onclick="toggleTheme()" title="โหมดสี">🌙</button>
+      <a href="admin.html" class="admin-link">Admin</a>
+    </div>
   </div>
 </header>
 
@@ -142,6 +231,56 @@ header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 </div>
 
 <script>
+
+const FONT = { min: 13, max: 22, def: 15 };
+
+function getFontPx() {
+  const raw = localStorage.getItem('nlem-font-px');
+  if (raw == null) return FONT.def;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) ? Math.max(FONT.min, Math.min(FONT.max, n)) : FONT.def;
+}
+
+function setFontPx(px) {
+  px = Math.max(FONT.min, Math.min(FONT.max, px));
+  document.documentElement.style.fontSize = px + 'px';
+  localStorage.setItem('nlem-font-px', String(px));
+  syncFontUi();
+}
+
+function adjustFont(delta) {
+  setFontPx(getFontPx() + delta);
+}
+
+function syncFontUi() {
+  const px = getFontPx();
+  const pct = Math.round((px / FONT.def) * 100);
+  document.querySelectorAll('.font-pct').forEach(el => { el.textContent = pct + '%'; });
+  document.querySelectorAll('.font-down').forEach(el => { el.disabled = px <= FONT.min; });
+  document.querySelectorAll('.font-up').forEach(el => { el.disabled = px >= FONT.max; });
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const dark = !html.classList.contains('dark');
+  html.classList.toggle('dark', dark);
+  localStorage.setItem('nlem-theme', dark ? 'dark' : 'light');
+  syncThemeBtn();
+}
+
+function syncThemeBtn() {
+  const dark = document.documentElement.classList.contains('dark');
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.textContent = dark ? '☀️' : '🌙';
+    btn.title = dark ? 'โหมดสว่าง' : 'โหมดมืด';
+  });
+}
+
+function initDisplayPrefs() {
+  document.documentElement.style.fontSize = getFontPx() + 'px';
+  syncFontUi();
+  syncThemeBtn();
+}
 
 const COLOR_BADGE = {
   teal:   { bg: '#9FE1CB', color: '#085041' },
@@ -357,6 +496,7 @@ function filterCards() {
   if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
 }
 
+initDisplayPrefs();
 load();
 </script>
 </body>

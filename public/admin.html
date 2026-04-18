@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+(function(){try{var t=localStorage.getItem('nlem-theme');if(t==='dark')document.documentElement.classList.add('dark');var px=localStorage.getItem('nlem-font-px');if(px)document.documentElement.style.fontSize=parseInt(px,10)+'px';}catch(e){}})();
+</script>
 <title>Admin — NLEM Drug Guide</title>
 <style>
 :root {
@@ -10,29 +13,96 @@
   --red-bg: #FAECE7; --red-text: #712B13;
   --border: #e5e5e3; --text: #1c1c1a; --muted: #6b6b68;
   --gray: #f5f5f4; --font: 'Sarabun', sans-serif;
+  --page-bg: #fafaf9;
+  --surface: #ffffff;
+  --input-bg: #ffffff;
+  color-scheme: light;
+}
+html { font-size: 15px; }
+html.dark {
+  color-scheme: dark;
+  --page-bg: #141413;
+  --surface: #1e1e1c;
+  --input-bg: #2a2927;
+  --gray: #2a2927;
+  --border: #40403c;
+  --text: #f4f4f2;
+  --muted: #a8a8a5;
+  --teal-bg: #134032;
+  --teal-text: #9fe1cb;
+  --red-bg: #4a2a22;
+  --red-text: #f5c4b3;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font); background: #fafaf9; color: var(--text); font-size: 14px; }
+body { font-family: var(--font); background: var(--page-bg); color: var(--text); font-size: 0.933rem; }
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap');
 
 /* Login */
-#login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-.login-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 2rem; width: 340px; }
-.login-card h2 { font-size: 16px; margin-bottom: 1rem; }
-.login-card input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: var(--font); margin-bottom: 10px; }
+#login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; padding: 1rem; }
+.login-prefs {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; width: 340px; max-width: 100%; }
+.login-card h2 { font-size: 1.067rem; margin-bottom: 1rem; }
+.login-card input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.933rem; font-family: var(--font); margin-bottom: 10px; background: var(--input-bg); color: var(--text); }
 .login-card input:focus { outline: none; border-color: var(--teal); }
-.login-card button { width: 100%; padding: 9px; background: var(--teal); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-family: var(--font); cursor: pointer; }
-.login-error { color: var(--red-text); font-size: 12px; margin-top: 6px; display: none; }
+.login-card button { width: 100%; padding: 9px; background: var(--teal); color: #fff; border: none; border-radius: 8px; font-size: 0.933rem; font-family: var(--font); cursor: pointer; }
+.login-error { color: var(--red-text); font-size: 0.8rem; margin-top: 6px; display: none; }
 
 /* App */
 #app { display: none; }
-header { background: #fff; border-bottom: 1px solid var(--border); padding: .75rem 1.5rem; display: flex; align-items: center; gap: 1rem; justify-content: space-between; }
-header h1 { font-size: 16px; font-weight: 600; color: var(--teal); }
+.font-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.font-tools button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: var(--gray);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  font-family: inherit;
+  line-height: 1;
+}
+.font-tools button:hover:not(:disabled) { opacity: 0.85; }
+.font-tools button:disabled { opacity: 0.35; cursor: not-allowed; }
+.font-label { font-size: 0.75rem; color: var(--muted); min-width: 3rem; text-align: center; }
+.theme-btn {
+  width: 40px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.theme-btn:hover { border-color: var(--teal); }
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: .75rem 1.5rem; display: flex; align-items: center; gap: 1rem; justify-content: space-between; flex-wrap: wrap; }
+.header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nav-home { font-size: 0.8rem; color: var(--muted); text-decoration: none; margin-right: 4px; }
+.nav-home:hover { color: var(--text); }
+header h1 { font-size: 1.067rem; font-weight: 600; color: var(--teal); }
 .tabs { display: flex; gap: 4px; }
-.tab { padding: 6px 14px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; font-family: var(--font); font-size: 13px; background: none; color: var(--muted); }
+.tab { padding: 6px 14px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; font-family: var(--font); font-size: 0.867rem; background: none; color: var(--muted); }
 .tab.active { background: var(--teal-bg); color: var(--teal-text); border-color: var(--teal); }
 .tab:hover:not(.active) { background: var(--gray); }
-.logout-btn { font-size: 12px; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; cursor: pointer; font-family: var(--font); }
+.logout-btn { font-size: 0.8rem; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; cursor: pointer; font-family: var(--font); }
 
 main { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
 .section { display: none; }
@@ -40,52 +110,65 @@ main { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
 
 /* Table */
 .table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
-.table-title { font-size: 15px; font-weight: 600; }
-.add-btn { padding: 7px 14px; background: var(--teal); color: #fff; border: none; border-radius: 7px; font-size: 13px; font-family: var(--font); cursor: pointer; }
-.filter-input { padding: 7px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: var(--font); width: 200px; }
+.table-title { font-size: 1rem; font-weight: 600; }
+.add-btn { padding: 7px 14px; background: var(--teal); color: #fff; border: none; border-radius: 7px; font-size: 0.867rem; font-family: var(--font); cursor: pointer; }
+.filter-input { padding: 7px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.867rem; font-family: var(--font); width: 200px; background: var(--input-bg); color: var(--text); }
 .filter-input:focus { outline: none; border-color: var(--teal); }
 .tbl-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-th { background: var(--gray); padding: 9px 12px; text-align: left; font-size: 12px; color: var(--muted); font-weight: 500; white-space: nowrap; }
-td { padding: 8px 12px; border-top: 1px solid var(--border); font-size: 13px; }
-tr:hover td { background: #fafaf9; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+th { background: var(--gray); padding: 9px 12px; text-align: left; font-size: 0.8rem; color: var(--muted); font-weight: 500; white-space: nowrap; }
+td { padding: 8px 12px; border-top: 1px solid var(--border); font-size: 0.867rem; }
+tr:hover td { background: var(--page-bg); }
 .inactive { opacity: .45; }
-.act-btn { font-size: 11px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); background: none; cursor: pointer; font-family: var(--font); }
+.act-btn { font-size: 0.733rem; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); background: none; cursor: pointer; font-family: var(--font); }
 .act-btn.edit { color: #185FA5; border-color: #B5D4F4; }
 .act-btn.del  { color: var(--red-text); border-color: #F5C4B3; }
 .act-btn.restore { color: var(--teal-text); border-color: var(--teal); }
-.badge-cat { font-size: 11px; padding: 2px 7px; border-radius: 4px; background: var(--teal-bg); color: var(--teal-text); font-weight: 500; }
+.badge-cat { font-size: 0.733rem; padding: 2px 7px; border-radius: 4px; background: var(--teal-bg); color: var(--teal-text); font-weight: 500; }
 
 /* Modal */
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; align-items: center; justify-content: center; }
 .modal-bg.open { display: flex; }
-.modal { background: #fff; border-radius: 14px; padding: 1.5rem; width: 480px; max-width: 95vw; }
-.modal h3 { font-size: 15px; margin-bottom: 1rem; }
+.modal { background: var(--surface); border-radius: 14px; padding: 1.5rem; width: 480px; max-width: 95vw; color: var(--text); }
+.modal h3 { font-size: 1rem; margin-bottom: 1rem; }
 .form-row { margin-bottom: 10px; }
-.form-row label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 3px; }
+.form-row label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 3px; }
 .form-row input, .form-row select, .form-row textarea {
   width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px;
-  font-size: 13px; font-family: var(--font); }
+  font-size: 0.867rem; font-family: var(--font); background: var(--input-bg); color: var(--text); }
 .form-row input:focus, .form-row select:focus { outline: none; border-color: var(--teal); }
 .form-row textarea { resize: vertical; min-height: 60px; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
-.modal-actions button { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-family: var(--font); cursor: pointer; border: 1px solid var(--border); }
+.modal-actions button { padding: 7px 16px; border-radius: 7px; font-size: 0.867rem; font-family: var(--font); cursor: pointer; border: 1px solid var(--border); }
 .btn-save   { background: var(--teal); color: #fff; border-color: var(--teal); }
 .btn-cancel { background: none; }
-.toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1c1c1a; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 200; display: none; }
+.toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1c1c1a; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 0.867rem; z-index: 200; display: none; }
 /* Multi-URL list */
 .url-list { display: flex; flex-direction: column; gap: 6px; }
 .url-item { display: flex; gap: 6px; align-items: center; }
-.url-item input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: var(--font); }
+.url-item input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.867rem; font-family: var(--font); background: var(--input-bg); color: var(--text); }
 .url-item input:focus { outline: none; border-color: var(--teal); }
-.url-remove { width: 28px; height: 28px; border: 1px solid #F5C4B3; border-radius: 6px; background: none; color: var(--red-text); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.url-add-btn { margin-top: 6px; font-size: 12px; color: var(--teal-text); background: var(--teal-bg); border: 1px solid var(--teal); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: var(--font); }
+.url-remove { width: 28px; height: 28px; border: 1px solid #F5C4B3; border-radius: 6px; background: none; color: var(--red-text); cursor: pointer; font-size: 0.933rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.url-add-btn { margin-top: 6px; font-size: 0.8rem; color: var(--teal-text); background: var(--teal-bg); border: 1px solid var(--teal); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: var(--font); }
+
+html.dark tr:hover td { background: #2a2927; }
+html.dark .logout-btn { background: var(--surface); color: var(--muted); }
+html.dark .toast { background: #e8e8e6; color: #1c1c1a; }
+html.dark .modal-actions .btn-cancel { color: var(--text); }
 </style>
 </head>
 <body>
 
 <!-- Login Screen -->
 <div id="login-screen">
+  <div class="login-prefs">
+    <div class="font-tools" title="ขนาดตัวอักษร">
+      <button type="button" class="font-down" onclick="adjustFont(-1)" aria-label="ลดขนาดตัวอักษร">A−</button>
+      <span class="font-label font-pct">100%</span>
+      <button type="button" class="font-up" onclick="adjustFont(1)" aria-label="เพิ่มขนาดตัวอักษร">A+</button>
+    </div>
+    <button type="button" class="theme-btn" onclick="toggleTheme()" title="โหมดสี">🌙</button>
+  </div>
   <div class="login-card">
     <h2>Admin — NLEM Drug Guide</h2>
     <input type="password" id="api-key-input" placeholder="กรอก Admin API Key..." onkeydown="if(event.key==='Enter')login()">
@@ -104,8 +187,14 @@ tr:hover td { background: #fafaf9; }
       <button class="tab" onclick="switchTab(this,'tab-links')">ลิงก์อ้างอิง</button>
       <button class="tab" onclick="switchTab(this,'tab-cats')">บัญชียา</button>
     </div>
-    <div>
-      <a href="index.html" style="font-size:12px;color:var(--muted);text-decoration:none;margin-right:8px">← หน้าหลัก</a>
+    <div class="header-right">
+      <div class="font-tools" title="ขนาดตัวอักษร">
+        <button type="button" class="font-down" onclick="adjustFont(-1)" aria-label="ลดขนาดตัวอักษร">A−</button>
+        <span class="font-label font-pct">100%</span>
+        <button type="button" class="font-up" onclick="adjustFont(1)" aria-label="เพิ่มขนาดตัวอักษร">A+</button>
+      </div>
+      <button type="button" class="theme-btn" onclick="toggleTheme()" title="โหมดสี">🌙</button>
+      <a href="index.html" class="nav-home">← หน้าหลัก</a>
       <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
     </div>
   </header>
@@ -261,6 +350,56 @@ tr:hover td { background: #fafaf9; }
 <script>
 let API_KEY = '';
 let cats = [], drugs = [], links = [], groups = [];
+
+const FONT = { min: 13, max: 22, def: 15 };
+
+function getFontPx() {
+  const raw = localStorage.getItem('nlem-font-px');
+  if (raw == null) return FONT.def;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) ? Math.max(FONT.min, Math.min(FONT.max, n)) : FONT.def;
+}
+
+function setFontPx(px) {
+  px = Math.max(FONT.min, Math.min(FONT.max, px));
+  document.documentElement.style.fontSize = px + 'px';
+  localStorage.setItem('nlem-font-px', String(px));
+  syncFontUi();
+}
+
+function adjustFont(delta) {
+  setFontPx(getFontPx() + delta);
+}
+
+function syncFontUi() {
+  const px = getFontPx();
+  const pct = Math.round((px / FONT.def) * 100);
+  document.querySelectorAll('.font-pct').forEach(el => { el.textContent = pct + '%'; });
+  document.querySelectorAll('.font-down').forEach(el => { el.disabled = px <= FONT.min; });
+  document.querySelectorAll('.font-up').forEach(el => { el.disabled = px >= FONT.max; });
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const dark = !html.classList.contains('dark');
+  html.classList.toggle('dark', dark);
+  localStorage.setItem('nlem-theme', dark ? 'dark' : 'light');
+  syncThemeBtn();
+}
+
+function syncThemeBtn() {
+  const dark = document.documentElement.classList.contains('dark');
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.textContent = dark ? '☀️' : '🌙';
+    btn.title = dark ? 'โหมดสว่าง' : 'โหมดมืด';
+  });
+}
+
+function initDisplayPrefs() {
+  document.documentElement.style.fontSize = getFontPx() + 'px';
+  syncFontUi();
+  syncThemeBtn();
+}
 
 function login() {
   API_KEY = document.getElementById('api-key-input').value.trim();
@@ -629,6 +768,8 @@ function showToast(msg) {
 document.querySelectorAll('.modal-bg').forEach(bg => {
   bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
 });
+
+initDisplayPrefs();
 </script>
 </body>
 </html>
