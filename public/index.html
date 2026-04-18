@@ -154,17 +154,38 @@ html.dark .drug-hit-detail { background: var(--gray); border-color: var(--border
 
 /* โหมดค้นหา: ข้อความชื่อยา + รายละเอียดใหญ่ขึ้น อ่านง่าย */
 .grid.search-active .drug-group-label { font-size: 0.82rem; font-weight: 600; }
+.grid.search-active .drug-chip-wrap.search-match {
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface) 86%, var(--teal-bg));
+  box-shadow: 0 10px 20px rgba(0,0,0,.06);
+}
+html.dark .grid.search-active .drug-chip-wrap.search-match {
+  background: color-mix(in oklab, var(--surface) 88%, #000);
+  box-shadow: 0 10px 22px rgba(0,0,0,.24);
+}
+.grid.search-active .drug-chip-wrap.search-match .drug-hit-detail {
+  border-left: 3px solid var(--teal);
+  background: color-mix(in oklab, var(--surface) 65%, var(--gray));
+}
+html.dark .grid.search-active .drug-chip-wrap.search-match .drug-hit-detail {
+  background: color-mix(in oklab, var(--surface) 58%, var(--gray));
+}
 .grid.search-active .drug-chip-wrap.search-match > .chip,
 .grid.search-active .drug-chip-wrap.search-match > a.chip-link,
 .grid.search-active .drug-chip-wrap.search-match > .chip-multi {
-  font-size: 1rem;
-  padding: 6px 14px;
-  line-height: 1.4;
+  font-size: 1.12rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  line-height: 1.35;
+  color: var(--text);
 }
 .grid.search-active .drug-chip-wrap.search-match > .chip.chip-nonform,
 .grid.search-active .drug-chip-wrap.search-match > .chip.chip-special {
-  font-size: 0.95rem;
-  padding: 6px 12px;
+  font-size: 1.06rem;
+  font-weight: 700;
+  padding: 8px 12px;
 }
 .grid.search-active .drug-chip-wrap.search-match .approval-btn { font-size: 0.75rem; padding: 3px 8px; }
 .grid.search-active .drug-chip-wrap.search-match .right-tag.rt-mini { font-size: 0.72rem; padding: 2px 6px; }
