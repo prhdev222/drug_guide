@@ -145,11 +145,30 @@ html.dark .m-filter-select { background-image: url("data:image/svg+xml,%3Csvg xm
 .drug-chip-wrap { display: inline-flex; flex-direction: column; align-items: flex-start; max-width: 100%; vertical-align: top; }
 .grid.search-active .chips { gap: 8px 10px; row-gap: 10px; }
 .drug-hit-detail { display: none; width: 100%; max-width: 100%; box-sizing: border-box; margin-top: 6px; padding: 8px 10px; font-size: 0.767rem; background: var(--gray); border-radius: 8px; border: 1px solid var(--border); line-height: 1.45; text-align: left; color: var(--text); }
-.grid.search-active .drug-chip-wrap.search-match .drug-hit-detail { display: block; }
+.grid.search-active .drug-chip-wrap.search-match .drug-hit-detail { display: block; font-size: 0.98rem; padding: 11px 14px; line-height: 1.55; }
 .dd-row { margin-bottom: 5px; }
 .dd-row:last-child { margin-bottom: 0; }
 .dd-k { color: var(--muted); font-weight: 600; font-size: 0.7rem; margin-right: 6px; }
+.grid.search-active .drug-hit-detail .dd-k { font-size: 0.82rem; }
 html.dark .drug-hit-detail { background: var(--gray); border-color: var(--border); }
+
+/* โหมดค้นหา: ข้อความชื่อยา + รายละเอียดใหญ่ขึ้น อ่านง่าย */
+.grid.search-active .drug-group-label { font-size: 0.82rem; font-weight: 600; }
+.grid.search-active .drug-chip-wrap.search-match > .chip,
+.grid.search-active .drug-chip-wrap.search-match > a.chip-link,
+.grid.search-active .drug-chip-wrap.search-match > .chip-multi {
+  font-size: 1rem;
+  padding: 6px 14px;
+  line-height: 1.4;
+}
+.grid.search-active .drug-chip-wrap.search-match > .chip.chip-nonform,
+.grid.search-active .drug-chip-wrap.search-match > .chip.chip-special {
+  font-size: 0.95rem;
+  padding: 6px 12px;
+}
+.grid.search-active .drug-chip-wrap.search-match .approval-btn { font-size: 0.75rem; padding: 3px 8px; }
+.grid.search-active .drug-chip-wrap.search-match .right-tag.rt-mini { font-size: 0.72rem; padding: 2px 6px; }
+.grid.search-active .drug-chip-wrap.search-match .multi-doc-link { font-size: 0.72rem; }
 
 /* Standard chips */
 .chip       { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--gray); }
