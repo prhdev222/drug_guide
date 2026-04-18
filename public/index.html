@@ -208,6 +208,7 @@ html.dark .chip { background: var(--gray); border-color: var(--border); color: v
   <button class="pill" onclick="setRight(this,'SSO')">ประกันสังคม</button>
   <button class="pill" onclick="setRight(this,'CSMBS')">ข้าราชการ</button>
   <button class="pill" onclick="setRight(this,'DOC')">ต้องมีเอกสาร</button>
+  <button class="pill" onclick="setRight(this,'DRUGDOC')">มียาที่แนบเอกสาร</button>
 </div>
 <div class="filter-row">
   <span class="filter-label">กรองกลุ่มยา:</span>
@@ -406,6 +407,7 @@ function renderAll() {
     ].join(' ').toLowerCase();
 
     const groupsInCard = [...new Set(catDrugs.map(d => d.drug_group).filter(Boolean))];
+    const hasDrugDoc = catDrugs.some(d => !!d.doc_url);
 
     const card = document.createElement('div');
     card.className = 'card';
@@ -413,6 +415,7 @@ function renderAll() {
     card.dataset.doc    = cat.doc_level || 'none';
     card.dataset.text   = searchText;
     card.dataset.groups = groupsInCard.join('||');
+    card.dataset.drugdoc = hasDrugDoc ? '1' : '0';
     if (cardBorder) card.style.cssText = cardBorder;
 
     card.innerHTML = `
@@ -477,12 +480,14 @@ function filterCards() {
     const doc        = card.dataset.doc    || '';
     const text       = card.dataset.text   || '';
     const cardGroups = card.dataset.groups || '';
+    const drugdoc    = card.dataset.drugdoc || '0';
 
     let rm = true;
     if      (activeRight === 'UC')    rm = rights.includes('UC');
     else if (activeRight === 'SSO')   rm = rights.includes('SSO');
     else if (activeRight === 'CSMBS') rm = rights.includes('CSMBS');
     else if (activeRight === 'DOC')   rm = doc === 'required' || doc === 'partial';
+    else if (activeRight === 'DRUGDOC') rm = drugdoc === '1';
 
     const gm = !activeGroup || cardGroups.split('||').includes(activeGroup);
     const sm = !q || text.includes(q) || card.textContent.toLowerCase().includes(q);
