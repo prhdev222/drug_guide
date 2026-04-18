@@ -69,16 +69,16 @@ INSERT OR IGNORE INTO categories VALUES
    'UC,SSO,CSMBS','partial','blue','รพช. / รพท.',1),
   ('ค','บัญชี ค','Tertiary/Specialty Medicines',
    'ยาสำหรับ รพ.ระดับตติยภูมิ / รพ.เฉพาะทาง โดยแพทย์เฉพาะทาง บางรายการต้องขออนุมัติ',
-   'UC,CSMBS','partial','purple','รพ.ตติยภูมิ / รพ.เฉพาะทาง',1),
+   'UC,SSO,CSMBS','partial','purple','รพ.ตติยภูมิ / รพ.เฉพาะทาง',1),
   ('ง','บัญชี ง','Special Indication Medicines',
    'ยาราคาแพงหรือมีข้อบ่งชี้เฉพาะ ต้องขออนุมัติล่วงหน้า (Prior Authorization) ทุกสิทธิ',
-   'UC,CSMBS','required','amber','รพ.ระดับสูงที่ได้รับอนุญาต (ต้องขออนุมัติก่อน)',1),
+   'UC,SSO,CSMBS','required','amber','รพ.ระดับสูงที่ได้รับอนุญาต (ต้องขออนุมัติก่อน)',1),
   ('จ1','บัญชี จ1','Herbal Medicines',
    'ยาสมุนไพรที่ผ่านการรับรอง มีหลักฐานประสิทธิภาพและความปลอดภัยรองรับ',
-   'UC,CSMBS','none','green','ตามที่แต่ละรายการกำหนด',1),
+   'UC,SSO,CSMBS','none','green','ตามที่แต่ละรายการกำหนด',1),
   ('จ2','บัญชี จ2','Special Program Medicines',
    'ยาภายใต้โครงการพิเศษ สปสช. ต้องลงทะเบียนเข้าร่วมโครงการก่อนรับยา',
-   'UC','required','coral','เฉพาะ รพ.ที่ได้รับอนุมัติจาก สปสช.',1);
+   'UC,SSO,CSMBS','required','coral','เฉพาะ รพ.ที่ได้รับอนุมัติจาก สปสช.',1);
 
 -- =============================================================
 -- SEED: Drugs
@@ -203,6 +203,8 @@ INSERT OR IGNORE INTO links (category_id, title, url, description, sort_order) V
 -- ALTER TABLE drugs ADD COLUMN approval_criteria TEXT;
 -- ALTER TABLE drugs ADD COLUMN fda_reg_no TEXT;
 -- ALTER TABLE drugs ADD COLUMN rights TEXT;
+-- อัปเดตสิทธิบัญชียา (เพิ่ม SSO) สำหรับ DB เดิม:
+-- UPDATE categories SET rights = 'UC,SSO,CSMBS' WHERE id IN ('ค','ง','จ1','จ2');
 -- CREATE TABLE IF NOT EXISTS approval_forms (
 --   id INTEGER PRIMARY KEY AUTOINCREMENT,
 --   drug_id INTEGER NOT NULL REFERENCES drugs(id),
