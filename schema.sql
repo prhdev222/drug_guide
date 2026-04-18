@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS drugs (
   name_en          TEXT NOT NULL,
   name_th          TEXT,
   drug_group       TEXT,
+  rights             TEXT,   -- UC,SSO,CSMBS คั่นด้วยจุลภาค ว่าง = ใช้ตามสิทธิของบัญชียา
   notes            TEXT,
   doc_url          TEXT,
   -- v2: Formulary & Approval
@@ -201,6 +202,7 @@ INSERT OR IGNORE INTO links (category_id, title, url, description, sort_order) V
 -- ALTER TABLE drugs ADD COLUMN approval_doc_url TEXT;
 -- ALTER TABLE drugs ADD COLUMN approval_criteria TEXT;
 -- ALTER TABLE drugs ADD COLUMN fda_reg_no TEXT;
+-- ALTER TABLE drugs ADD COLUMN rights TEXT;
 -- CREATE TABLE IF NOT EXISTS approval_forms (
 --   id INTEGER PRIMARY KEY AUTOINCREMENT,
 --   drug_id INTEGER NOT NULL REFERENCES drugs(id),

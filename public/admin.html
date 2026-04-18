@@ -100,6 +100,10 @@ html.dark .fstatus-special { background: #3d2e10; color: #fac775; }
 
 /* Approval info box */
 .approval-info { font-size: 0.8rem; color: var(--muted); background: var(--gray); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; border-left: 3px solid #F5C4B3; line-height: 1.5; }
+.rights-check-row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-top: 4px; }
+.rights-inline { font-size: 0.85rem; color: var(--text); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+.rights-inline input { width: 15px; height: 15px; accent-color: var(--teal); cursor: pointer; }
+.form-hint { font-size: 0.75rem; color: var(--muted); margin-top: 4px; line-height: 1.45; }
 
 /* Modal */
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; align-items: center; justify-content: center; }
@@ -277,6 +281,16 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
     <div class="form-row">
       <label>บัญชี *</label>
       <select id="drug-cat"></select>
+      <p class="form-hint" id="drug-cat-rights-hint"></p>
+    </div>
+    <div class="form-row">
+      <label>สิทธิที่ใช้ยานี้ได้ <span style="font-size:0.75rem;color:var(--muted);font-weight:400">(ไม่บังคับ — เลือกได้หลายสิทธิ)</span></label>
+      <div class="rights-check-row" id="drug-rights-row">
+        <label class="rights-inline"><input type="checkbox" value="UC"> บัตรทอง (UC)</label>
+        <label class="rights-inline"><input type="checkbox" value="SSO"> ประกันสังคม</label>
+        <label class="rights-inline"><input type="checkbox" value="CSMBS"> ข้าราชการ (CSMBS)</label>
+      </div>
+      <p class="form-hint">ไม่ติ๊ก = แสดงตามสิทธิของบัญชียา (NLEM) — ติ๊กเมื่อรายยานี้ใช้ได้เฉพาะบางสิทธิ</p>
     </div>
     <div class="form-row"><label>ชื่อยา (EN) *</label><input id="drug-name-en" placeholder="Imatinib"></div>
     <div class="form-row"><label>ชื่อยา (TH)</label><input id="drug-name-th" placeholder="อิมาทินิบ"></div>
@@ -480,10 +494,13 @@ async function loadAll() {
   renderLinks();
   renderCats();
   renderGroups();
-  const opts = cats.map(c => `<option value="${c.id}" data-doc="${c.doc_level||'none'}">${c.id} — ${c.name_th}</option>`).join('');
+  const opts = cats.map(c => {
+    const rEsc = String(c.rights || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    return `<option value="${c.id}" data-doc="${c.doc_level || 'none'}" data-rights="${rEsc}">${c.id} — ${c.name_th}</option>`;
+  }).join('');
   const drugCat = document.getElementById('drug-cat');
   drugCat.innerHTML = opts;
-  drugCat.addEventListener('change', updateDocUrlVisibility);
+  drugCat.onchange = () => { updateDocUrlVisibility(); updateCatRightsHint(); };
   document.getElementById('link-cat').innerHTML = '<option value="">— ทั่วไป —</option>' + opts;
   populateGroupSelect();
 }
@@ -500,6 +517,33 @@ function updateDocUrlVisibility() {
   const docLevel = opt?.dataset?.doc || 'none';
   const show = docLevel === 'partial' || docLevel === 'required';
   document.getElementById('drug-doc-url-row').style.display = show ? '' : 'none';
+}
+function updateCatRightsHint() {
+  const sel = document.getElementById('drug-cat');
+  const hint = document.getElementById('drug-cat-rights-hint');
+  if (!sel || !hint) return;
+  const opt = sel.options[sel.selectedIndex];
+  const raw = opt?.getAttribute('data-rights') || '';
+  if (!raw) {
+    hint.textContent = '';
+    return;
+  }
+  hint.textContent = 'สิทธิ NLEM ของบัญชีนี้: ' + raw.replace(/,/g, ', ') + ' — ถ้าไม่ติ๊กสิทธิรายยา ระบบจะอ้างอิงตามบัญชี';
+}
+function clearDrugRightsChecks() {
+  document.querySelectorAll('#drug-rights-row input[type="checkbox"]').forEach(c => { c.checked = false; });
+}
+function setDrugRightsFromCsv(csv) {
+  clearDrugRightsChecks();
+  if (!csv) return;
+  String(csv).split(',').map(s => s.trim()).filter(Boolean).forEach(r => {
+    const cb = document.querySelector(`#drug-rights-row input[value="${r}"]`);
+    if (cb) cb.checked = true;
+  });
+}
+function getDrugRightsCsv() {
+  const picked = [...document.querySelectorAll('#drug-rights-row input[type="checkbox"]:checked')].map(c => c.value);
+  return picked.length ? picked.join(',') : null;
 }
 
 // ---- Drug multi-URL helpers ----
@@ -737,6 +781,7 @@ function openDrugModal(id) {
   document.getElementById('drug-name-en').value = '';
   document.getElementById('drug-name-th').value = '';
   document.getElementById('drug-group').value = '';
+  clearDrugRightsChecks();
   document.getElementById('drug-notes').value = '';
   document.getElementById('drug-formulary').value = 'in_stock';
   document.getElementById('drug-fda-reg').value = '';
@@ -753,6 +798,7 @@ function openDrugModal(id) {
       document.getElementById('drug-name-en').value = d.name_en;
       document.getElementById('drug-name-th').value = d.name_th || '';
       populateGroupSelect(d.drug_group || '');
+      setDrugRightsFromCsv(d.rights || '');
       document.getElementById('drug-formulary').value = d.formulary_status || 'in_stock';
       document.getElementById('drug-fda-reg').value = d.fda_reg_no || '';
       setApprovalUrls(d.approval_doc_url || '');
@@ -766,6 +812,7 @@ function openDrugModal(id) {
   }
   updateApprovalVisibility();
   updateDocUrlVisibility();
+  updateCatRightsHint();
   document.getElementById('drug-modal').classList.add('open');
 }
 async function saveDrug() {
@@ -776,6 +823,7 @@ async function saveDrug() {
     name_en:          document.getElementById('drug-name-en').value.trim(),
     name_th:          document.getElementById('drug-name-th').value.trim() || null,
     drug_group:       document.getElementById('drug-group').value || null,
+    rights:           getDrugRightsCsv(),
     formulary_status: document.getElementById('drug-formulary').value,
     fda_reg_no:       document.getElementById('drug-fda-reg').value.trim() || null,
     approval_doc_url: getApprovalUrls(),

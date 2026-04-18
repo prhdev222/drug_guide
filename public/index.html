@@ -124,6 +124,8 @@ html.dark .m-filter-select { background-image: url("data:image/svg+xml,%3Csvg xm
 .rt-uc    { background: var(--teal-bg);   color: var(--teal-text); }
 .rt-sso   { background: var(--blue-bg);   color: var(--blue-text); }
 .rt-csmbs { background: var(--purple-bg); color: var(--purple-text); }
+.right-tag.rt-mini { font-size: 0.62rem; padding: 1px 5px; font-weight: 500; line-height: 1.25; }
+.drug-rt-wrap { display: inline-flex; flex-wrap: wrap; gap: 2px 4px; margin-left: 4px; vertical-align: middle; align-items: center; max-width: 100%; }
 .divider  { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
 .doc-badge  { display: inline-flex; font-size: 0.733rem; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
 .doc-none     { background: var(--green-bg);  color: var(--green-text); }
@@ -350,6 +352,19 @@ const DOC_BADGE = {
 };
 const RIGHTS_MAP = { UC: 'บัตรทอง UC', SSO: 'ประกันสังคม', CSMBS: 'ข้าราชการ CSMBS' };
 const RIGHTS_CLS = { UC: 'rt-uc', SSO: 'rt-sso', CSMBS: 'rt-csmbs' };
+/** สิทธิจริงของรายยา: มี rights รายยา → ใช้นั้น ไม่มี → ตามบัญชี */
+function drugEffectiveRightsArr(d, catRightList) {
+  const dr = (d.rights || '').split(',').map(s => s.trim()).filter(Boolean);
+  return dr.length ? dr : [...catRightList];
+}
+function drugRightsSuffixHtml(d) {
+  const parts = (d.rights || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (!parts.length) return '';
+  const tags = parts.map(r =>
+    `<span class="right-tag rt-mini ${RIGHTS_CLS[r] || ''}">${RIGHTS_MAP[r] || r}</span>`
+  ).join('');
+  return ` <span class="drug-rt-wrap" title="สิทธิเฉพาะรายยา">${tags}</span>`;
+}
 
 let cats = [], drugs = [], links = [], drugGroups = [];
 let activeRight = 'ALL';
@@ -510,13 +525,13 @@ function buildDrugChip(d) {
   if (fs === 'non_formulary') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
     const btn   = buildApprovalBtns(d, fs);
-    return `<span class="chip chip-nonform"${title}>🔴 ${label}${btn}</span>`;
+    return `<span class="chip chip-nonform"${title}>🔴 ${label}${drugRightsSuffixHtml(d)}${btn}</span>`;
   }
 
   if (fs === 'special_order') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
     const btn   = buildApprovalBtns(d, fs);
-    return `<span class="chip chip-special"${title}>🟠 ${label}${btn}</span>`;
+    return `<span class="chip chip-special"${title}>🟠 ${label}${drugRightsSuffixHtml(d)}${btn}</span>`;
   }
 
   // in_stock — check NLEM doc_url
@@ -525,16 +540,16 @@ function buildDrugChip(d) {
     try { urls = JSON.parse(d.doc_url); if (!Array.isArray(urls)) urls = [d.doc_url]; }
     catch { urls = [d.doc_url]; }
     if (urls.length === 1) {
-      return `<a class="chip chip-link" href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">📄 ${label}</a>`;
+      return `<a class="chip chip-link" href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">📄 ${label}${drugRightsSuffixHtml(d)}</a>`;
     }
-    let html = `<span class="chip chip-multi">📄 ${label}`;
+    let html = `<span class="chip chip-multi">📄 ${label}${drugRightsSuffixHtml(d)}`;
     urls.forEach((u, i) => {
       html += `<a href="${u}" target="_blank" rel="noopener" class="multi-doc-link">เอกสาร ${i + 1}</a>`;
     });
     return html + '</span>';
   }
 
-  return `<span class="chip">${label}</span>`;
+  return `<span class="chip">${label}${drugRightsSuffixHtml(d)}</span>`;
 }
 
 function renderAll() {
@@ -563,7 +578,7 @@ function renderAll() {
     });
 
     const searchText = [cat.name_th, cat.name_en, cat.description,
-      catDrugs.map(d => `${d.name_en} ${d.name_th || ''} ${d.drug_group || ''}`).join(' ')
+      catDrugs.map(d => `${d.name_en} ${d.name_th || ''} ${d.drug_group || ''} ${d.rights || ''}`).join(' ')
     ].join(' ').toLowerCase();
 
     const groupsInCard = [...new Set(catDrugs.map(d => d.drug_group).filter(Boolean))];
@@ -571,9 +586,12 @@ function renderAll() {
     const hasNform     = catDrugs.some(d => d.formulary_status === 'non_formulary');
     const hasSorder    = catDrugs.some(d => d.formulary_status === 'special_order');
 
+    const rightsUnion = new Set();
+    catDrugs.forEach(d => drugEffectiveRightsArr(d, rightList).forEach(r => rightsUnion.add(r)));
+
     const card = document.createElement('div');
     card.className = 'card';
-    card.dataset.rights  = rightList.join(' ');
+    card.dataset.rights  = [...rightsUnion].join(' ');
     card.dataset.doc     = cat.doc_level || 'none';
     card.dataset.text    = searchText;
     card.dataset.groups  = groupsInCard.join('||');

@@ -5,7 +5,7 @@ export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json();
     const {
-      category_id, name_en, name_th, drug_group, notes, doc_url,
+      category_id, name_en, name_th, drug_group, rights, notes, doc_url,
       formulary_status = 'in_stock', approval_doc_url, approval_criteria, fda_reg_no,
     } = body;
     let { sort_order } = body;
@@ -26,14 +26,15 @@ export async function onRequestPost({ request, env }) {
 
     const rows = await turso(env,
       `INSERT INTO drugs
-        (category_id, name_en, name_th, drug_group, notes, sort_order, doc_url,
+        (category_id, name_en, name_th, drug_group, rights, notes, sort_order, doc_url,
          formulary_status, approval_doc_url, approval_criteria, fda_reg_no)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?) RETURNING *`,
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?) RETURNING *`,
       [
         category_id,
         name_en,
         name_th          ?? null,
         drug_group       ?? null,
+        rights           ?? null,
         notes            ?? null,
         sort_order,
         doc_url          ?? null,
@@ -56,7 +57,7 @@ export async function onRequestPut({ request, env }) {
     if (!id) return err('id query param required');
 
     const {
-      name_en, name_th, drug_group, notes, active, sort_order, doc_url,
+      name_en, name_th, drug_group, rights, notes, active, sort_order, doc_url,
       formulary_status, approval_doc_url, approval_criteria, fda_reg_no,
     } = await request.json();
 
@@ -65,6 +66,7 @@ export async function onRequestPut({ request, env }) {
          name_en           = COALESCE(?, name_en),
          name_th           = COALESCE(?, name_th),
          drug_group        = COALESCE(?, drug_group),
+         rights            = ?,
          notes             = COALESCE(?, notes),
          active            = COALESCE(?, active),
          sort_order        = COALESCE(?, sort_order),
@@ -78,6 +80,7 @@ export async function onRequestPut({ request, env }) {
         name_en           ?? null,
         name_th           ?? null,
         drug_group        ?? null,
+        rights            ?? null,
         notes             ?? null,
         active            ?? null,
         sort_order        ?? null,
