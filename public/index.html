@@ -141,7 +141,15 @@ html.dark .m-filter-select { background-image: url("data:image/svg+xml,%3Csvg xm
 .drug-list { display: none; margin-top: 8px; }
 .drug-list.open { display: block; }
 .drug-group-label { font-size: 0.733rem; color: var(--muted); margin: 6px 0 3px; }
-.chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; align-items: flex-start; }
+.drug-chip-wrap { display: inline-flex; flex-direction: column; align-items: flex-start; max-width: 100%; vertical-align: top; }
+.grid.search-active .chips { gap: 8px 10px; row-gap: 10px; }
+.drug-hit-detail { display: none; width: 100%; max-width: 100%; box-sizing: border-box; margin-top: 6px; padding: 8px 10px; font-size: 0.767rem; background: var(--gray); border-radius: 8px; border: 1px solid var(--border); line-height: 1.45; text-align: left; color: var(--text); }
+.grid.search-active .drug-chip-wrap.search-match .drug-hit-detail { display: block; }
+.dd-row { margin-bottom: 5px; }
+.dd-row:last-child { margin-bottom: 0; }
+.dd-k { color: var(--muted); font-weight: 600; font-size: 0.7rem; margin-right: 6px; }
+html.dark .drug-hit-detail { background: var(--gray); border-color: var(--border); }
 
 /* Standard chips */
 .chip       { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--gray); }
@@ -352,6 +360,43 @@ const DOC_BADGE = {
 };
 const RIGHTS_MAP = { UC: 'บัตรทอง UC', SSO: 'ประกันสังคม', CSMBS: 'ข้าราชการ CSMBS' };
 const RIGHTS_CLS = { UC: 'rt-uc', SSO: 'rt-sso', CSMBS: 'rt-csmbs' };
+const FSTATUS_LABEL = {
+  in_stock: '🟢 มีในคลัง รพ.สงฆ์',
+  non_formulary: '🔴 ต้องขออนุมัติ',
+  special_order: '🟠 สั่งฉุกเฉิน',
+};
+function escDataAttr(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+function drugSearchHaystack(d) {
+  return [d.name_en, d.name_th, d.drug_group, d.notes, d.approval_criteria, d.fda_reg_no]
+    .filter(Boolean).join(' ').toLowerCase();
+}
+function drugDetailBlock(d) {
+  const fs = d.formulary_status || 'in_stock';
+  const rows = [];
+  if (d.drug_group) rows.push(`<div class="dd-row"><span class="dd-k">กลุ่มยา</span> ${escChipText(d.drug_group)}</div>`);
+  rows.push(`<div class="dd-row"><span class="dd-k">สถานะคลัง</span> ${escChipText(FSTATUS_LABEL[fs] || fs)}</div>`);
+  const dr = (d.rights || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (dr.length) {
+    const lab = dr.map(r => RIGHTS_MAP[r] || r).join(' · ');
+    rows.push(`<div class="dd-row"><span class="dd-k">สิทธิรายยา</span> ${escChipText(lab)}</div>`);
+  }
+  if (d.fda_reg_no) rows.push(`<div class="dd-row"><span class="dd-k">เลข อย.</span> ${escChipText(d.fda_reg_no)}</div>`);
+  if (d.notes) {
+    const t = d.notes.length > 240 ? d.notes.slice(0, 240) + '…' : d.notes;
+    rows.push(`<div class="dd-row"><span class="dd-k">หมายเหตุ</span> ${escChipText(t)}</div>`);
+  }
+  if (d.approval_criteria && fs !== 'in_stock') {
+    const t = d.approval_criteria.length > 260 ? d.approval_criteria.slice(0, 260) + '…' : d.approval_criteria;
+    rows.push(`<div class="dd-row"><span class="dd-k">เกณฑ์อนุมัติ</span> ${escChipText(t)}</div>`);
+  }
+  return `<div class="drug-hit-detail">${rows.join('')}</div>`;
+}
+function wrapDrugChip(d, innerHtml) {
+  const hay = drugSearchHaystack(d);
+  return `<span class="drug-chip-wrap" data-haystack="${escDataAttr(hay)}">${innerHtml}${drugDetailBlock(d)}</span>`;
+}
 /** สิทธิจริงของรายยา: มี rights รายยา → ใช้นั้น ไม่มี → ตามบัญชี */
 function drugEffectiveRightsArr(d, catRightList) {
   const dr = (d.rights || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -525,13 +570,13 @@ function buildDrugChip(d) {
   if (fs === 'non_formulary') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
     const btn   = buildApprovalBtns(d, fs);
-    return `<span class="chip chip-nonform"${title}>🔴 ${label}${drugRightsSuffixHtml(d)}${btn}</span>`;
+    return wrapDrugChip(d, `<span class="chip chip-nonform"${title}>🔴 ${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
   }
 
   if (fs === 'special_order') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
     const btn   = buildApprovalBtns(d, fs);
-    return `<span class="chip chip-special"${title}>🟠 ${label}${drugRightsSuffixHtml(d)}${btn}</span>`;
+    return wrapDrugChip(d, `<span class="chip chip-special"${title}>🟠 ${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
   }
 
   // in_stock — check NLEM doc_url
@@ -540,16 +585,16 @@ function buildDrugChip(d) {
     try { urls = JSON.parse(d.doc_url); if (!Array.isArray(urls)) urls = [d.doc_url]; }
     catch { urls = [d.doc_url]; }
     if (urls.length === 1) {
-      return `<a class="chip chip-link" href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">📄 ${label}${drugRightsSuffixHtml(d)}</a>`;
+      return wrapDrugChip(d, `<a class="chip chip-link" href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">📄 ${label}${drugRightsSuffixHtml(d)}</a>`);
     }
     let html = `<span class="chip chip-multi">📄 ${label}${drugRightsSuffixHtml(d)}`;
     urls.forEach((u, i) => {
       html += `<a href="${u}" target="_blank" rel="noopener" class="multi-doc-link">เอกสาร ${i + 1}</a>`;
     });
-    return html + '</span>';
+    return wrapDrugChip(d, html + '</span>');
   }
 
-  return `<span class="chip">${label}${drugRightsSuffixHtml(d)}</span>`;
+  return wrapDrugChip(d, `<span class="chip">${label}${drugRightsSuffixHtml(d)}</span>`);
 }
 
 function renderAll() {
@@ -588,12 +633,14 @@ function renderAll() {
 
     const rightsUnion = new Set();
     catDrugs.forEach(d => drugEffectiveRightsArr(d, rightList).forEach(r => rightsUnion.add(r)));
+    const drugHaystackAll = catDrugs.map(d => drugSearchHaystack(d)).join(' ');
 
     const card = document.createElement('div');
     card.className = 'card';
     card.dataset.rights  = [...rightsUnion].join(' ');
     card.dataset.doc     = cat.doc_level || 'none';
     card.dataset.text    = searchText;
+    card.dataset.drugHaystack = drugHaystackAll;
     card.dataset.groups  = groupsInCard.join('||');
     card.dataset.drugdoc = hasDrugDoc ? '1' : '0';
     card.dataset.nform   = hasNform   ? '1' : '0';
@@ -663,6 +710,57 @@ function setGroup(sel) {
   filterCards();
 }
 
+function applySearchDrugUi(qRaw) {
+  const q = (qRaw || '').trim().toLowerCase();
+  const grid = document.getElementById('card-grid');
+  if (!grid) return;
+  grid.classList.toggle('search-active', !!q);
+  document.querySelectorAll('.card').forEach(card => {
+    const list = card.querySelector('.drug-list');
+    const btn  = card.querySelector('.toggle-btn');
+    const hidden = card.classList.contains('hidden');
+    if (!q) {
+      card.querySelectorAll('.drug-chip-wrap').forEach(w => {
+        w.classList.remove('search-match');
+        w.style.display = '';
+      });
+      card.querySelectorAll('.drug-group-label').forEach(l => { l.style.display = ''; });
+      if (list && btn) {
+        list.classList.remove('open');
+        const count = btn.textContent.match(/\d+/)?.[0] || '';
+        btn.textContent = `▸ ตัวอย่างยาในบัญชีนี้ (${count} รายการ)`;
+      }
+      return;
+    }
+    if (hidden) {
+      card.querySelectorAll('.drug-chip-wrap').forEach(w => {
+        w.classList.remove('search-match');
+        w.style.display = '';
+      });
+      return;
+    }
+    let anyMatch = false;
+    card.querySelectorAll('.drug-chip-wrap').forEach(wrap => {
+      const h = (wrap.getAttribute('data-haystack') || '').toLowerCase();
+      const match = h.includes(q);
+      wrap.classList.toggle('search-match', match);
+      wrap.style.display = match ? '' : 'none';
+      if (match) anyMatch = true;
+    });
+    card.querySelectorAll('.drug-group-label').forEach(lab => {
+      const chips = lab.nextElementSibling;
+      if (!chips || !chips.classList.contains('chips')) return;
+      const anyVisible = [...chips.querySelectorAll('.drug-chip-wrap')].some(w => w.style.display !== 'none');
+      lab.style.display = anyVisible ? '' : 'none';
+    });
+    if (anyMatch && list && btn) {
+      list.classList.add('open');
+      const count = btn.textContent.match(/\d+/)?.[0] || '';
+      btn.textContent = `▾ ซ่อนรายการยา (${count} รายการ)`;
+    }
+  });
+}
+
 function filterCards() {
   const q = document.getElementById('search').value.toLowerCase();
   let visible = 0;
@@ -690,11 +788,13 @@ function filterCards() {
     else if (activeStock === 'special_order') sm = sorder === '1';
 
     const gm = !activeGroup || cardGroups.split('||').includes(activeGroup);
-    const qm = !q || text.includes(q) || card.textContent.toLowerCase().includes(q);
+    const drugHay = (card.dataset.drugHaystack || '').toLowerCase();
+    const qm = !q || text.includes(q) || drugHay.includes(q);
 
     if (rm && sm && gm && qm) { card.classList.remove('hidden'); visible++; }
     else                      { card.classList.add('hidden'); }
   });
+  applySearchDrugUi(document.getElementById('search').value);
   document.getElementById('count-label').textContent = `แสดง ${visible} บัญชี`;
   const noRes = document.querySelector('.no-result');
   if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
