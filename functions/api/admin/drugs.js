@@ -3,16 +3,32 @@ import { turso, json, err } from '../../_utils/db.js';
 /** POST /api/admin/drugs — เพิ่มยาใหม่ */
 export async function onRequestPost({ request, env }) {
   try {
-    const { category_id, name_en, name_th, drug_group, notes, sort_order = 0, doc_url } =
-      await request.json();
+    const {
+      category_id, name_en, name_th, drug_group, notes, sort_order = 0, doc_url,
+      formulary_status = 'in_stock', approval_doc_url, approval_criteria, fda_reg_no,
+    } = await request.json();
 
     if (!category_id) return err('category_id is required');
     if (!name_en)     return err('name_en is required');
 
     const rows = await turso(env,
-      `INSERT INTO drugs (category_id, name_en, name_th, drug_group, notes, sort_order, doc_url)
-       VALUES (?,?,?,?,?,?,?) RETURNING *`,
-      [category_id, name_en, name_th ?? null, drug_group ?? null, notes ?? null, sort_order, doc_url ?? null]
+      `INSERT INTO drugs
+        (category_id, name_en, name_th, drug_group, notes, sort_order, doc_url,
+         formulary_status, approval_doc_url, approval_criteria, fda_reg_no)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?) RETURNING *`,
+      [
+        category_id,
+        name_en,
+        name_th          ?? null,
+        drug_group       ?? null,
+        notes            ?? null,
+        sort_order,
+        doc_url          ?? null,
+        formulary_status,
+        approval_doc_url ?? null,
+        approval_criteria ?? null,
+        fda_reg_no       ?? null,
+      ]
     );
     return json(rows[0], 201);
   } catch (e) {
@@ -23,30 +39,40 @@ export async function onRequestPost({ request, env }) {
 /** PUT /api/admin/drugs?id=123 — แก้ไขยา */
 export async function onRequestPut({ request, env }) {
   try {
-    const id   = new URL(request.url).searchParams.get('id');
-    if (!id)   return err('id query param required');
+    const id = new URL(request.url).searchParams.get('id');
+    if (!id) return err('id query param required');
 
-    const body = await request.json();
-    const { name_en, name_th, drug_group, notes, active, sort_order, doc_url } = body;
+    const {
+      name_en, name_th, drug_group, notes, active, sort_order, doc_url,
+      formulary_status, approval_doc_url, approval_criteria, fda_reg_no,
+    } = await request.json();
 
     const rows = await turso(env,
       `UPDATE drugs SET
-         name_en    = COALESCE(?, name_en),
-         name_th    = COALESCE(?, name_th),
-         drug_group = COALESCE(?, drug_group),
-         notes      = COALESCE(?, notes),
-         active     = COALESCE(?, active),
-         sort_order = COALESCE(?, sort_order),
-         doc_url    = ?
+         name_en           = COALESCE(?, name_en),
+         name_th           = COALESCE(?, name_th),
+         drug_group        = COALESCE(?, drug_group),
+         notes             = COALESCE(?, notes),
+         active            = COALESCE(?, active),
+         sort_order        = COALESCE(?, sort_order),
+         doc_url           = ?,
+         formulary_status  = COALESCE(?, formulary_status),
+         approval_doc_url  = ?,
+         approval_criteria = ?,
+         fda_reg_no        = ?
        WHERE id = ? RETURNING *`,
       [
-        name_en    ?? null,
-        name_th    ?? null,
-        drug_group ?? null,
-        notes      ?? null,
-        active     ?? null,
-        sort_order ?? null,
-        doc_url    ?? null,
+        name_en           ?? null,
+        name_th           ?? null,
+        drug_group        ?? null,
+        notes             ?? null,
+        active            ?? null,
+        sort_order        ?? null,
+        doc_url           ?? null,
+        formulary_status  ?? null,
+        approval_doc_url  ?? null,
+        approval_criteria ?? null,
+        fda_reg_no        ?? null,
         parseInt(id),
       ]
     );
@@ -62,7 +88,6 @@ export async function onRequestDelete({ request, env }) {
   try {
     const id = new URL(request.url).searchParams.get('id');
     if (!id) return err('id query param required');
-
     await turso(env, 'UPDATE drugs SET active = 0 WHERE id = ?', [parseInt(id)]);
     return json({ ok: true, id: parseInt(id) });
   } catch (e) {
@@ -70,15 +95,17 @@ export async function onRequestDelete({ request, env }) {
   }
 }
 
-/** GET /api/admin/drugs — รายการทั้งหมด รวม inactive (สำหรับ admin) */
+/** GET /api/admin/drugs — รายการทั้งหมด รวม inactive */
 export async function onRequestGet({ request, env }) {
   try {
     const url      = new URL(request.url);
     const category = url.searchParams.get('category');
+    const formulary = url.searchParams.get('formulary');
 
-    let sql = 'SELECT * FROM drugs';
+    let sql = 'SELECT * FROM drugs WHERE 1=1';
     const args = [];
-    if (category) { sql += ' WHERE category_id = ?'; args.push(category); }
+    if (category)  { sql += ' AND category_id = ?';      args.push(category); }
+    if (formulary) { sql += ' AND formulary_status = ?';  args.push(formulary); }
     sql += ' ORDER BY category_id, sort_order, name_en';
 
     const rows = await turso(env, sql, args);

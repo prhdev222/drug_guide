@@ -52,41 +52,12 @@ body { font-family: var(--font); background: var(--page-bg); color: var(--text);
 header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; }
 .header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.font-tools {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-}
-.font-tools button {
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  background: var(--gray);
-  color: var(--text);
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.85rem;
-  font-family: inherit;
-  line-height: 1;
-}
+.font-tools { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.font-tools button { width: 32px; height: 32px; border: none; border-radius: 8px; background: var(--gray); color: var(--text); cursor: pointer; font-weight: 700; font-size: 0.85rem; font-family: inherit; line-height: 1; }
 .font-tools button:hover:not(:disabled) { opacity: 0.85; }
 .font-tools button:disabled { opacity: 0.35; cursor: not-allowed; }
 .font-label { font-size: 0.75rem; color: var(--muted); min-width: 3rem; text-align: center; }
-.theme-btn {
-  width: 40px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-  font-size: 1.15rem;
-  line-height: 1;
-}
+.theme-btn { width: 40px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-size: 1.15rem; line-height: 1; }
 .theme-btn:hover { border-color: var(--teal); }
 header h1 { font-size: 1.2rem; font-weight: 600; color: var(--teal); }
 header p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
@@ -128,7 +99,7 @@ header p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 .doc-form-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 .doc-form-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 0.733rem; padding: 4px 10px; border-radius: 6px; border: 1px solid; text-decoration: none; font-weight: 500; transition: opacity .15s; }
 .doc-form-btn:hover { opacity: .75; }
-.doc-form-btn.pdf { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
+.doc-form-btn.pdf   { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
 .doc-form-btn.forms { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
 .toggle-btn { font-size: 0.8rem; background: none; border: none; cursor: pointer; color: var(--muted); margin-top: 6px; padding: 0; font-family: var(--font); }
 .toggle-btn:hover { color: var(--text); }
@@ -136,17 +107,28 @@ header p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 .drug-list.open { display: block; }
 .drug-group-label { font-size: 0.733rem; color: var(--muted); margin: 6px 0 3px; }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
-.chip { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--gray); }
-.chip-link { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; text-decoration: none; transition: opacity .15s; }
+
+/* Standard chips */
+.chip       { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--gray); }
+.chip-link  { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; text-decoration: none; transition: opacity .15s; }
 .chip-link:hover { opacity: .75; }
 .chip-multi { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .multi-doc-link { font-size: 0.667rem; padding: 1px 6px; border-radius: 10px; background: #1D4ED8; color: #fff; text-decoration: none; transition: opacity .15s; }
 .multi-doc-link:hover { opacity: .8; }
+
+/* Non-formulary chips */
+.chip-nonform { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #F5C4B3; color: #712B13; background: #FAECE7; display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.chip-special { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #FAC775; color: #633806; background: #FDF3D8; display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.approval-btn { font-size: 0.667rem; padding: 1px 6px; border-radius: 10px; background: #712B13; color: #fff; text-decoration: none; transition: opacity .15s; white-space: nowrap; }
+.approval-btn:hover { opacity: .8; }
+.chip-special .approval-btn { background: #7A4B00; }
+
+/* criteria tooltip trigger */
+.chip-nonform[title], .chip-special[title] { cursor: help; }
+
 .level-tag { font-size: 0.733rem; color: var(--muted); margin-top: 6px; }
 .count-label { max-width: 900px; margin: 0 auto .5rem; padding: 0 1rem; font-size: 0.8rem; color: var(--muted); }
 .no-result { text-align: center; padding: 3rem; color: var(--muted); grid-column: 1/-1; display: none; }
-
-
 .loading { text-align: center; padding: 3rem; color: var(--muted); grid-column: 1/-1; }
 .error-msg { background: var(--coral-bg); color: var(--coral-text); padding: 1rem; border-radius: 8px; font-size: 0.867rem; grid-column: 1/-1; }
 
@@ -160,20 +142,14 @@ header p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 .link-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--teal-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
 .link-body { min-width: 0; }
 .link-title { font-size: 0.867rem; font-weight: 500; color: var(--text); margin-bottom: 2px; line-height: 1.4; }
-.link-host { font-size: 0.733rem; color: var(--teal); }
-.link-desc { font-size: 0.733rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+.link-host  { font-size: 0.733rem; color: var(--teal); }
+.link-desc  { font-size: 0.733rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
 
-html.dark .chip-link {
-  background: rgba(59, 130, 246, 0.18);
-  color: #93c5fd;
-  border-color: #3b82f6;
-}
-html.dark .chip-multi {
-  background: rgba(59, 130, 246, 0.18);
-  color: #93c5fd;
-  border-color: #3b82f6;
-}
-html.dark .doc-form-btn.pdf { background: #3f1f1f; color: #fecaca; border-color: #991b1b; }
+html.dark .chip-link  { background: rgba(59,130,246,.18); color: #93c5fd; border-color: #3b82f6; }
+html.dark .chip-multi { background: rgba(59,130,246,.18); color: #93c5fd; border-color: #3b82f6; }
+html.dark .chip-nonform { background: #4a2a22; color: #f5c4b3; border-color: #991b1b; }
+html.dark .chip-special { background: #3d2e10; color: #fac775; border-color: #7a4b00; }
+html.dark .doc-form-btn.pdf   { background: #3f1f1f; color: #fecaca; border-color: #991b1b; }
 html.dark .doc-form-btn.forms { background: #1e3a5f; color: #bfdbfe; border-color: #1d4ed8; }
 html.dark .chip { background: var(--gray); border-color: var(--border); color: var(--muted); }
 </style>
@@ -211,6 +187,13 @@ html.dark .chip { background: var(--gray); border-color: var(--border); color: v
   <button class="pill" onclick="setRight(this,'DRUGDOC')">มียาที่แนบเอกสาร</button>
 </div>
 <div class="filter-row">
+  <span class="filter-label">สถานะคลัง:</span>
+  <button class="pill active" onclick="setStock(this,'ALL')">ทั้งหมด</button>
+  <button class="pill" onclick="setStock(this,'in_stock')">🟢 มีในคลัง</button>
+  <button class="pill" onclick="setStock(this,'non_formulary')">🔴 ต้องขออนุมัติ</button>
+  <button class="pill" onclick="setStock(this,'special_order')">🟠 สั่งพิเศษ</button>
+</div>
+<div class="filter-row">
   <span class="filter-label">กรองกลุ่มยา:</span>
   <select id="group-filter" class="group-select" onchange="setGroup(this)">
     <option value="">— ทั้งหมด —</option>
@@ -232,43 +215,33 @@ html.dark .chip { background: var(--gray); border-color: var(--border); color: v
 </div>
 
 <script>
-
 const FONT = { min: 13, max: 22, def: 15 };
-
 function getFontPx() {
   const raw = localStorage.getItem('nlem-font-px');
   if (raw == null) return FONT.def;
   const n = parseInt(raw, 10);
   return Number.isFinite(n) ? Math.max(FONT.min, Math.min(FONT.max, n)) : FONT.def;
 }
-
 function setFontPx(px) {
   px = Math.max(FONT.min, Math.min(FONT.max, px));
   document.documentElement.style.fontSize = px + 'px';
   localStorage.setItem('nlem-font-px', String(px));
   syncFontUi();
 }
-
-function adjustFont(delta) {
-  setFontPx(getFontPx() + delta);
-}
-
+function adjustFont(delta) { setFontPx(getFontPx() + delta); }
 function syncFontUi() {
-  const px = getFontPx();
+  const px  = getFontPx();
   const pct = Math.round((px / FONT.def) * 100);
   document.querySelectorAll('.font-pct').forEach(el => { el.textContent = pct + '%'; });
   document.querySelectorAll('.font-down').forEach(el => { el.disabled = px <= FONT.min; });
   document.querySelectorAll('.font-up').forEach(el => { el.disabled = px >= FONT.max; });
 }
-
 function toggleTheme() {
-  const html = document.documentElement;
-  const dark = !html.classList.contains('dark');
-  html.classList.toggle('dark', dark);
+  const dark = !document.documentElement.classList.contains('dark');
+  document.documentElement.classList.toggle('dark', dark);
   localStorage.setItem('nlem-theme', dark ? 'dark' : 'light');
   syncThemeBtn();
 }
-
 function syncThemeBtn() {
   const dark = document.documentElement.classList.contains('dark');
   document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -276,7 +249,6 @@ function syncThemeBtn() {
     btn.title = dark ? 'โหมดสว่าง' : 'โหมดมืด';
   });
 }
-
 function initDisplayPrefs() {
   document.documentElement.style.fontSize = getFontPx() + 'px';
   syncFontUi();
@@ -301,6 +273,7 @@ const RIGHTS_CLS = { UC: 'rt-uc', SSO: 'rt-sso', CSMBS: 'rt-csmbs' };
 
 let cats = [], drugs = [], links = [], drugGroups = [];
 let activeRight = 'ALL';
+let activeStock = 'ALL';
 let activeGroup = '';
 
 const LINK_ICONS = {
@@ -356,6 +329,44 @@ function renderLinks() {
   }).join('');
 }
 
+function buildDrugChip(d) {
+  const label = d.name_th ? `${d.name_en} (${d.name_th})` : d.name_en;
+  const fs    = d.formulary_status || 'in_stock';
+
+  if (fs === 'non_formulary') {
+    const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
+    const btn   = d.approval_doc_url
+      ? `<a class="approval-btn" href="${d.approval_doc_url}" target="_blank" rel="noopener">📋 แบบฟอร์ม รพ.สงฆ์</a>`
+      : '';
+    return `<span class="chip chip-nonform"${title}>🔴 ${label}${btn}</span>`;
+  }
+
+  if (fs === 'special_order') {
+    const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
+    const btn   = d.approval_doc_url
+      ? `<a class="approval-btn" href="${d.approval_doc_url}" target="_blank" rel="noopener">📋 ใบสั่งพิเศษ</a>`
+      : '';
+    return `<span class="chip chip-special"${title}>🟠 ${label}${btn}</span>`;
+  }
+
+  // in_stock — check NLEM doc_url
+  if (d.doc_url) {
+    let urls = [];
+    try { urls = JSON.parse(d.doc_url); if (!Array.isArray(urls)) urls = [d.doc_url]; }
+    catch { urls = [d.doc_url]; }
+    if (urls.length === 1) {
+      return `<a class="chip chip-link" href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">📄 ${label}</a>`;
+    }
+    let html = `<span class="chip chip-multi">📄 ${label}`;
+    urls.forEach((u, i) => {
+      html += `<a href="${u}" target="_blank" rel="noopener" class="multi-doc-link">เอกสาร ${i + 1}</a>`;
+    });
+    return html + '</span>';
+  }
+
+  return `<span class="chip">${label}</span>`;
+}
+
 function renderAll() {
   const grid = document.getElementById('card-grid');
   grid.innerHTML = '';
@@ -365,10 +376,8 @@ function renderAll() {
     const badge     = COLOR_BADGE[cat.color] || COLOR_BADGE.teal;
     const doc       = DOC_BADGE[cat.doc_level] || DOC_BADGE.none;
     const rightList = (cat.rights || '').split(',').filter(Boolean);
-    const cardBorder = ['required','partial'].includes(cat.doc_level) && cat.doc_level === 'required'
-      ? 'border-color:#F5C4B3'  : '';
+    const cardBorder = cat.doc_level === 'required' ? 'border-color:#F5C4B3' : '';
 
-    // group drugs
     const groups = {};
     catDrugs.forEach(d => {
       const g = d.drug_group || 'อื่นๆ';
@@ -376,29 +385,10 @@ function renderAll() {
       groups[g].push(d);
     });
 
-    // build drug html
     let drugHtml = '';
     Object.entries(groups).forEach(([g, list]) => {
       drugHtml += `<p class="drug-group-label">${g}</p><div class="chips">`;
-      list.forEach(d => {
-        const label = d.name_th ? `${d.name_en} (${d.name_th})` : d.name_en;
-        if (d.doc_url) {
-          let urls = [];
-          try { urls = JSON.parse(d.doc_url); if (!Array.isArray(urls)) urls = [d.doc_url]; }
-          catch { urls = [d.doc_url]; }
-          if (urls.length === 1) {
-            drugHtml += `<a class="chip chip-link" href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">📄 ${label}</a>`;
-          } else {
-            drugHtml += `<span class="chip chip-multi">📄 ${label}`;
-            urls.forEach((u, i) => {
-              drugHtml += `<a href="${u}" target="_blank" rel="noopener" class="multi-doc-link">เอกสาร ${i + 1}</a>`;
-            });
-            drugHtml += `</span>`;
-          }
-        } else {
-          drugHtml += `<span class="chip">${label}</span>`;
-        }
-      });
+      list.forEach(d => { drugHtml += buildDrugChip(d); });
       drugHtml += '</div>';
     });
 
@@ -407,15 +397,19 @@ function renderAll() {
     ].join(' ').toLowerCase();
 
     const groupsInCard = [...new Set(catDrugs.map(d => d.drug_group).filter(Boolean))];
-    const hasDrugDoc = catDrugs.some(d => !!d.doc_url);
+    const hasDrugDoc   = catDrugs.some(d => !!d.doc_url);
+    const hasNform     = catDrugs.some(d => d.formulary_status === 'non_formulary');
+    const hasSorder    = catDrugs.some(d => d.formulary_status === 'special_order');
 
     const card = document.createElement('div');
     card.className = 'card';
-    card.dataset.rights = rightList.join(' ');
-    card.dataset.doc    = cat.doc_level || 'none';
-    card.dataset.text   = searchText;
-    card.dataset.groups = groupsInCard.join('||');
+    card.dataset.rights  = rightList.join(' ');
+    card.dataset.doc     = cat.doc_level || 'none';
+    card.dataset.text    = searchText;
+    card.dataset.groups  = groupsInCard.join('||');
     card.dataset.drugdoc = hasDrugDoc ? '1' : '0';
+    card.dataset.nform   = hasNform   ? '1' : '0';
+    card.dataset.sorder  = hasSorder  ? '1' : '0';
     if (cardBorder) card.style.cssText = cardBorder;
 
     card.innerHTML = `
@@ -436,8 +430,7 @@ function renderAll() {
       <div class="doc-form-row">
         <span class="doc-badge ${doc.cls}">${doc.label}</span>
         ${cat.doc_url ? `
-        <a class="doc-form-btn pdf"
-           href="${cat.doc_url}" target="_blank" rel="noopener">
+        <a class="doc-form-btn pdf" href="${cat.doc_url}" target="_blank" rel="noopener">
           📄 เอกสาร / แบบฟอร์ม
         </a>` : ''}
       </div>
@@ -448,7 +441,6 @@ function renderAll() {
 
   filterCards();
 }
-
 
 function toggleDrugs(btn) {
   const list = btn.nextElementSibling;
@@ -461,7 +453,16 @@ function toggleDrugs(btn) {
 
 function setRight(el, val) {
   activeRight = val;
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.filter-row:first-of-type .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  filterCards();
+}
+
+function setStock(el, val) {
+  activeStock = val;
+  // reset all stock pills then activate clicked one
+  const stockRow = el.closest('.filter-row');
+  stockRow.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   filterCards();
 }
@@ -476,27 +477,35 @@ function filterCards() {
   const q = document.getElementById('search').value.toLowerCase();
   let visible = 0;
   document.querySelectorAll('.card').forEach(card => {
-    const rights     = card.dataset.rights || '';
-    const doc        = card.dataset.doc    || '';
-    const text       = card.dataset.text   || '';
-    const cardGroups = card.dataset.groups || '';
+    const rights     = card.dataset.rights  || '';
+    const doc        = card.dataset.doc     || '';
+    const text       = card.dataset.text    || '';
+    const cardGroups = card.dataset.groups  || '';
     const drugdoc    = card.dataset.drugdoc || '0';
+    const nform      = card.dataset.nform   || '0';
+    const sorder     = card.dataset.sorder  || '0';
 
+    // Rights filter
     let rm = true;
-    if      (activeRight === 'UC')    rm = rights.includes('UC');
-    else if (activeRight === 'SSO')   rm = rights.includes('SSO');
-    else if (activeRight === 'CSMBS') rm = rights.includes('CSMBS');
-    else if (activeRight === 'DOC')   rm = doc === 'required' || doc === 'partial';
+    if      (activeRight === 'UC')      rm = rights.includes('UC');
+    else if (activeRight === 'SSO')     rm = rights.includes('SSO');
+    else if (activeRight === 'CSMBS')   rm = rights.includes('CSMBS');
+    else if (activeRight === 'DOC')     rm = doc === 'required' || doc === 'partial';
     else if (activeRight === 'DRUGDOC') rm = drugdoc === '1';
 
-    const gm = !activeGroup || cardGroups.split('||').includes(activeGroup);
-    const sm = !q || text.includes(q) || card.textContent.toLowerCase().includes(q);
+    // Stock filter
+    let sm = true;
+    if      (activeStock === 'in_stock')      sm = nform === '0' && sorder === '0';
+    else if (activeStock === 'non_formulary') sm = nform === '1';
+    else if (activeStock === 'special_order') sm = sorder === '1';
 
-    if (rm && gm && sm) { card.classList.remove('hidden'); visible++; }
-    else                { card.classList.add('hidden'); }
+    const gm = !activeGroup || cardGroups.split('||').includes(activeGroup);
+    const qm = !q || text.includes(q) || card.textContent.toLowerCase().includes(q);
+
+    if (rm && sm && gm && qm) { card.classList.remove('hidden'); visible++; }
+    else                      { card.classList.add('hidden'); }
   });
-  const label = document.getElementById('count-label');
-  label.textContent = `แสดง ${visible} บัญชี`;
+  document.getElementById('count-label').textContent = `แสดง ${visible} บัญชี`;
   const noRes = document.querySelector('.no-result');
   if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
 }

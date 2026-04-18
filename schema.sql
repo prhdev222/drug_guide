@@ -16,14 +16,20 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 CREATE TABLE IF NOT EXISTS drugs (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  category_id TEXT NOT NULL REFERENCES categories(id),
-  name_en     TEXT NOT NULL,
-  name_th     TEXT,
-  drug_group  TEXT,                     -- 'ยาต้านเชื้อ','ยามะเร็ง','ARV' ฯลฯ
-  notes       TEXT,
-  active      INTEGER DEFAULT 1,
-  sort_order  INTEGER DEFAULT 0
+  id               INTEGER PRIMARY KEY AUTOINCREMENT,
+  category_id      TEXT NOT NULL REFERENCES categories(id),
+  name_en          TEXT NOT NULL,
+  name_th          TEXT,
+  drug_group       TEXT,
+  notes            TEXT,
+  doc_url          TEXT,
+  -- v2: Formulary & Approval
+  formulary_status TEXT NOT NULL DEFAULT 'in_stock', -- 'in_stock'|'non_formulary'|'special_order'
+  approval_doc_url TEXT,   -- link แบบฟอร์มขออนุมัติ รพ.สงฆ์
+  approval_criteria TEXT,  -- เกณฑ์/เงื่อนไขการอนุมัติ
+  fda_reg_no       TEXT,   -- เลขทะเบียน อย.
+  active           INTEGER DEFAULT 1,
+  sort_order       INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS links (
@@ -32,6 +38,20 @@ CREATE TABLE IF NOT EXISTS links (
   title       TEXT NOT NULL,
   url         TEXT NOT NULL,
   description TEXT,
+  active      INTEGER DEFAULT 1,
+  sort_order  INTEGER DEFAULT 0
+);
+
+-- approval_forms: แบบฟอร์มอนุมัติรายยา แยกตามสิทธิ (สำหรับการขยายในอนาคต)
+CREATE TABLE IF NOT EXISTS approval_forms (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  drug_id     INTEGER NOT NULL REFERENCES drugs(id),
+  rights      TEXT NOT NULL DEFAULT 'ALL',         -- 'UC'|'SSO'|'CSMBS'|'ALL'
+  form_type   TEXT NOT NULL DEFAULT 'prh_approval', -- 'prh_approval'|'nhso_prior_auth'|'exceptional_drug'
+  title       TEXT NOT NULL,
+  url         TEXT,
+  criteria    TEXT,
+  notes       TEXT,
   active      INTEGER DEFAULT 1,
   sort_order  INTEGER DEFAULT 0
 );
@@ -171,3 +191,25 @@ INSERT OR IGNORE INTO links (category_id, title, url, description, sort_order) V
   ('ค','สปสช. — ยาบัญชี ค เกณฑ์การใช้',
    'https://www.nhso.go.th',
    'เกณฑ์และแนวปฏิบัติสำหรับยาบัญชี ค',7);
+
+-- =============================================================
+-- MIGRATION v2 (รันเฉพาะ database ที่มีอยู่แล้ว)
+-- ถ้าสร้าง database ใหม่จาก schema.sql นี้ ไม่ต้องรัน
+-- =============================================================
+-- ALTER TABLE drugs ADD COLUMN doc_url TEXT;
+-- ALTER TABLE drugs ADD COLUMN formulary_status TEXT NOT NULL DEFAULT 'in_stock';
+-- ALTER TABLE drugs ADD COLUMN approval_doc_url TEXT;
+-- ALTER TABLE drugs ADD COLUMN approval_criteria TEXT;
+-- ALTER TABLE drugs ADD COLUMN fda_reg_no TEXT;
+-- CREATE TABLE IF NOT EXISTS approval_forms (
+--   id INTEGER PRIMARY KEY AUTOINCREMENT,
+--   drug_id INTEGER NOT NULL REFERENCES drugs(id),
+--   rights TEXT NOT NULL DEFAULT 'ALL',
+--   form_type TEXT NOT NULL DEFAULT 'prh_approval',
+--   title TEXT NOT NULL,
+--   url TEXT,
+--   criteria TEXT,
+--   notes TEXT,
+--   active INTEGER DEFAULT 1,
+--   sort_order INTEGER DEFAULT 0
+-- );

@@ -39,15 +39,7 @@ body { font-family: var(--font); background: var(--page-bg); color: var(--text);
 
 /* Login */
 #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; padding: 1rem; }
-.login-prefs {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.login-prefs { position: absolute; top: 1rem; right: 1rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; width: 340px; max-width: 100%; }
 .login-card h2 { font-size: 1.067rem; margin-bottom: 1rem; }
 .login-card input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.933rem; font-family: var(--font); margin-bottom: 10px; background: var(--input-bg); color: var(--text); }
@@ -57,63 +49,36 @@ body { font-family: var(--font); background: var(--page-bg); color: var(--text);
 
 /* App */
 #app { display: none; }
-.font-tools {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-}
-.font-tools button {
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  background: var(--gray);
-  color: var(--text);
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.85rem;
-  font-family: inherit;
-  line-height: 1;
-}
+.font-tools { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.font-tools button { width: 32px; height: 32px; border: none; border-radius: 8px; background: var(--gray); color: var(--text); cursor: pointer; font-weight: 700; font-size: 0.85rem; font-family: inherit; line-height: 1; }
 .font-tools button:hover:not(:disabled) { opacity: 0.85; }
 .font-tools button:disabled { opacity: 0.35; cursor: not-allowed; }
 .font-label { font-size: 0.75rem; color: var(--muted); min-width: 3rem; text-align: center; }
-.theme-btn {
-  width: 40px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-  font-size: 1.15rem;
-  line-height: 1;
-}
+.theme-btn { width: 40px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-size: 1.15rem; line-height: 1; }
 .theme-btn:hover { border-color: var(--teal); }
 header { background: var(--surface); border-bottom: 1px solid var(--border); padding: .75rem 1.5rem; display: flex; align-items: center; gap: 1rem; justify-content: space-between; flex-wrap: wrap; }
 .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .nav-home { font-size: 0.8rem; color: var(--muted); text-decoration: none; margin-right: 4px; }
 .nav-home:hover { color: var(--text); }
 header h1 { font-size: 1.067rem; font-weight: 600; color: var(--teal); }
-.tabs { display: flex; gap: 4px; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
 .tab { padding: 6px 14px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; font-family: var(--font); font-size: 0.867rem; background: none; color: var(--muted); }
 .tab.active { background: var(--teal-bg); color: var(--teal-text); border-color: var(--teal); }
 .tab:hover:not(.active) { background: var(--gray); }
 .logout-btn { font-size: 0.8rem; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; cursor: pointer; font-family: var(--font); }
 
-main { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+main { max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; }
 .section { display: none; }
 .section.active { display: block; }
 
 /* Table */
-.table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+.table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; flex-wrap: wrap; gap: 8px; }
 .table-title { font-size: 1rem; font-weight: 600; }
 .add-btn { padding: 7px 14px; background: var(--teal); color: #fff; border: none; border-radius: 7px; font-size: 0.867rem; font-family: var(--font); cursor: pointer; }
 .filter-input { padding: 7px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.867rem; font-family: var(--font); width: 200px; background: var(--input-bg); color: var(--text); }
 .filter-input:focus { outline: none; border-color: var(--teal); }
+.filter-select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.867rem; font-family: var(--font); background: var(--input-bg); color: var(--text); cursor: pointer; }
+.filter-select:focus { outline: none; border-color: var(--teal); }
 .tbl-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 th { background: var(--gray); padding: 9px 12px; text-align: left; font-size: 0.8rem; color: var(--muted); font-weight: 500; white-space: nowrap; }
@@ -126,23 +91,34 @@ tr:hover td { background: var(--page-bg); }
 .act-btn.restore { color: var(--teal-text); border-color: var(--teal); }
 .badge-cat { font-size: 0.733rem; padding: 2px 7px; border-radius: 4px; background: var(--teal-bg); color: var(--teal-text); font-weight: 500; }
 
+/* Formulary status badges */
+.fstatus { font-size: 0.733rem; padding: 2px 7px; border-radius: 4px; font-weight: 500; white-space: nowrap; }
+.fstatus-in      { background: var(--teal-bg); color: var(--teal-text); }
+.fstatus-non     { background: var(--red-bg);  color: var(--red-text); }
+.fstatus-special { background: #FDF3D8; color: #7A4B00; }
+html.dark .fstatus-special { background: #3d2e10; color: #fac775; }
+
+/* Approval info box */
+.approval-info { font-size: 0.8rem; color: var(--muted); background: var(--gray); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; border-left: 3px solid #F5C4B3; line-height: 1.5; }
+
 /* Modal */
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; align-items: center; justify-content: center; }
 .modal-bg.open { display: flex; }
-.modal { background: var(--surface); border-radius: 14px; padding: 1.5rem; width: 480px; max-width: 95vw; color: var(--text); }
+.modal { background: var(--surface); border-radius: 14px; padding: 1.5rem; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; color: var(--text); }
 .modal h3 { font-size: 1rem; margin-bottom: 1rem; }
 .form-row { margin-bottom: 10px; }
 .form-row label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 3px; }
 .form-row input, .form-row select, .form-row textarea {
   width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px;
   font-size: 0.867rem; font-family: var(--font); background: var(--input-bg); color: var(--text); }
-.form-row input:focus, .form-row select:focus { outline: none; border-color: var(--teal); }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--teal); }
 .form-row textarea { resize: vertical; min-height: 60px; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
 .modal-actions button { padding: 7px 16px; border-radius: 7px; font-size: 0.867rem; font-family: var(--font); cursor: pointer; border: 1px solid var(--border); }
 .btn-save   { background: var(--teal); color: #fff; border-color: var(--teal); }
 .btn-cancel { background: none; }
 .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1c1c1a; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 0.867rem; z-index: 200; display: none; }
+
 /* Multi-URL list */
 .url-list { display: flex; flex-direction: column; gap: 6px; }
 .url-item { display: flex; gap: 6px; align-items: center; }
@@ -150,6 +126,17 @@ tr:hover td { background: var(--page-bg); }
 .url-item input:focus { outline: none; border-color: var(--teal); }
 .url-remove { width: 28px; height: 28px; border: 1px solid #F5C4B3; border-radius: 6px; background: none; color: var(--red-text); cursor: pointer; font-size: 0.933rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .url-add-btn { margin-top: 6px; font-size: 0.8rem; color: var(--teal-text); background: var(--teal-bg); border: 1px solid var(--teal); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: var(--font); }
+
+/* Non-formulary summary panel */
+.nform-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 1rem; }
+.nform-summary-header { background: var(--gray); padding: 10px 14px; font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.nform-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-top: 1px solid var(--border); }
+.nform-row:first-child { border-top: none; }
+.nform-name { flex: 1; font-size: 0.867rem; }
+.nform-name small { display: block; font-size: 0.733rem; color: var(--muted); margin-top: 2px; }
+.nform-link { font-size: 0.733rem; padding: 3px 8px; border-radius: 4px; background: var(--red-bg); color: var(--red-text); border: 1px solid #F5C4B3; text-decoration: none; white-space: nowrap; }
+.nform-link:hover { opacity: .8; }
+.nform-empty { padding: 1.5rem; text-align: center; color: var(--muted); font-size: 0.867rem; }
 
 html.dark tr:hover td { background: #2a2927; }
 html.dark .logout-btn { background: var(--surface); color: var(--muted); }
@@ -183,6 +170,7 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
     <h1>Admin — NLEM Drug Guide</h1>
     <div class="tabs">
       <button class="tab active" onclick="switchTab(this,'tab-drugs')">รายการยา</button>
+      <button class="tab" onclick="switchTab(this,'tab-nform')">🔴 ขออนุมัติ</button>
       <button class="tab" onclick="switchTab(this,'tab-groups')">กลุ่มยา</button>
       <button class="tab" onclick="switchTab(this,'tab-links')">ลิงก์อ้างอิง</button>
       <button class="tab" onclick="switchTab(this,'tab-cats')">บัญชียา</button>
@@ -204,17 +192,33 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
     <div class="section active" id="tab-drugs">
       <div class="table-header">
         <span class="table-title">รายการยา</span>
-        <div style="display:flex;gap:8px">
-          <input class="filter-input" placeholder="ค้นหาชื่อยา..." oninput="filterTable('drugs-tbody',this.value)">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <select class="filter-select" id="formulary-filter" onchange="applyDrugFilters()">
+            <option value="">— ทุกสถานะคลัง —</option>
+            <option value="in_stock">🟢 มีในคลัง</option>
+            <option value="non_formulary">🔴 ต้องขออนุมัติ</option>
+            <option value="special_order">🟠 สั่งพิเศษ</option>
+          </select>
+          <input class="filter-input" id="drug-search" placeholder="ค้นหาชื่อยา..." oninput="applyDrugFilters()">
           <button class="add-btn" onclick="openDrugModal()">+ เพิ่มยา</button>
         </div>
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>บัญชี</th><th>ชื่อยา (EN)</th><th>ชื่อยา (TH)</th><th>กลุ่มยา</th><th>สถานะ</th><th></th></tr></thead>
-          <tbody id="drugs-tbody"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
+          <thead><tr><th>บัญชี</th><th>ชื่อยา (EN)</th><th>ชื่อยา (TH)</th><th>กลุ่มยา</th><th>คลัง</th><th>แบบฟอร์ม</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody id="drugs-tbody"><tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
         </table>
       </div>
+    </div>
+
+    <!-- TAB: Non-Formulary Summary -->
+    <div class="section" id="tab-nform">
+      <div class="table-header">
+        <span class="table-title">ยานอกบัญชีคลัง — รายการขออนุมัติ</span>
+        <button class="add-btn" onclick="switchTabById('tab-drugs');openDrugModal()">+ เพิ่มยาใหม่</button>
+      </div>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">ยาที่มีสถานะ 🔴 ต้องขออนุมัติ หรือ 🟠 สั่งพิเศษ — คลิก "แก้ไข" เพื่อเพิ่ม link แบบฟอร์ม รพ.สงฆ์</p>
+      <div id="nform-list"></div>
     </div>
 
     <!-- TAB: Drug Groups -->
@@ -269,17 +273,48 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
       <label>บัญชี *</label>
       <select id="drug-cat"></select>
     </div>
-    <div class="form-row"><label>ชื่อยา (EN) *</label><input id="drug-name-en" placeholder="Paracetamol"></div>
-    <div class="form-row"><label>ชื่อยา (TH)</label><input id="drug-name-th" placeholder="พาราเซตามอล"></div>
+    <div class="form-row"><label>ชื่อยา (EN) *</label><input id="drug-name-en" placeholder="Imatinib"></div>
+    <div class="form-row"><label>ชื่อยา (TH)</label><input id="drug-name-th" placeholder="อิมาทินิบ"></div>
     <div class="form-row">
       <label>กลุ่มยา</label>
       <select id="drug-group">
         <option value="">— ไม่ระบุ —</option>
       </select>
     </div>
+
+    <!-- สถานะคลังยา -->
+    <div class="form-row">
+      <label>สถานะคลังยา *</label>
+      <select id="drug-formulary" onchange="updateApprovalVisibility()">
+        <option value="in_stock">🟢 มีในคลัง รพ.สงฆ์</option>
+        <option value="non_formulary">🔴 ไม่มีในคลัง — ต้องขออนุมัติ</option>
+        <option value="special_order">🟠 สั่งพิเศษ — ต้องรอคลัง</option>
+      </select>
+    </div>
+
+    <!-- Approval section (แสดงเมื่อไม่มีในคลัง) -->
+    <div id="approval-section" style="display:none">
+      <div class="approval-info">
+        ⚠️ ยานอกบัญชีคลัง — กรอกข้อมูลด้านล่างเพื่อให้แพทย์ทราบขั้นตอนการขออนุมัติ
+      </div>
+      <div class="form-row">
+        <label>เลขทะเบียน อย.</label>
+        <input id="drug-fda-reg" placeholder="เช่น 1A 23/2564">
+      </div>
+      <div class="form-row">
+        <label>🔗 Link แบบฟอร์มขออนุมัติ รพ.สงฆ์</label>
+        <input id="drug-approval-url" type="url" placeholder="https://drive.google.com/file/...">
+        <p style="font-size:0.75rem;color:var(--muted);margin-top:3px">ลิงก์ Google Drive, SharePoint หรือ URL อื่น ๆ ของ รพ.สงฆ์</p>
+      </div>
+      <div class="form-row">
+        <label>เกณฑ์ / เงื่อนไขการอนุมัติ</label>
+        <textarea id="drug-approval-criteria" placeholder="เช่น ใช้หลัง TKI ล้มเหลว ≥2 ตัว, ยืนยัน T315I mutation, ส่ง hematologist ประเมินก่อน"></textarea>
+      </div>
+    </div>
+
     <div class="form-row"><label>หมายเหตุ</label><textarea id="drug-notes"></textarea></div>
     <div class="form-row" id="drug-doc-url-row" style="display:none">
-      <label>📄 Link เอกสาร / แบบฟอร์ม</label>
+      <label>📄 Link เอกสาร NLEM / แบบฟอร์มสิทธิ</label>
       <div class="url-list" id="drug-url-list"></div>
       <button type="button" class="url-add-btn" onclick="addDocUrl()">+ เพิ่ม link</button>
     </div>
@@ -330,10 +365,7 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
   <div class="modal">
     <h3 id="cat-modal-title">แก้ไขบัญชียา</h3>
     <input type="hidden" id="cat-id">
-    <div class="form-row">
-      <label>คำอธิบาย</label>
-      <textarea id="cat-desc" rows="3"></textarea>
-    </div>
+    <div class="form-row"><label>คำอธิบาย</label><textarea id="cat-desc" rows="3"></textarea></div>
     <div class="form-row">
       <label>🔗 Link เอกสาร / แบบฟอร์ม (Google Drive หรือ URL อื่นๆ)</label>
       <input id="cat-doc-url" type="url" placeholder="https://drive.google.com/...">
@@ -353,24 +385,25 @@ let cats = [], drugs = [], links = [], groups = [];
 
 const FONT = { min: 13, max: 22, def: 15 };
 
+const FSTATUS = {
+  in_stock:      { label: '🟢 มีในคลัง',    cls: 'fstatus-in',      icon: '🟢' },
+  non_formulary: { label: '🔴 ขออนุมัติ',   cls: 'fstatus-non',     icon: '🔴' },
+  special_order: { label: '🟠 สั่งพิเศษ',   cls: 'fstatus-special', icon: '🟠' },
+};
+
 function getFontPx() {
   const raw = localStorage.getItem('nlem-font-px');
   if (raw == null) return FONT.def;
   const n = parseInt(raw, 10);
   return Number.isFinite(n) ? Math.max(FONT.min, Math.min(FONT.max, n)) : FONT.def;
 }
-
 function setFontPx(px) {
   px = Math.max(FONT.min, Math.min(FONT.max, px));
   document.documentElement.style.fontSize = px + 'px';
   localStorage.setItem('nlem-font-px', String(px));
   syncFontUi();
 }
-
-function adjustFont(delta) {
-  setFontPx(getFontPx() + delta);
-}
-
+function adjustFont(delta) { setFontPx(getFontPx() + delta); }
 function syncFontUi() {
   const px = getFontPx();
   const pct = Math.round((px / FONT.def) * 100);
@@ -378,15 +411,12 @@ function syncFontUi() {
   document.querySelectorAll('.font-down').forEach(el => { el.disabled = px <= FONT.min; });
   document.querySelectorAll('.font-up').forEach(el => { el.disabled = px >= FONT.max; });
 }
-
 function toggleTheme() {
-  const html = document.documentElement;
-  const dark = !html.classList.contains('dark');
-  html.classList.toggle('dark', dark);
+  const dark = !document.documentElement.classList.contains('dark');
+  document.documentElement.classList.toggle('dark', dark);
   localStorage.setItem('nlem-theme', dark ? 'dark' : 'light');
   syncThemeBtn();
 }
-
 function syncThemeBtn() {
   const dark = document.documentElement.classList.contains('dark');
   document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -394,7 +424,6 @@ function syncThemeBtn() {
     btn.title = dark ? 'โหมดสว่าง' : 'โหมดมืด';
   });
 }
-
 function initDisplayPrefs() {
   document.documentElement.style.fontSize = getFontPx() + 'px';
   syncFontUi();
@@ -404,7 +433,6 @@ function initDisplayPrefs() {
 function login() {
   API_KEY = document.getElementById('api-key-input').value.trim();
   if (!API_KEY) return;
-  // Test the key by calling admin endpoint
   fetch('/api/admin/categories', { headers: { 'X-Admin-Key': API_KEY } })
     .then(r => {
       if (r.ok) {
@@ -417,11 +445,7 @@ function login() {
     })
     .catch(() => { document.getElementById('login-error').style.display = 'block'; });
 }
-
-function logout() {
-  API_KEY = '';
-  location.reload();
-}
+function logout() { API_KEY = ''; location.reload(); }
 
 function api(path, method = 'GET', body) {
   return fetch(path, {
@@ -438,18 +462,25 @@ async function loadAll() {
     api('/api/admin/links'),
     api('/api/admin/drug-groups'),
   ]);
-  renderDrugs(); renderLinks(); renderCats(); renderGroups();
-  // Populate category selects
+  renderDrugs();
+  renderNformList();
+  renderLinks();
+  renderCats();
+  renderGroups();
   const opts = cats.map(c => `<option value="${c.id}" data-doc="${c.doc_level||'none'}">${c.id} — ${c.name_th}</option>`).join('');
   const drugCat = document.getElementById('drug-cat');
   drugCat.innerHTML = opts;
   drugCat.addEventListener('change', updateDocUrlVisibility);
-  document.getElementById('link-cat').innerHTML =
-    '<option value="">— ทั่วไป —</option>' + opts;
-  // Populate drug group dropdown
+  document.getElementById('link-cat').innerHTML = '<option value="">— ทั่วไป —</option>' + opts;
   populateGroupSelect();
 }
 
+// ---- Approval visibility ----
+function updateApprovalVisibility() {
+  const fs   = document.getElementById('drug-formulary').value;
+  const show = fs === 'non_formulary' || fs === 'special_order';
+  document.getElementById('approval-section').style.display = show ? '' : 'none';
+}
 function updateDocUrlVisibility() {
   const sel = document.getElementById('drug-cat');
   const opt = sel.options[sel.selectedIndex];
@@ -458,6 +489,7 @@ function updateDocUrlVisibility() {
   document.getElementById('drug-doc-url-row').style.display = show ? '' : 'none';
 }
 
+// ---- Drug multi-URL helpers ----
 function addDocUrl(value = '') {
   const list = document.getElementById('drug-url-list');
   const item = document.createElement('div');
@@ -468,7 +500,6 @@ function addDocUrl(value = '') {
   list.appendChild(item);
   item.querySelector('input').focus();
 }
-
 function getDocUrls() {
   const inputs = document.querySelectorAll('#drug-url-list .url-item input');
   const urls = [...inputs].map(i => i.value.trim()).filter(Boolean);
@@ -476,7 +507,6 @@ function getDocUrls() {
   if (urls.length === 1) return urls[0];
   return JSON.stringify(urls);
 }
-
 function setDocUrls(raw) {
   document.getElementById('drug-url-list').innerHTML = '';
   if (!raw) return;
@@ -488,14 +518,13 @@ function setDocUrls(raw) {
 
 // ---- Drug Groups ----
 function populateGroupSelect(currentVal = '') {
-  const sel = document.getElementById('drug-group');
+  const sel  = document.getElementById('drug-group');
   const prev = currentVal || sel.value;
   sel.innerHTML = '<option value="">— ไม่ระบุ —</option>' +
     groups.filter(g => g.active).map(g =>
       `<option value="${g.name}" ${g.name === prev ? 'selected' : ''}>${g.name}</option>`
     ).join('');
 }
-
 function renderGroups() {
   const tbody = document.getElementById('groups-tbody');
   tbody.innerHTML = groups.map(g => `
@@ -511,7 +540,6 @@ function renderGroups() {
       </td>
     </tr>`).join('');
 }
-
 function openGroupModal(id) {
   document.getElementById('group-id').value = '';
   document.getElementById('group-name').value = '';
@@ -528,24 +556,19 @@ function openGroupModal(id) {
   }
   document.getElementById('group-modal').classList.add('open');
 }
-
 async function saveGroup() {
   const id   = document.getElementById('group-id').value;
   const name = document.getElementById('group-name').value.trim();
   const sort_order = parseInt(document.getElementById('group-order').value) || 0;
   if (!name) { alert('กรุณากรอกชื่อกลุ่มยา'); return; }
-  if (id) {
-    await api(`/api/admin/drug-groups?id=${id}`, 'PUT', { name, sort_order });
-  } else {
-    await api('/api/admin/drug-groups', 'POST', { name, sort_order });
-  }
+  if (id) { await api(`/api/admin/drug-groups?id=${id}`, 'PUT', { name, sort_order }); }
+  else    { await api('/api/admin/drug-groups', 'POST', { name, sort_order }); }
   closeModal('group-modal');
   groups = await api('/api/admin/drug-groups');
   renderGroups();
   populateGroupSelect();
   showToast('บันทึกสำเร็จ');
 }
-
 async function toggleGroup(id, active) {
   await api(`/api/admin/drug-groups?id=${id}`, 'PUT', { active });
   groups = await api('/api/admin/drug-groups');
@@ -556,13 +579,28 @@ async function toggleGroup(id, active) {
 
 // ---- Drugs ----
 function renderDrugs() {
-  const tbody = document.getElementById('drugs-tbody');
-  tbody.innerHTML = drugs.map(d => `
+  const tbody  = document.getElementById('drugs-tbody');
+  const q      = (document.getElementById('drug-search')?.value || '').toLowerCase();
+  const fFilter = document.getElementById('formulary-filter')?.value || '';
+  const list = drugs.filter(d => {
+    const matchQ = !q || d.name_en.toLowerCase().includes(q) || (d.name_th||'').toLowerCase().includes(q);
+    const matchF = !fFilter || d.formulary_status === fFilter;
+    return matchQ && matchF;
+  });
+  tbody.innerHTML = list.map(d => {
+    const fs = FSTATUS[d.formulary_status] || FSTATUS.in_stock;
+    const hasForm = !!d.approval_doc_url;
+    return `
     <tr class="${d.active ? '' : 'inactive'}">
       <td><span class="badge-cat">${d.category_id}</span></td>
       <td>${d.name_en}</td>
       <td>${d.name_th || '—'}</td>
       <td>${d.drug_group || '—'}</td>
+      <td><span class="fstatus ${fs.cls}">${fs.label}</span></td>
+      <td>${hasForm
+        ? `<a href="${d.approval_doc_url}" target="_blank" style="font-size:0.733rem;color:var(--teal)">📋 ดูแบบฟอร์ม</a>`
+        : (d.formulary_status !== 'in_stock' ? '<span style="font-size:0.733rem;color:var(--muted)">ยังไม่มี link</span>' : '—')}
+      </td>
       <td>${d.active ? 'ใช้งาน' : 'ปิดใช้'}</td>
       <td style="white-space:nowrap">
         <button class="act-btn edit" onclick="openDrugModal(${d.id})">แก้ไข</button>
@@ -570,13 +608,50 @@ function renderDrugs() {
           ? `<button class="act-btn del" onclick="toggleDrug(${d.id},0)">ปิด</button>`
           : `<button class="act-btn restore" onclick="toggleDrug(${d.id},1)">เปิด</button>`}
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('') || '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">ไม่พบรายการ</td></tr>';
 }
 
-function filterTable(tbodyId, q) {
-  document.querySelectorAll(`#${tbodyId} tr`).forEach(tr => {
-    tr.style.display = tr.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+function applyDrugFilters() { renderDrugs(); }
+
+function renderNformList() {
+  const list = document.getElementById('nform-list');
+  const nform = drugs.filter(d => d.formulary_status === 'non_formulary' || d.formulary_status === 'special_order');
+  if (!nform.length) {
+    list.innerHTML = '<div class="nform-summary"><div class="nform-empty">ยังไม่มียานอกบัญชีคลัง — ทุกยามีในคลัง รพ.สงฆ์</div></div>';
+    return;
+  }
+  // Group by formulary_status
+  const byStatus = {};
+  nform.forEach(d => {
+    if (!byStatus[d.formulary_status]) byStatus[d.formulary_status] = [];
+    byStatus[d.formulary_status].push(d);
   });
+  let html = '';
+  ['non_formulary','special_order'].forEach(fs => {
+    if (!byStatus[fs]) return;
+    const fsInfo = FSTATUS[fs];
+    html += `<div class="nform-summary">`;
+    html += `<div class="nform-summary-header">${fsInfo.icon} ${fsInfo.label} (${byStatus[fs].length} รายการ)</div>`;
+    byStatus[fs].forEach(d => {
+      html += `<div class="nform-row">
+        <div style="width:50px;text-align:center"><span class="badge-cat">${d.category_id}</span></div>
+        <div class="nform-name">
+          ${d.name_en}${d.name_th ? ` (${d.name_th})` : ''}
+          ${d.drug_group ? `<small>${d.drug_group}</small>` : ''}
+          ${d.approval_criteria ? `<small style="margin-top:2px;color:var(--muted)">${d.approval_criteria.substring(0,80)}${d.approval_criteria.length>80?'…':''}</small>` : ''}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          ${d.approval_doc_url
+            ? `<a class="nform-link" href="${d.approval_doc_url}" target="_blank" rel="noopener">📋 แบบฟอร์ม</a>`
+            : `<span style="font-size:0.733rem;color:var(--muted)">ยังไม่มี link</span>`}
+          <button class="act-btn edit" onclick="openDrugModal(${d.id})">แก้ไข</button>
+        </div>
+      </div>`;
+    });
+    html += '</div><br>';
+  });
+  list.innerHTML = html;
 }
 
 function openDrugModal(id) {
@@ -585,6 +660,10 @@ function openDrugModal(id) {
   document.getElementById('drug-name-th').value = '';
   document.getElementById('drug-group').value = '';
   document.getElementById('drug-notes').value = '';
+  document.getElementById('drug-formulary').value = 'in_stock';
+  document.getElementById('drug-fda-reg').value = '';
+  document.getElementById('drug-approval-url').value = '';
+  document.getElementById('drug-approval-criteria').value = '';
   setDocUrls('');
   document.getElementById('drug-order').value = 0;
   document.getElementById('drug-modal-title').textContent = 'เพิ่มยาใหม่';
@@ -596,43 +675,49 @@ function openDrugModal(id) {
       document.getElementById('drug-name-en').value = d.name_en;
       document.getElementById('drug-name-th').value = d.name_th || '';
       populateGroupSelect(d.drug_group || '');
+      document.getElementById('drug-formulary').value = d.formulary_status || 'in_stock';
+      document.getElementById('drug-fda-reg').value = d.fda_reg_no || '';
+      document.getElementById('drug-approval-url').value = d.approval_doc_url || '';
+      document.getElementById('drug-approval-criteria').value = d.approval_criteria || '';
       document.getElementById('drug-notes').value = d.notes || '';
       setDocUrls(d.doc_url || '');
       document.getElementById('drug-order').value = d.sort_order;
       document.getElementById('drug-modal-title').textContent = 'แก้ไขยา';
     }
   }
+  updateApprovalVisibility();
   updateDocUrlVisibility();
   document.getElementById('drug-modal').classList.add('open');
 }
-
 async function saveDrug() {
   const id      = document.getElementById('drug-id').value;
   const payload = {
-    category_id: document.getElementById('drug-cat').value,
-    name_en:     document.getElementById('drug-name-en').value.trim(),
-    name_th:     document.getElementById('drug-name-th').value.trim() || null,
-    drug_group:  document.getElementById('drug-group').value || null,
-    notes:       document.getElementById('drug-notes').value.trim() || null,
-    doc_url:     getDocUrls(),
-    sort_order:  parseInt(document.getElementById('drug-order').value) || 0,
+    category_id:      document.getElementById('drug-cat').value,
+    name_en:          document.getElementById('drug-name-en').value.trim(),
+    name_th:          document.getElementById('drug-name-th').value.trim() || null,
+    drug_group:       document.getElementById('drug-group').value || null,
+    formulary_status: document.getElementById('drug-formulary').value,
+    fda_reg_no:       document.getElementById('drug-fda-reg').value.trim() || null,
+    approval_doc_url: document.getElementById('drug-approval-url').value.trim() || null,
+    approval_criteria:document.getElementById('drug-approval-criteria').value.trim() || null,
+    notes:            document.getElementById('drug-notes').value.trim() || null,
+    doc_url:          getDocUrls(),
+    sort_order:       parseInt(document.getElementById('drug-order').value) || 0,
   };
   if (!payload.name_en) { alert('กรุณากรอกชื่อยา (EN)'); return; }
-  if (id) {
-    await api(`/api/admin/drugs?id=${id}`, 'PUT', payload);
-  } else {
-    await api('/api/admin/drugs', 'POST', payload);
-  }
+  if (id) { await api(`/api/admin/drugs?id=${id}`, 'PUT', payload); }
+  else    { await api('/api/admin/drugs', 'POST', payload); }
   closeModal('drug-modal');
   drugs = await api('/api/admin/drugs');
   renderDrugs();
+  renderNformList();
   showToast('บันทึกสำเร็จ');
 }
-
 async function toggleDrug(id, active) {
   await api(`/api/admin/drugs?id=${id}`, 'PUT', { active });
   drugs = await api('/api/admin/drugs');
   renderDrugs();
+  renderNformList();
   showToast(active ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว');
 }
 
@@ -654,7 +739,6 @@ function renderLinks() {
       </td>
     </tr>`).join('');
 }
-
 function openLinkModal(id) {
   document.getElementById('link-id').value = '';
   document.getElementById('link-cat').value = '';
@@ -677,7 +761,6 @@ function openLinkModal(id) {
   }
   document.getElementById('link-modal').classList.add('open');
 }
-
 async function saveLink() {
   const id      = document.getElementById('link-id').value;
   const payload = {
@@ -689,17 +772,13 @@ async function saveLink() {
   };
   if (!payload.title) { alert('กรุณากรอกชื่อลิงก์'); return; }
   if (!payload.url)   { alert('กรุณากรอก URL'); return; }
-  if (id) {
-    await api(`/api/admin/links?id=${id}`, 'PUT', payload);
-  } else {
-    await api('/api/admin/links', 'POST', payload);
-  }
+  if (id) { await api(`/api/admin/links?id=${id}`, 'PUT', payload); }
+  else    { await api('/api/admin/links', 'POST', payload); }
   closeModal('link-modal');
   links = await api('/api/admin/links');
   renderLinks();
   showToast('บันทึกสำเร็จ');
 }
-
 async function toggleLink(id, active) {
   await api(`/api/admin/links?id=${id}`, 'PUT', { active });
   links = await api('/api/admin/links');
@@ -718,12 +797,9 @@ function renderCats() {
       <td style="font-size:11px">${c.rights || '—'}</td>
       <td style="font-size:11px">${c.doc_level}</td>
       <td>${c.active ? 'ใช้งาน' : 'ปิดใช้'}</td>
-      <td>
-        <button class="act-btn edit" onclick="editCat('${c.id}')">แก้ไข</button>
-      </td>
+      <td><button class="act-btn edit" onclick="editCat('${c.id}')">แก้ไข</button></td>
     </tr>`).join('');
 }
-
 function editCat(id) {
   const c = cats.find(x => x.id === id);
   if (!c) return;
@@ -733,7 +809,6 @@ function editCat(id) {
   document.getElementById('cat-doc-url').value = c.doc_url || '';
   document.getElementById('cat-modal').classList.add('open');
 }
-
 async function saveCat() {
   const id      = document.getElementById('cat-id').value;
   const desc    = document.getElementById('cat-desc').value.trim();
@@ -752,11 +827,14 @@ function switchTab(btn, sectionId) {
   btn.classList.add('active');
   document.getElementById(sectionId).classList.add('active');
 }
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
+function switchTabById(sectionId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.getAttribute('onclick')?.includes(sectionId));
+  });
 }
-
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -764,7 +842,6 @@ function showToast(msg) {
   setTimeout(() => { t.style.display = 'none'; }, 2500);
 }
 
-// Close modal on backdrop click
 document.querySelectorAll('.modal-bg').forEach(bg => {
   bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
 });
