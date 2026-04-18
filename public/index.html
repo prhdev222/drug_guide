@@ -68,7 +68,8 @@ header p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 .controls input { flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.933rem; font-family: var(--font); background: var(--input-bg); color: var(--text); }
 .controls input:focus { outline: none; border-color: var(--teal); }
 
-.filter-row { max-width: 900px; margin: 0 auto .5rem; padding: 0 1rem; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.filters-panel { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+.filter-row { margin: 0 0 .5rem; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .filter-label { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
 .pill { font-size: 0.8rem; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all .15s; font-family: var(--font); }
 .pill.active { background: var(--teal); color: #fff; border-color: var(--teal); }
@@ -76,6 +77,38 @@ header p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 .group-select { font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--input-bg); color: var(--muted); font-family: var(--font); cursor: pointer; outline: none; max-width: 220px; }
 .group-select:focus { border-color: var(--teal); color: var(--text); }
 .group-select.active { border-color: var(--teal); background: var(--teal-bg); color: var(--teal-text); }
+
+/* มือถือ: ซ่อนปุ่ม pill แสดง dropdown */
+.filter-mobile { display: none; }
+.filter-m-field { display: flex; flex-direction: column; gap: 5px; }
+.filter-m-field label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+.m-filter-select {
+  width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+  background-color: var(--input-bg); color: var(--text); font-size: 0.9rem; font-family: var(--font);
+  cursor: pointer; outline: none; -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b68' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px;
+}
+.m-filter-select:focus { border-color: var(--teal); }
+html.dark .m-filter-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a8a8a5' d='M2 4l4 4 4-4'/%3E%3C/svg%3E"); }
+
+@media (max-width: 640px) {
+  .filter-desktop { display: none !important; }
+  .filter-mobile { display: flex; flex-direction: column; gap: 12px; margin-bottom: 0.75rem; }
+  .controls { margin: 0.85rem auto; padding: 0 1rem; }
+  .controls input { min-width: 0; width: 100%; padding: 11px 14px; font-size: 1rem; border-radius: 10px; }
+  header { padding: 0.75rem 1rem; }
+  .header-inner { gap: 0.65rem; }
+  header h1 { font-size: 1.05rem; line-height: 1.25; }
+  header p { font-size: 0.75rem; line-height: 1.35; }
+  .header-actions { width: 100%; justify-content: flex-end; }
+  .count-label { font-size: 0.8rem; margin-bottom: 0.35rem; }
+  .grid { grid-template-columns: 1fr; gap: 10px; padding: 0 1rem 1.5rem; }
+  .card { padding: 0.9rem 1rem; border-radius: 12px; }
+  .links-section { padding: 0 1rem 1.5rem; margin-bottom: 1.5rem; }
+  .links-grid { grid-template-columns: 1fr; gap: 8px; }
+  .link-card { padding: 11px 12px; }
+}
 
 .grid { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.25rem; transition: border-color .15s; }
@@ -133,9 +166,19 @@ header p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 .error-msg { background: var(--coral-bg); color: var(--coral-text); padding: 1rem; border-radius: 8px; font-size: 0.867rem; grid-column: 1/-1; }
 
 .links-section { max-width: 900px; margin: 0 auto 2.5rem; padding: 0 1rem; }
-.links-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.links-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.links-heading-block { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .links-title { font-size: 0.933rem; font-weight: 600; color: var(--text); }
-.links-subtitle { font-size: 0.8rem; color: var(--muted); }
+.links-subtitle { font-size: 0.8rem; color: var(--muted); line-height: 1.35; }
+.links-toggle-btn {
+  font-size: 0.8rem; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--muted); cursor: pointer; font-family: var(--font);
+  flex-shrink: 0; white-space: nowrap;
+}
+.links-toggle-btn:hover { border-color: var(--teal); color: var(--teal); }
+.links-section.links-collapsed .links-subtitle,
+.links-section.links-collapsed .links-grid { display: none; }
+.links-section.links-collapsed { margin-bottom: 1rem; }
 .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
 .link-card { display: flex; align-items: flex-start; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; text-decoration: none; transition: border-color .15s; }
 .link-card:hover { border-color: var(--teal); }
@@ -177,28 +220,62 @@ html.dark .chip { background: var(--gray); border-color: var(--border); color: v
 <div class="controls">
   <input type="text" id="search" placeholder="ค้นหายา เช่น imatinib, warfarin, ฟ้าทะลายโจร..." oninput="filterCards()">
 </div>
-<div class="filter-row">
-  <span class="filter-label">กรองสิทธิ:</span>
-  <button class="pill active" onclick="setRight(this,'ALL')">ทั้งหมด</button>
-  <button class="pill" onclick="setRight(this,'UC')">บัตรทอง (UC)</button>
-  <button class="pill" onclick="setRight(this,'SSO')">ประกันสังคม</button>
-  <button class="pill" onclick="setRight(this,'CSMBS')">ข้าราชการ</button>
-  <button class="pill" onclick="setRight(this,'DOC')">ต้องมีเอกสาร</button>
-  <button class="pill" onclick="setRight(this,'DRUGDOC')">มียาที่แนบเอกสาร</button>
-</div>
-<div class="filter-row">
-  <span class="filter-label">สถานะคลัง:</span>
-  <button class="pill active" onclick="setStock(this,'ALL')">ทั้งหมด</button>
-  <button class="pill" onclick="setStock(this,'in_stock')">🟢 มีในคลัง</button>
-  <button class="pill" onclick="setStock(this,'non_formulary')">🔴 ต้องขออนุมัติ</button>
-  <button class="pill" onclick="setStock(this,'special_order')">🟠 สั่งฉุกเฉิน</button>
-</div>
-<div class="filter-row">
-  <span class="filter-label">กรองกลุ่มยา:</span>
-  <select id="group-filter" class="group-select" onchange="setGroup(this)">
-    <option value="">— ทั้งหมด —</option>
-  </select>
-</div>
+
+<section class="filters-panel" aria-label="ตัวกรอง">
+  <div class="filter-desktop">
+    <div class="filter-row" data-filter-row="rights">
+      <span class="filter-label">กรองสิทธิ:</span>
+      <button type="button" class="pill active" data-right="ALL" onclick="setRight(this,'ALL')">ทั้งหมด</button>
+      <button type="button" class="pill" data-right="UC" onclick="setRight(this,'UC')">บัตรทอง (UC)</button>
+      <button type="button" class="pill" data-right="SSO" onclick="setRight(this,'SSO')">ประกันสังคม</button>
+      <button type="button" class="pill" data-right="CSMBS" onclick="setRight(this,'CSMBS')">ข้าราชการ</button>
+      <button type="button" class="pill" data-right="DOC" onclick="setRight(this,'DOC')">ต้องมีเอกสาร</button>
+      <button type="button" class="pill" data-right="DRUGDOC" onclick="setRight(this,'DRUGDOC')">มียาที่แนบเอกสาร</button>
+    </div>
+    <div class="filter-row" data-filter-row="stock">
+      <span class="filter-label">สถานะคลัง:</span>
+      <button type="button" class="pill active" data-stock="ALL" onclick="setStock(this,'ALL')">ทั้งหมด</button>
+      <button type="button" class="pill" data-stock="in_stock" onclick="setStock(this,'in_stock')">🟢 มีในคลัง</button>
+      <button type="button" class="pill" data-stock="non_formulary" onclick="setStock(this,'non_formulary')">🔴 ต้องขออนุมัติ</button>
+      <button type="button" class="pill" data-stock="special_order" onclick="setStock(this,'special_order')">🟠 สั่งฉุกเฉิน</button>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">กรองกลุ่มยา:</span>
+      <select id="group-filter" class="group-select" onchange="setGroup(this)">
+        <option value="">— ทั้งหมด —</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="filter-mobile">
+    <div class="filter-m-field">
+      <label for="filter-m-right">กรองสิทธิ</label>
+      <select id="filter-m-right" class="m-filter-select" onchange="onMobileRightChange()">
+        <option value="ALL">ทั้งหมด</option>
+        <option value="UC">บัตรทอง (UC)</option>
+        <option value="SSO">ประกันสังคม</option>
+        <option value="CSMBS">ข้าราชการ (CSMBS)</option>
+        <option value="DOC">ต้องมีเอกสาร (บัญชี)</option>
+        <option value="DRUGDOC">มียาที่แนบเอกสาร</option>
+      </select>
+    </div>
+    <div class="filter-m-field">
+      <label for="filter-m-stock">สถานะคลัง</label>
+      <select id="filter-m-stock" class="m-filter-select" onchange="onMobileStockChange()">
+        <option value="ALL">ทั้งหมด</option>
+        <option value="in_stock">มีในคลัง</option>
+        <option value="non_formulary">ต้องขออนุมัติ</option>
+        <option value="special_order">สั่งฉุกเฉิน</option>
+      </select>
+    </div>
+    <div class="filter-m-field">
+      <label for="group-filter-m">กลุ่มยา</label>
+      <select id="group-filter-m" class="m-filter-select group-select" onchange="setGroup(this)">
+        <option value="">— ทั้งหมด —</option>
+      </select>
+    </div>
+  </div>
+</section>
 
 <p class="count-label" id="count-label">กำลังโหลด...</p>
 
@@ -208,8 +285,11 @@ html.dark .chip { background: var(--gray); border-color: var(--border); color: v
 
 <div class="links-section" id="links-section" style="display:none">
   <div class="links-header">
-    <span class="links-title">แหล่งข้อมูลและแบบฟอร์มทางการ</span>
-    <span class="links-subtitle">— ข้อมูลสิทธิ NLEM อ้างอิงจากแหล่งราชการ</span>
+    <div class="links-heading-block">
+      <span class="links-title">แหล่งข้อมูลและแบบฟอร์มทางการ</span>
+      <span class="links-subtitle">— ข้อมูลสิทธิ NLEM อ้างอิงจากแหล่งราชการ</span>
+    </div>
+    <button type="button" class="links-toggle-btn" id="links-toggle-btn" onclick="toggleLinksSection()" aria-expanded="true" title="ซ่อนส่วนแหล่งข้อมูล">ซ่อน</button>
   </div>
   <div class="links-grid" id="links-grid"></div>
 </div>
@@ -294,6 +374,8 @@ async function load() {
       fetch('/api/drug-groups').then(r => r.json()),
     ]);
     populateGroupFilter();
+    syncRightUi();
+    syncStockUi();
     renderAll();
     renderLinks();
   } catch (e) {
@@ -303,9 +385,65 @@ async function load() {
 }
 
 function populateGroupFilter() {
-  const sel = document.getElementById('group-filter');
-  sel.innerHTML = '<option value="">— ทั้งหมด —</option>' +
+  const opts = '<option value="">— ทั้งหมด —</option>' +
     drugGroups.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+  ['group-filter', 'group-filter-m'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = opts;
+    sel.value = activeGroup;
+  });
+}
+
+function syncRightUi() {
+  document.querySelectorAll('[data-filter-row="rights"] .pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.right === activeRight);
+  });
+  const m = document.getElementById('filter-m-right');
+  if (m) m.value = activeRight;
+}
+function syncStockUi() {
+  document.querySelectorAll('[data-filter-row="stock"] .pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.stock === activeStock);
+  });
+  const m = document.getElementById('filter-m-stock');
+  if (m) m.value = activeStock;
+}
+function onMobileRightChange() {
+  activeRight = document.getElementById('filter-m-right').value;
+  syncRightUi();
+  filterCards();
+}
+function onMobileStockChange() {
+  activeStock = document.getElementById('filter-m-stock').value;
+  syncStockUi();
+  filterCards();
+}
+
+function applyLinksSectionCollapsed() {
+  const sec = document.getElementById('links-section');
+  const btn = document.getElementById('links-toggle-btn');
+  if (!sec || sec.style.display === 'none') return;
+  const collapsed = localStorage.getItem('nlem-links-collapsed') === '1';
+  sec.classList.toggle('links-collapsed', collapsed);
+  if (btn) {
+    btn.textContent = collapsed ? 'แสดง' : 'ซ่อน';
+    btn.title = collapsed ? 'แสดงแหล่งข้อมูลและแบบฟอร์มทางการ' : 'ซ่อนส่วนแหล่งข้อมูล';
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+}
+function toggleLinksSection() {
+  const sec = document.getElementById('links-section');
+  const btn = document.getElementById('links-toggle-btn');
+  if (!sec) return;
+  const next = !sec.classList.contains('links-collapsed');
+  sec.classList.toggle('links-collapsed', next);
+  localStorage.setItem('nlem-links-collapsed', next ? '1' : '0');
+  if (btn) {
+    btn.textContent = next ? 'แสดง' : 'ซ่อน';
+    btn.title = next ? 'แสดงแหล่งข้อมูลและแบบฟอร์มทางการ' : 'ซ่อนส่วนแหล่งข้อมูล';
+    btn.setAttribute('aria-expanded', next ? 'false' : 'true');
+  }
 }
 
 function renderLinks() {
@@ -327,6 +465,7 @@ function renderLinks() {
         </div>
       </a>`;
   }).join('');
+  applyLinksSectionCollapsed();
 }
 
 /** อ่าน approval_doc_url: URL เดียว หรือ JSON [{title,url}] */
@@ -483,31 +622,26 @@ function toggleDrugs(btn) {
 }
 
 function setRight(el, val) {
-  if (val !== 'ALL' && activeRight === val) {
-    val = 'ALL';
-    el = el.closest('.filter-row').querySelector('.pill');
-  }
+  if (val !== 'ALL' && activeRight === val) val = 'ALL';
   activeRight = val;
-  el.closest('.filter-row').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
+  syncRightUi();
   filterCards();
 }
 
 function setStock(el, val) {
-  if (val !== 'ALL' && activeStock === val) {
-    val = 'ALL';
-    el = el.closest('.filter-row').querySelector('.pill');
-  }
+  if (val !== 'ALL' && activeStock === val) val = 'ALL';
   activeStock = val;
-  const stockRow = el.closest('.filter-row');
-  stockRow.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
+  syncStockUi();
   filterCards();
 }
 
 function setGroup(sel) {
   activeGroup = sel.value;
-  sel.classList.toggle('active', !!activeGroup);
+  const twinId = sel.id === 'group-filter' ? 'group-filter-m' : 'group-filter';
+  const twin = document.getElementById(twinId);
+  if (twin) twin.value = activeGroup;
+  document.getElementById('group-filter')?.classList.toggle('active', !!activeGroup);
+  document.getElementById('group-filter-m')?.classList.toggle('active', !!activeGroup);
   filterCards();
 }
 
