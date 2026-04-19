@@ -284,7 +284,11 @@ html.dark .chip { background: var(--gray); border-color: var(--border); color: v
 .nlem-info-non h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 10px; line-height: 1.35; }
 .nlem-info-non p { font-size: 0.833rem; color: var(--text); line-height: 1.55; margin-bottom: 10px; }
 .nlem-info-non p:last-child { margin-bottom: 0; }
+/* หัวข้อสิทธิแต่ละแถว — สีเขียว (teal) เหมือนกัน */
+.nlem-info-non strong.non-scheme-title { color: var(--teal); font-weight: 600; }
 .nlem-info-non strong { color: var(--teal); font-weight: 600; }
+html.dark .nlem-info-non strong.non-scheme-title,
+html.dark .nlem-info-non strong { color: var(--teal-text); }
 html.dark .nlem-info-badge { border-color: #64748b; color: #f87171; background: var(--surface); }
 html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
 @media (max-width: 400px) {
@@ -348,9 +352,9 @@ html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0
   </div>
   <div class="nlem-info-non">
     <h3>กลุ่มยานอกบัญชียาหลักแห่งชาติ (Non-NLEM)</h3>
-    <p><strong>สิทธิข้าราชการ</strong> อาจมีสิทธิได้ใช้ยานอกบัญชียาหลัก (Non-NLEM) ได้ ขึ้นกับแพทย์ผู้รักษา ซึ่งต้องมีการให้เหตุผลทางคลินิกที่สามารถตรวจสอบย้อนหลังกับกรมบัญชีกลางได้</p>
-    <p><strong>บัตรทอง (UC)</strong> กรณียานอกบัญชียาหลัก (non-NLEM) โดยทั่วไป <strong>ต้องชำระค่าใช้จ่ายเอง</strong> รายละเอียดและแนวทางปฏิบัติขึ้นกับดุลยพินิจและนโยบายของแต่ละโรงพยาบาล</p>
-    <p><strong>ประกันสังคม (SSO)</strong> ผู้ประกันตน อาจจะไม่ต้องเสียค่าใช้จ่ายเพิ่ม ถ้าหากเป็นกรณีจำเป็นตามข้อบ่งชี้ทางการแพทย์ โดยสถานพยาบาลสามารถจัดหายาที่มีคุณสมบัติในการรักษาเทียบเท่ากัน (generic substitution) ในบัญชียาหลักให้ได้</p>
+    <p><strong class="non-scheme-title">สิทธิข้าราชการ</strong> อาจมีสิทธิได้ใช้ยานอกบัญชียาหลัก (Non-NLEM) ได้ ขึ้นกับแพทย์ผู้รักษา ซึ่งต้องมีการให้เหตุผลทางคลินิกที่สามารถตรวจสอบย้อนหลังกับกรมบัญชีกลางได้</p>
+    <p><strong class="non-scheme-title">บัตรทอง (UC)</strong> กรณียานอกบัญชียาหลัก (non-NLEM) โดยทั่วไป <strong>ต้องชำระค่าใช้จ่ายเอง</strong> รายละเอียดและแนวทางปฏิบัติขึ้นกับดุลยพินิจและนโยบายของแต่ละโรงพยาบาล</p>
+    <p><strong class="non-scheme-title">ประกันสังคม (SSO)</strong> ผู้ประกันตน อาจจะไม่ต้องเสียค่าใช้จ่ายเพิ่ม ถ้าหากเป็นกรณีจำเป็นตามข้อบ่งชี้ทางการแพทย์ โดยสถานพยาบาลสามารถจัดหายาที่มีคุณสมบัติในการรักษาเทียบเท่ากัน (generic substitution) ในบัญชียาหลักให้ได้</p>
   </div>
 </section>
 
