@@ -584,7 +584,7 @@ const SYNTH_NON_CATEGORY = {
   name_en: 'Non-NLEM / Hospital list',
   description: 'ยาที่ไม่อยู่ในบัญชียาหลักแห่งชาติ — ระเบียบขึ้นกับโรงพยาบาลและสิทธิการรักษา',
   rights: 'UC,SSO,CSMBS',
-  doc_level: 'none',
+  doc_level: 'partial',
   color: 'slate',
   level_desc: 'ตามนโยบาย รพ.',
   active: 1,
@@ -848,7 +848,11 @@ function renderAll() {
     if (catDrugs.length === 0 && cat.id !== 'NON') return;
 
     const badge     = COLOR_BADGE[cat.color] || COLOR_BADGE.teal;
-    const doc       = DOC_BADGE[cat.doc_level] || DOC_BADGE.none;
+    const doc =
+      cat.id === 'NON'
+        ? { cls: 'doc-partial', label: 'อาจมีเอกสารพิเศษ หรือต้องลงทะเบียน OCPA' }
+        : (DOC_BADGE[cat.doc_level] || DOC_BADGE.none);
+    const effectiveDocLevel = cat.id === 'NON' ? 'partial' : (cat.doc_level || 'none');
     const rightList = (cat.rights || '').split(',').filter(Boolean);
     const cardBorder = cat.doc_level === 'required' ? 'border-color:#F5C4B3' : '';
 
@@ -890,7 +894,7 @@ function renderAll() {
     const card = document.createElement('div');
     card.className = 'card';
     card.dataset.rights  = [...rightsUnion].join(' ');
-    card.dataset.doc     = cat.doc_level || 'none';
+    card.dataset.doc     = effectiveDocLevel;
     card.dataset.text    = searchText;
     card.dataset.drugHaystack = drugHaystackAll;
     card.dataset.groups  = groupsInCard.join('||');

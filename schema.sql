@@ -87,7 +87,7 @@ INSERT OR IGNORE INTO categories VALUES
    'UC,SSO,CSMBS','required','coral','เฉพาะ รพ.ที่ได้รับอนุมัติจาก สปสช.',NULL,1),
   ('NON','นอกบัญชียาหลักแห่งชาติ','Non-NLEM / Hospital list',
    'ยาไม่อยู่ในบัญชียาหลักแห่งชาติ — ระเบียบขึ้นกับโรงพยาบาลและสิทธิการรักษา',
-   'UC,SSO,CSMBS','none','slate','ตามนโยบาย รพ.',NULL,1);
+   'UC,SSO,CSMBS','partial','slate','ตามนโยบาย รพ.',NULL,1);
 
 -- =============================================================
 -- SEED: Drugs

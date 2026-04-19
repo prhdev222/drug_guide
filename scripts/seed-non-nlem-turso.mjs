@@ -145,9 +145,10 @@ INSERT OR IGNORE INTO categories (
 ) VALUES (
   'NON','นอกบัญชียาหลักแห่งชาติ','Non-NLEM / Hospital list',
   'ยาไม่อยู่ในบัญชียาหลักแห่งชาติ — ระเบียบขึ้นกับโรงพยาบาลและสิทธิการรักษา',
-  'UC,SSO,CSMBS','none','slate','ตามนโยบาย รพ.',1
+  'UC,SSO,CSMBS','partial','slate','ตามนโยบาย รพ.',1
 )`);
-console.log('✓ หมวด NON (ถ้ายังไม่มี)');
+await exec(`UPDATE categories SET doc_level = 'partial' WHERE id = 'NON'`);
+console.log('✓ หมวด NON (ถ้ายังไม่มี — และอัปเดต doc_level เป็น partial)');
 
 /** INSERT … SELECT … WHERE NOT EXISTS — รันซ้ำได้ ไม่สร้างแถวซ้ำ */
 const rows = [
