@@ -2,6 +2,9 @@
 .dev.vars
 .env.local
 
+# Generated NLEM bulk import (รัน scripts/import-nlem-from-xlsx.py — อย่า commit ไฟล์ใหญ่)
+data/nlem-national-import.sql
+
 # Wrangler build cache
 .wrangler/
 
