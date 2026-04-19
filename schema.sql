@@ -176,6 +176,30 @@ INSERT OR IGNORE INTO drugs (category_id, name_en, name_th, drug_group, sort_ord
   ('จ2','Rifampicin+INH+PZA+EMB',NULL,'วัณโรค (standard 4-drug regimen)',10);
 
 -- =============================================================
+-- SEED: ตัวอย่างยา non-NLEM (หมวด NON — ใช้สาธิตฟอร์มและหน้าแรก)
+-- DB เดิมที่มีอยู่แล้ว: คัดลอก INSERT นี้ไปรันใน Turso SQL แยกได้
+-- =============================================================
+INSERT OR IGNORE INTO drugs (
+  category_id, name_en, name_th, drug_group, sort_order,
+  listing_scope, nn_civil_servant, nn_doc_required, nn_ocpa,
+  notes, formulary_status, approval_criteria
+) VALUES
+  ('NON','Nintedanib','นินเทดานิบ','ยาปอด / IPF — ตัวอย่าง',1,
+   'non_nlem',0,1,1,
+   'ตัวอย่างในระบบ: มักมีทั้งเอกสารประกอบและแนวทางลงทะเบียน OCPA (ขึ้นกับนโยบาย รพ.)','non_formulary',
+   'ตัวอย่างเกณฑ์ — ปรับตามจริงของหน่วยบริการ'),
+  ('NON','Colistin','โคลิสติน','ยาต้านเชื้อ — ตัวอย่าง',2,
+   'non_nlem',1,1,0,
+   'ตัวอย่าง: เน้นสิทธิข้าราชการและเอกสารตามระเบียบ รพ.','in_stock',NULL),
+  ('NON','Insulin degludec','อินซูลิน เดอกลูเดค','ยาเบาหวาน — ตัวอย่าง',3,
+   'non_nlem',0,0,0,
+   'ตัวอย่าง: บันทึกในฟอร์มูลารีโดยไม่ติ๊กเกณฑ์พิเศษด้านบน','in_stock',NULL),
+  ('NON','Fam-trastuzumab deruxtecan','แฟม-ทราสทูซูแมบ เดอรักซ์เทแคน','ยามะเร็ง HER2 — ตัวอย่าง',4,
+   'non_nlem',0,1,1,
+   'ตัวอย่าง: สถานะสั่งฉุกเฉิน + เกณฑ์เอกสาร/OCPA','special_order',
+   'ตัวอย่าง — ตรวจสอบคำสั่งใช้ยาและแบบฟอร์มตามหน่วยบริการ');
+
+-- =============================================================
 -- SEED: Links
 -- =============================================================
 INSERT OR IGNORE INTO links (category_id, title, url, description, sort_order) VALUES

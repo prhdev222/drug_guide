@@ -106,18 +106,64 @@ html.dark .fstatus-special { background: #3d2e10; color: #fac775; }
 .form-hint { font-size: 0.75rem; color: var(--muted); margin-top: 4px; line-height: 1.45; }
 
 /* Modal */
-.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; align-items: center; justify-content: center; }
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); backdrop-filter: blur(2px); z-index: 100; align-items: center; justify-content: center; padding: 12px; }
 .modal-bg.open { display: flex; }
-.modal { background: var(--surface); border-radius: 14px; padding: 1.5rem; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; color: var(--text); }
-.modal h3 { font-size: 1rem; margin-bottom: 1rem; }
-.form-row { margin-bottom: 10px; }
+.modal { background: var(--surface); border-radius: 16px; padding: 1.5rem; width: 520px; max-width: 95vw; max-height: min(88vh, 900px); overflow-y: auto; color: var(--text); border: 1px solid var(--border); box-shadow: 0 24px 48px rgba(0,0,0,.12); }
+html.dark .modal { box-shadow: 0 24px 48px rgba(0,0,0,.45); }
+.modal.modal--drug { width: min(580px, 96vw); padding: 1.35rem 1.5rem 1.5rem; }
+.modal h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border); color: var(--text); }
+.form-row { margin-bottom: 12px; }
+.form-row label.field-label,
+.form-row > label:first-child { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 500; }
 .form-row label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 3px; }
 .form-row input, .form-row select, .form-row textarea {
-  width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px;
-  font-size: 0.867rem; font-family: var(--font); background: var(--input-bg); color: var(--text); }
-.form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--teal); }
+  width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 0.867rem; font-family: var(--font); background: var(--input-bg); color: var(--text); transition: border-color .15s, box-shadow .15s; }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(29,158,117,.18); }
+.form-row select:disabled { opacity: 0.72; cursor: not-allowed; background: var(--gray); }
 .form-row textarea { resize: vertical; min-height: 60px; }
-.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.25rem; }
+.modal--drug .modal-actions { padding-top: 1rem; border-top: 1px solid var(--border); }
+
+/* Drug modal — ประเภท NLEM */
+.scope-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+@media (max-width: 520px) { .scope-picker { grid-template-columns: 1fr; } }
+.scope-card {
+  position: relative; display: block; cursor: pointer; margin: 0;
+  padding: 12px 14px; border-radius: 12px; border: 2px solid var(--border);
+  background: var(--gray); transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.scope-card:hover { border-color: var(--teal); }
+.scope-card:has(input:checked) {
+  border-color: var(--teal); background: var(--teal-bg); box-shadow: 0 0 0 1px rgba(29,158,117,.25);
+}
+.scope-card input {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.scope-card-body { display: flex; flex-direction: column; gap: 4px; }
+.scope-card-title { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.scope-card-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.35; }
+
+/* non-NLEM panel */
+.nn-panel {
+  margin-top: 2px; padding: 14px 16px; border-radius: 12px;
+  border: 1px solid var(--border); background: linear-gradient(165deg, var(--gray) 0%, var(--surface) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+html.dark .nn-panel { background: linear-gradient(165deg, #252523 0%, var(--surface) 100%); }
+.nn-panel > label:first-child { font-size: 0.82rem; font-weight: 600; color: var(--teal-text); margin-bottom: 10px !important; letter-spacing: .02em; }
+.nn-panel .nn-check-grid {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 4px;
+}
+.nn-panel .rights-inline {
+  padding: 8px 11px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); width: 100%; align-items: flex-start; gap: 10px;
+}
+.nn-panel .rights-inline:hover { border-color: var(--teal); }
+.nn-panel .rights-inline input { flex-shrink: 0; margin-top: 2px; }
+.nn-panel .rights-inline a { color: var(--teal-text); font-weight: 500; text-underline-offset: 2px; }
+.nn-panel .rights-inline a:hover { text-decoration: underline; }
+.nn-panel .form-hint { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 0.74rem; }
 .modal-actions button { padding: 7px 16px; border-radius: 7px; font-size: 0.867rem; font-family: var(--font); cursor: pointer; border: 1px solid var(--border); }
 .btn-save   { background: var(--teal); color: #fff; border-color: var(--teal); }
 .btn-cancel { background: none; }
@@ -275,25 +321,37 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
 
 <!-- Drug Modal -->
 <div class="modal-bg" id="drug-modal">
-  <div class="modal">
+  <div class="modal modal--drug">
     <h3 id="drug-modal-title">เพิ่มยาใหม่</h3>
     <input type="hidden" id="drug-id">
     <div class="form-row">
-      <label>ประเภทรายการ *</label>
-      <div class="rights-check-row" style="margin-top:4px">
-        <label class="rights-inline"><input type="radio" name="drug-listing-scope" value="nlem" checked onchange="updateListingScopeUi(1)"> ในบัญชียาหลักแห่งชาติ (NLEM)</label>
-        <label class="rights-inline"><input type="radio" name="drug-listing-scope" value="non_nlem" onchange="updateListingScopeUi(1)"> นอกบัญชียาหลักแห่งชาติ (non-NLEM)</label>
+      <label class="field-label">ประเภทรายการ *</label>
+      <div class="scope-picker">
+        <label class="scope-card">
+          <input type="radio" name="drug-listing-scope" value="nlem" checked onchange="updateListingScopeUi(1)">
+          <span class="scope-card-body">
+            <span class="scope-card-title">ในบัญชียาหลักแห่งชาติ</span>
+            <span class="scope-card-desc">NLEM — เลือกบัญชี ก · ข · ค · ง · จ₁ · จ₂</span>
+          </span>
+        </label>
+        <label class="scope-card">
+          <input type="radio" name="drug-listing-scope" value="non_nlem" onchange="updateListingScopeUi(1)">
+          <span class="scope-card-body">
+            <span class="scope-card-title">นอกบัญชียาหลักแห่งชาติ</span>
+            <span class="scope-card-desc">non-NLEM — เก็บในหมวด NON พร้อมเกณฑ์ด้านล่าง</span>
+          </span>
+        </label>
       </div>
-      <p class="form-hint">non-NLEM = ยาที่โรงพยาบาลบันทึกนอกบัญชียาหลัก — เลือกเกณฑ์ด้านสิทธิ/เอกสารด้านล่าง</p>
+      <p class="form-hint">ยานอกบัญชียาหลัก = ยาที่โรงพยาบาลบันทึกแยกจาก NLEM — ระบุเกณฑ์สิทธิ / เอกสาร / OCPA ให้ครบถ้วน</p>
     </div>
-    <div class="form-row" id="non-nlem-block" style="display:none">
-      <label>ข้อมูล non-NLEM</label>
-      <div class="rights-check-row">
-        <label class="rights-inline"><input type="checkbox" id="nn-civil"> เกี่ยวข้องสิทธิข้าราชการ (CSMBS)</label>
-        <label class="rights-inline"><input type="checkbox" id="nn-doc"> ต้องมีเอกสารประกอบ</label>
-        <label class="rights-inline"><input type="checkbox" id="nn-ocpa"> ต้องลงทะเบียน OCPA — <a href="https://www.rama.mahidol.ac.th/cancer_center/th/OCPA_from/form" target="_blank" rel="noopener" onclick="event.stopPropagation()">แบบฟอร์มศูนย์มะเร็ง รามาธิบดี</a></label>
+    <div class="form-row nn-panel" id="non-nlem-block" hidden>
+      <label>ข้อมูลเฉพาะ non-NLEM</label>
+      <div class="nn-check-grid">
+        <label class="rights-inline"><input type="checkbox" id="nn-civil"> <span>เกี่ยวข้องสิทธิข้าราชการ (CSMBS)</span></label>
+        <label class="rights-inline"><input type="checkbox" id="nn-doc"> <span>ต้องมีเอกสารประกอบ</span></label>
+        <label class="rights-inline"><input type="checkbox" id="nn-ocpa"> <span>ต้องลงทะเบียน OCPA — <a href="https://www.rama.mahidol.ac.th/cancer_center/th/OCPA_from/form" target="_blank" rel="noopener" onclick="event.stopPropagation()">แบบฟอร์มศูนย์มะเร็ง รามาธิบดี</a></span></label>
       </div>
-      <p class="form-hint">ใช้คู่กับช่องสิทธิรายยาด้านล่างเมื่อต้องการจำกัดเฉพาะบางสิทธิ</p>
+      <p class="form-hint">ใช้คู่กับช่อง<strong>สิทธิรายยา</strong>ด้านล่าง เมื่อต้องการจำกัดเฉพาะสิทธิบางประเภท — ถ้าไม่ติ๊กช่องสิทธิรายยา = ถือว่าใช้ได้ครบทุกสิทธิที่หมวด NON มี</p>
     </div>
     <div class="form-row" id="drug-cat-row">
       <label>บัญชี *</label>
@@ -570,7 +628,7 @@ function updateListingScopeUi(fromUserToggle) {
   const block = document.getElementById('non-nlem-block');
   const fromT = !!fromUserToggle;
   if (scope === 'non_nlem') {
-    block.style.display = '';
+    block.hidden = false;
     catSel.value = 'NON';
     catSel.disabled = true;
     if (fromT) {
@@ -579,7 +637,7 @@ function updateListingScopeUi(fromUserToggle) {
       document.getElementById('nn-ocpa').checked = false;
     }
   } else {
-    block.style.display = 'none';
+    block.hidden = true;
     catSel.disabled = false;
     if (fromT) {
       document.getElementById('nn-civil').checked = false;
@@ -851,7 +909,7 @@ function openDrugModal(id) {
   document.getElementById('nn-civil').checked = false;
   document.getElementById('nn-doc').checked = false;
   document.getElementById('nn-ocpa').checked = false;
-  document.getElementById('non-nlem-block').style.display = 'none';
+  document.getElementById('non-nlem-block').hidden = true;
   document.getElementById('drug-cat').disabled = false;
   document.getElementById('drug-notes').value = '';
   document.getElementById('drug-formulary').value = 'in_stock';
