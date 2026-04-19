@@ -79,12 +79,17 @@ for (const sql of [
   `ALTER TABLE drugs ADD COLUMN nn_civil_servant INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE drugs ADD COLUMN nn_doc_required INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE drugs ADD COLUMN nn_ocpa INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE categories ADD COLUMN doc_url TEXT`,
 ]) {
   await tryAlter(sql);
 }
 
+/** ระบุชื่อคอลัมน์ — Turso บางชุดมี categories.doc_url (ลิงก์ระดับหมวด) เพิ่มจาก migration */
 await exec(`
-INSERT OR IGNORE INTO categories VALUES (
+INSERT OR IGNORE INTO categories (
+  id, name_th, name_en, description,
+  rights, doc_level, color, level_desc, active
+) VALUES (
   'NON','นอกบัญชียาหลักแห่งชาติ','Non-NLEM / Hospital list',
   'ยาไม่อยู่ในบัญชียาหลักแห่งชาติ — ระเบียบขึ้นกับโรงพยาบาลและสิทธิการรักษา',
   'UC,SSO,CSMBS','none','slate','ตามนโยบาย รพ.',1

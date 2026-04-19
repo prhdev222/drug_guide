@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS categories (
   doc_level TEXT CHECK(doc_level IN ('none','partial','required')),
   color     TEXT,                       -- CSS color key: teal,blue,purple,amber,green,coral
   level_desc TEXT,
+  doc_url   TEXT,                       -- ลิงก์เอกสารระดับหมวด (ถ้ามี)
   active    INTEGER DEFAULT 1
 );
 
@@ -68,25 +69,25 @@ CREATE TABLE IF NOT EXISTS approval_forms (
 INSERT OR IGNORE INTO categories VALUES
   ('ก','บัญชี ก','Essential Medicines',
    'ยาจำเป็นพื้นฐาน ใช้ได้ทุกระดับสถานพยาบาล ตั้งแต่คลินิกถึงโรงพยาบาลระดับตติยภูมิ',
-   'UC,SSO,CSMBS','none','teal','ทุกระดับ (รพสต. ถึง รพ.ตติยภูมิ)',1),
+   'UC,SSO,CSMBS','none','teal','ทุกระดับ (รพสต. ถึง รพ.ตติยภูมิ)',NULL,1),
   ('ข','บัญชี ข','Secondary Care Medicines',
    'ยาสำหรับโรงพยาบาลชุมชน (รพช.) และโรงพยาบาลทั่วไป (รพท.) โดยแพทย์ทั่วไปหรือแพทย์เฉพาะทาง',
-   'UC,SSO,CSMBS','partial','blue','รพช. / รพท.',1),
+   'UC,SSO,CSMBS','partial','blue','รพช. / รพท.',NULL,1),
   ('ค','บัญชี ค','Tertiary/Specialty Medicines',
    'ยาสำหรับ รพ.ระดับตติยภูมิ / รพ.เฉพาะทาง โดยแพทย์เฉพาะทาง บางรายการต้องขออนุมัติ',
-   'UC,SSO,CSMBS','partial','purple','รพ.ตติยภูมิ / รพ.เฉพาะทาง',1),
+   'UC,SSO,CSMBS','partial','purple','รพ.ตติยภูมิ / รพ.เฉพาะทาง',NULL,1),
   ('ง','บัญชี ง','Special Indication Medicines',
    'ยาราคาแพงหรือมีข้อบ่งชี้เฉพาะ ต้องขออนุมัติล่วงหน้า (Prior Authorization) ทุกสิทธิ',
-   'UC,SSO,CSMBS','required','amber','รพ.ระดับสูงที่ได้รับอนุญาต (ต้องขออนุมัติก่อน)',1),
+   'UC,SSO,CSMBS','required','amber','รพ.ระดับสูงที่ได้รับอนุญาต (ต้องขออนุมัติก่อน)',NULL,1),
   ('จ1','บัญชี จ1','Herbal Medicines',
    'ยาสมุนไพรที่ผ่านการรับรอง มีหลักฐานประสิทธิภาพและความปลอดภัยรองรับ',
-   'UC,SSO,CSMBS','none','green','ตามที่แต่ละรายการกำหนด',1),
+   'UC,SSO,CSMBS','none','green','ตามที่แต่ละรายการกำหนด',NULL,1),
   ('จ2','บัญชี จ2','Special Program Medicines',
    'ยาภายใต้โครงการพิเศษ สปสช. ต้องลงทะเบียนเข้าร่วมโครงการก่อนรับยา',
-   'UC,SSO,CSMBS','required','coral','เฉพาะ รพ.ที่ได้รับอนุมัติจาก สปสช.',1),
+   'UC,SSO,CSMBS','required','coral','เฉพาะ รพ.ที่ได้รับอนุมัติจาก สปสช.',NULL,1),
   ('NON','นอกบัญชียาหลักแห่งชาติ','Non-NLEM / Hospital list',
    'ยาไม่อยู่ในบัญชียาหลักแห่งชาติ — ระเบียบขึ้นกับโรงพยาบาลและสิทธิการรักษา',
-   'UC,SSO,CSMBS','none','slate','ตามนโยบาย รพ.',1);
+   'UC,SSO,CSMBS','none','slate','ตามนโยบาย รพ.',NULL,1);
 
 -- =============================================================
 -- SEED: Drugs
@@ -268,7 +269,8 @@ INSERT OR IGNORE INTO links (category_id, title, url, description, sort_order) V
 -- ALTER TABLE drugs ADD COLUMN nn_civil_servant INTEGER NOT NULL DEFAULT 0;
 -- ALTER TABLE drugs ADD COLUMN nn_doc_required INTEGER NOT NULL DEFAULT 0;
 -- ALTER TABLE drugs ADD COLUMN nn_ocpa INTEGER NOT NULL DEFAULT 0;
--- INSERT OR IGNORE INTO categories VALUES ('NON','นอกบัญชียาหลักแห่งชาติ','Non-NLEM / Hospital list','ยาไม่อยู่ในบัญชียาหลักแห่งชาติ — ระเบียบขึ้นกับโรงพยาบาลและสิทธิการรักษา','UC,SSO,CSMBS','none','slate','ตามนโยบาย รพ.',1);
+-- ALTER TABLE categories ADD COLUMN doc_url TEXT;
+-- INSERT OR IGNORE INTO categories (id,name_th,name_en,description,rights,doc_level,color,level_desc,active) VALUES ('NON',...);  -- หรือใส่ NULL สำหรับ doc_url ในแถว VALUES เต็ม
 -- อัปเดตสิทธิบัญชียา (เพิ่ม SSO) สำหรับ DB เดิม:
 -- UPDATE categories SET rights = 'UC,SSO,CSMBS' WHERE id IN ('ค','ง','จ1','จ2');
 -- CREATE TABLE IF NOT EXISTS approval_forms (
