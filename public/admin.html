@@ -355,9 +355,10 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
       <label>ข้อมูลเฉพาะ non-NLEM</label>
       <div class="nn-check-grid">
         <label class="rights-inline"><input type="checkbox" id="nn-civil"> <span>เกี่ยวข้องสิทธิข้าราชการ (CSMBS)</span></label>
-        <label class="rights-inline"><input type="checkbox" id="nn-doc"> <span>ต้องมีเอกสารประกอบ</span></label>
-        <label class="rights-inline"><input type="checkbox" id="nn-ocpa"> <span>ต้องลงทะเบียน OCPA — <a href="https://www.rama.mahidol.ac.th/cancer_center/th/OCPA_from/form" target="_blank" rel="noopener" onclick="event.stopPropagation()">แบบฟอร์มศูนย์มะเร็ง รามาธิบดี</a></span></label>
+        <label class="rights-inline"><input type="checkbox" id="nn-doc" onchange="updateApprovalVisibility()"> <span>ต้องมีเอกสารประกอบ</span></label>
+        <label class="rights-inline"><input type="checkbox" id="nn-ocpa" onchange="updateApprovalVisibility()"> <span>ต้องลงทะเบียน OCPA — <a href="https://www.rama.mahidol.ac.th/cancer_center/th/OCPA_from/form" target="_blank" rel="noopener" onclick="event.stopPropagation()">แบบฟอร์มศูนย์มะเร็ง รามาธิบดี</a></span></label>
       </div>
+      <p class="form-hint">ถ้าติ๊ก <strong>ต้องมีเอกสารประกอบ</strong> หรือ <strong>OCPA</strong> จะมีช่อง <strong>แนบลิงก์เอกสาร/แบบฟอร์ม</strong> (ใต้สถานะคลังยา) — เก็บในฐานข้อมูลร่วมกับฟิลด์แบบฟอร์มของยานอกคลัง</p>
       <p class="form-hint">ใช้คู่กับช่อง<strong>สิทธิรายยา</strong>ด้านล่าง เมื่อต้องการจำกัดเฉพาะสิทธิบางประเภท — ถ้าไม่ติ๊กช่องสิทธิรายยา = ถือว่าใช้ได้ครบทุกสิทธิที่หมวด NON มี</p>
     </div>
     <div class="form-row" id="drug-cat-row">
@@ -387,14 +388,22 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
     <!-- สถานะคลังยา -->
     <div class="form-row">
       <label>สถานะคลังยา *</label>
-      <select id="drug-formulary" onchange="updateApprovalVisibility()">
+      <select id="drug-formulary" onchange="updateApprovalVisibility(); updateDocUrlVisibility();">
         <option value="in_stock">🟢 มีในคลัง รพ.สงฆ์</option>
         <option value="non_formulary">🔴 ไม่มีในคลัง — ต้องขออนุมัติ</option>
         <option value="special_order">🟠 สั่งฉุกเฉิน — ต้องรอคลัง</option>
       </select>
     </div>
 
-    <!-- Approval section (แสดงเมื่อไม่มีในคลัง) -->
+    <!-- ลิงก์แบบฟอร์ม/เอกสาร — แสดงเมื่อยานอกคลัง หรือ non-NLEM + ติ๊กเอกสาร/OCPA -->
+    <div id="approval-links-row" class="form-row" style="display:none">
+      <label id="approval-links-label">🔗 Link แบบฟอร์ม / เอกสาร (หลายลิงก์ได้)</label>
+      <div class="url-list" id="drug-approval-url-list"></div>
+      <button type="button" class="url-add-btn" onclick="addApprovalUrlItem()">+ เพิ่ม link</button>
+      <p id="approval-links-hint" style="font-size:0.75rem;color:var(--muted);margin-top:3px"></p>
+    </div>
+
+    <!-- Approval section (เฉพาะยานอกคลัง — เกณฑ์ / อย.) -->
     <div id="approval-section" style="display:none">
       <div class="approval-info">
         ⚠️ ยานอกบัญชีคลัง — กรอกข้อมูลด้านล่างเพื่อให้แพทย์ทราบขั้นตอนการขออนุมัติ
@@ -402,12 +411,6 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
       <div class="form-row">
         <label>เลขทะเบียน อย. <span style="font-size:0.75rem;color:var(--muted);font-weight:400">(ไม่บังคับ)</span></label>
         <input id="drug-fda-reg" placeholder="เช่น 1A 23/2564 — เว้นว่างได้">
-      </div>
-      <div class="form-row">
-        <label>🔗 Link แบบฟอร์ม / เอกสาร (หลายลิงก์ได้)</label>
-        <div class="url-list" id="drug-approval-url-list"></div>
-        <button type="button" class="url-add-btn" onclick="addApprovalUrlItem()">+ เพิ่ม link</button>
-        <p style="font-size:0.75rem;color:var(--muted);margin-top:3px">ระบุชื่อลิงก์สั้น ๆ (เช่น แบบฟอร์ม รพ.สงฆ์, เอกสารยาพิเศษ บัญชี จ2) แล้ววาง URL — Google Drive, SharePoint ฯลฯ</p>
       </div>
       <div class="form-row">
         <label>เกณฑ์ / เงื่อนไขการอนุมัติ</label>
@@ -652,9 +655,30 @@ function updateDrugCatSubhint() {
 
 // ---- Approval visibility ----
 function updateApprovalVisibility() {
-  const fs   = document.getElementById('drug-formulary').value;
-  const show = fs === 'non_formulary' || fs === 'special_order';
-  document.getElementById('approval-section').style.display = show ? '' : 'none';
+  const fs    = document.getElementById('drug-formulary').value;
+  const scope = document.querySelector('input[name="drug-listing-scope"]:checked')?.value || 'nlem';
+  const nnDoc = document.getElementById('nn-doc')?.checked;
+  const nnOcpa = document.getElementById('nn-ocpa')?.checked;
+  const nnAttach = scope === 'non_nlem' && !!(nnDoc || nnOcpa);
+  const showStockOut = fs === 'non_formulary' || fs === 'special_order';
+
+  const sec = document.getElementById('approval-section');
+  const linksRow = document.getElementById('approval-links-row');
+  if (sec) sec.style.display = showStockOut ? '' : 'none';
+  if (linksRow) linksRow.style.display = (showStockOut || nnAttach) ? '' : 'none';
+
+  const lbl = document.getElementById('approval-links-label');
+  const hint = document.getElementById('approval-links-hint');
+  if (lbl) {
+    lbl.textContent = nnAttach && !showStockOut
+      ? '📎 ลิงก์เอกสารประกอบ / OCPA / แบบฟอร์มที่เกี่ยวข้อง'
+      : '🔗 Link แบบฟอร์ม / เอกสาร (หลายลิงก์ได้)';
+  }
+  if (hint) {
+    hint.textContent = nnAttach && !showStockOut
+      ? 'แนบลิงก์จากหน่วยบริการ แบบฟอร์ม OCPA / เกณฑ์เบิก / Google Drive — ระบุชื่อลิงก์สั้น ๆ ได้หลายรายการ'
+      : 'ระบุชื่อลิงก์สั้น ๆ (เช่น แบบฟอร์ม รพ.สงฆ์, เอกสารยาพิเศษ บัญชี จ2) แล้ววาง URL — Google Drive, SharePoint ฯลฯ';
+  }
 }
 function updateDocUrlVisibility() {
   const sel = document.getElementById('drug-cat');
@@ -708,6 +732,7 @@ function updateListingScopeUi(fromUserToggle) {
     }
   }
   updateCatRightsHint();
+  updateApprovalVisibility();
   updateDocUrlVisibility();
   updateDrugCatSubhint();
 }

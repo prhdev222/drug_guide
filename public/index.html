@@ -177,7 +177,9 @@ html.dark .grid.search-active .drug-chip-wrap.search-match .drug-hit-detail {
 }
 .grid.search-active .drug-chip-wrap.search-match > .chip,
 .grid.search-active .drug-chip-wrap.search-match > a.chip-link,
-.grid.search-active .drug-chip-wrap.search-match > .chip-multi {
+.grid.search-active .drug-chip-wrap.search-match > .chip-multi,
+.grid.search-active .drug-chip-wrap.search-match > .chip.chip-doc-stack,
+.grid.search-active .drug-chip-wrap.search-match > .chip.chip-nn-attach {
   font-size: 1.12rem;
   font-weight: 600;
   padding: 8px 14px;
@@ -199,6 +201,10 @@ html.dark .grid.search-active .drug-chip-wrap.search-match .drug-hit-detail {
 .chip-link  { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; text-decoration: none; transition: opacity .15s; }
 .chip-link:hover { opacity: .75; }
 .chip-multi { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.chip-doc-stack,
+.chip-nn-attach { font-size: 0.733rem; padding: 2px 8px; border-radius: 20px; border: 1px solid #BFDBFE; color: #1D4ED8; background: #EFF6FF; display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.chip-doc-stack a:not(.approval-btn) { color: inherit; text-decoration: none; font-weight: 500; }
+.chip-doc-stack a:not(.approval-btn):hover { opacity: .75; }
 .multi-doc-link { font-size: 0.667rem; padding: 1px 6px; border-radius: 10px; background: #1D4ED8; color: #fff; text-decoration: none; transition: opacity .15s; }
 .multi-doc-link:hover { opacity: .8; }
 
@@ -242,7 +248,9 @@ html.dark .grid.search-active .drug-chip-wrap.search-match .drug-hit-detail {
 .link-desc  { font-size: 0.733rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
 
 html.dark .chip-link  { background: rgba(59,130,246,.18); color: #93c5fd; border-color: #3b82f6; }
-html.dark .chip-multi { background: rgba(59,130,246,.18); color: #93c5fd; border-color: #3b82f6; }
+html.dark .chip-multi,
+html.dark .chip-doc-stack,
+html.dark .chip-nn-attach { background: rgba(59,130,246,.18); color: #93c5fd; border-color: #3b82f6; }
 html.dark .chip-nonform { background: #4a2a22; color: #f5c4b3; border-color: #991b1b; }
 html.dark .chip-special { background: #3d2e10; color: #fac775; border-color: #7a4b00; }
 html.dark .doc-form-btn.pdf   { background: #3f1f1f; color: #fecaca; border-color: #991b1b; }
@@ -525,6 +533,17 @@ function drugDetailBlock(d) {
     if (nnParts.length) {
       rows.push(`<div class="dd-row dd-nn-rules"><span class="dd-k">เกณฑ์ non-NLEM</span> ${nnParts.join(' · ')}</div>`);
     }
+    if ((Number(d.nn_doc_required) || Number(d.nn_ocpa)) && d.approval_doc_url) {
+      const pairs = parseApprovalDocLinks(d.approval_doc_url);
+      if (pairs.length) {
+        const hrefEsc = u => String(u).replace(/"/g, '%22').replace(/</g, '%3C');
+        const linkBits = pairs.map((p, i) => {
+          const lab = p.title ? escChipText(p.title) : ('ลิงก์ ' + (i + 1));
+          return `<a href="${hrefEsc(p.url)}" target="_blank" rel="noopener">${lab}</a>`;
+        }).join(' · ');
+        rows.push(`<div class="dd-row dd-nn-links"><span class="dd-k">ลิงก์เอกสาร / OCPA</span> ${linkBits}</div>`);
+      }
+    }
   }
   if (d.drug_group) rows.push(`<div class="dd-row"><span class="dd-k">กลุ่มยา</span> ${escChipText(d.drug_group)}</div>`);
   rows.push(`<div class="dd-row"><span class="dd-k">สถานะคลัง</span> ${escChipText(FSTATUS_LABEL[fs] || fs)}</div>`);
@@ -767,19 +786,26 @@ function buildDrugChip(d) {
     return wrapDrugChip(d, `<span class="chip chip-special"${title}>🟠 ${nnMark}${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
   }
 
-  // in_stock — check NLEM doc_url
+  // in_stock — doc_url (NLEM) + ลิงก์เอกสาร/OCPA (non-NLEM ผ่าน approval_doc_url)
+  const nnAttach = isNonNlemDrug(d) && (Number(d.nn_doc_required) || Number(d.nn_ocpa));
+  const apprNn = nnAttach ? buildApprovalBtns(d, fs) : '';
+
   if (d.doc_url) {
     let urls = [];
     try { urls = JSON.parse(d.doc_url); if (!Array.isArray(urls)) urls = [d.doc_url]; }
     catch { urls = [d.doc_url]; }
     if (urls.length === 1) {
-      return wrapDrugChip(d, `<a class="chip chip-link" href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">📄 ${nnMark}${label}${drugRightsSuffixHtml(d)}</a>`);
+      return wrapDrugChip(d, `<span class="chip chip-link chip-doc-stack">📄 <a href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">${nnMark}${label}${drugRightsSuffixHtml(d)}</a>${apprNn}</span>`);
     }
     let html = `<span class="chip chip-multi">📄 ${nnMark}${label}${drugRightsSuffixHtml(d)}`;
     urls.forEach((u, i) => {
       html += `<a href="${u}" target="_blank" rel="noopener" class="multi-doc-link">เอกสาร ${i + 1}</a>`;
     });
-    return wrapDrugChip(d, html + '</span>');
+    return wrapDrugChip(d, html + apprNn + '</span>');
+  }
+
+  if (apprNn) {
+    return wrapDrugChip(d, `<span class="chip chip-nn-attach">${nnMark}${label}${drugRightsSuffixHtml(d)}${apprNn}</span>`);
   }
 
   return wrapDrugChip(d, `<span class="chip">${nnMark}${label}${drugRightsSuffixHtml(d)}</span>`);
