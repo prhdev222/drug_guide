@@ -106,6 +106,40 @@ function buildNotes(conditions, warnings, notes, otherInfo) {
   return chunks.length ? chunks.join("\n") : null;
 }
 
+/** คอลัมน์บัญชีย่อยใหม่ (DATA index 9): b / ex / s / R1 / R2 */
+function normalizeNlemListTypeId(raw) {
+  if (raw == null || raw === "") return null;
+  const s = String(raw).trim();
+  if (!s || s === "-") return null;
+  const lower = s.toLowerCase();
+  if (lower === "b" || lower === "ex" || lower === "s") return lower;
+  if (s === "R1" || lower === "r1") return "R1";
+  if (s === "R2" || lower === "r2") return "R2";
+  return null;
+}
+
+/** metadata บัญชีย่อย NLEM — ไม่สับสนกับบัญชีหลัก ก·ข·ค·ง·จ */
+async function ensureNlemListTypesTable(libsql) {
+  await libsql.execute(`
+    CREATE TABLE IF NOT EXISTS nlem_list_types (
+      id TEXT PRIMARY KEY,
+      name_th TEXT NOT NULL,
+      name_en TEXT NOT NULL,
+      description TEXT,
+      sort_order INTEGER DEFAULT 0,
+      active INTEGER DEFAULT 1
+    )
+  `);
+  await libsql.execute(`
+    INSERT OR IGNORE INTO nlem_list_types (id, name_th, name_en, description, sort_order, active) VALUES
+      ('b','บัญชีพื้นฐาน','Basic','ยาพื้นฐานที่จำเป็น',1,1),
+      ('ex','บัญชีเฉพาะ','Exclusive','ยาเฉพาะกลุ่มโรค',2,1),
+      ('s','บัญชีพิเศษ','Special','ยาพิเศษ',3,1),
+      ('R1','บัญชีจำกัด 1','Restricted 1','ยาจำกัดการใช้ระดับ 1',4,1),
+      ('R2','บัญชีจำกัด 2','Restricted 2','ยาจำกัดการใช้ระดับ 2',5,1)
+  `);
+}
+
 /** ชื่อกลุ่มยาไม่ซ้ำ — ต้องตรงกับค่าที่จะใส่ใน drugs.drug_group (ใช้หลัง const DATA โหลดแล้ว) */
 function collectDistinctDrugGroupsFromDATA() {
   const names = [];
@@ -161,6 +195,7 @@ async function migrateDrugsTableColumns(libsql) {
     ["nn_civil_servant", "INTEGER NOT NULL DEFAULT 0"],
     ["nn_doc_required", "INTEGER NOT NULL DEFAULT 0"],
     ["nn_ocpa", "INTEGER NOT NULL DEFAULT 0"],
+    ["nlem_list_type_id", "TEXT"],
   ];
   for (const [col, decl] of additions) {
     if (existing.has(col)) continue;
@@ -184,6 +219,7 @@ async function seed() {
 
   await migrateDrugsTableColumns(client);
   await ensureDrugGroupsTable(client);
+  await ensureNlemListTypesTable(client);
 
   /* หน้าแรกโหลดแค่หมวดที่ active=1 (functions/api/categories.js)
      ถ้าบัญชี ก–จ₂ ถูกปิด จะไม่มีการ์ด แม้ /api/drugs จะมียาแล้ว */
@@ -217,12 +253,13 @@ async function seed() {
     category_id, name_en, name_th, drug_group, notes,
     formulary_status, listing_scope,
     nn_civil_servant, nn_doc_required, nn_ocpa,
-    active, sort_order
+    active, sort_order,
+    nlem_list_type_id
   ) VALUES (
     ?, ?, NULL, ?, ?,
     'non_formulary', 'nlem',
     0, 0, 0,
-    1, ?
+    1, ?, ?
   )`;
 
   let skipped = 0;
@@ -252,12 +289,13 @@ async function seed() {
     }
     const dg = buildDrugGroup(row[0], row[1], row[2], row[3]);
     const notes = buildNotes(row[10], row[11], row[12], row[13]);
+    const nlemLt = normalizeNlemListTypeId(row[9]);
     for (const cid of cats) {
       sortByCat[cid] = (sortByCat[cid] ?? 0) + 1;
       const sortOrder = sortByCat[cid];
       await client.execute({
         sql: insertDrugsSql,
-        args: [cid, nameEn, dg, notes, sortOrder],
+        args: [cid, nameEn, dg, notes, sortOrder, nlemLt],
       });
       drugRows++;
     }

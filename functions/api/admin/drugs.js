@@ -9,6 +9,7 @@ export async function onRequestPost({ request, env }) {
       formulary_status = 'non_formulary', approval_doc_url, approval_criteria, fda_reg_no,
       listing_scope = 'nlem',
       nn_civil_servant = 0, nn_doc_required = 0, nn_ocpa = 0,
+      nlem_list_type_id,
     } = body;
     let { sort_order } = body;
 
@@ -33,8 +34,9 @@ export async function onRequestPost({ request, env }) {
       `INSERT INTO drugs
         (category_id, name_en, name_th, drug_group, rights, notes, sort_order, doc_url,
          formulary_status, approval_doc_url, approval_criteria, fda_reg_no,
-         listing_scope, nn_civil_servant, nn_doc_required, nn_ocpa)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING *`,
+         listing_scope, nn_civil_servant, nn_doc_required, nn_ocpa,
+         nlem_list_type_id)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING *`,
       [
         catId,
         name_en,
@@ -52,6 +54,7 @@ export async function onRequestPost({ request, env }) {
         scope === 'non_nlem' ? (nn_civil_servant ? 1 : 0) : 0,
         scope === 'non_nlem' ? (nn_doc_required ? 1 : 0) : 0,
         scope === 'non_nlem' ? (nn_ocpa ? 1 : 0) : 0,
+        scope === 'non_nlem' ? null : (nlem_list_type_id || null),
       ]
     );
     return json(rows[0], 201);
@@ -71,6 +74,7 @@ export async function onRequestPut({ request, env }) {
       category_id, name_en, name_th, drug_group, rights, notes, active, sort_order, doc_url,
       formulary_status, approval_doc_url, approval_criteria, fda_reg_no,
       listing_scope, nn_civil_servant, nn_doc_required, nn_ocpa,
+      nlem_list_type_id,
     } = body;
 
     const hasScope = Object.prototype.hasOwnProperty.call(body, 'listing_scope');
@@ -86,6 +90,16 @@ export async function onRequestPut({ request, env }) {
       nnC = isNn ? (nn_civil_servant ? 1 : 0) : 0;
       nnD = isNn ? (nn_doc_required ? 1 : 0) : 0;
       nnO = isNn ? (nn_ocpa ? 1 : 0) : 0;
+    }
+
+    let nlemLtBind;
+    if (Object.prototype.hasOwnProperty.call(body, 'nlem_list_type_id')) {
+      nlemLtBind = body.nlem_list_type_id || null;
+    } else {
+      const prev = await turso(env, 'SELECT nlem_list_type_id FROM drugs WHERE id = ?', [
+        parseInt(id),
+      ]);
+      nlemLtBind = prev[0]?.nlem_list_type_id ?? null;
     }
 
     const rows = await turso(env,
@@ -106,7 +120,8 @@ export async function onRequestPut({ request, env }) {
          listing_scope     = COALESCE(?, listing_scope),
          nn_civil_servant  = COALESCE(?, nn_civil_servant),
          nn_doc_required   = COALESCE(?, nn_doc_required),
-         nn_ocpa           = COALESCE(?, nn_ocpa)
+         nn_ocpa           = COALESCE(?, nn_ocpa),
+         nlem_list_type_id = ?
        WHERE id = ? RETURNING *`,
       [
         catDb,
@@ -126,6 +141,7 @@ export async function onRequestPut({ request, env }) {
         nnC,
         nnD,
         nnO,
+        nlemLtBind,
         parseInt(id),
       ]
     );

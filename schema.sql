@@ -16,6 +16,23 @@ CREATE TABLE IF NOT EXISTS categories (
   active    INTEGER DEFAULT 1
 );
 
+-- บัญชีย่อย NLEM ตามประกาศ (b / ex / s / R1 / R2) — คนละชุดกับบัญชี ก·ข·ค·ง·จ
+CREATE TABLE IF NOT EXISTS nlem_list_types (
+  id          TEXT PRIMARY KEY,
+  name_th     TEXT NOT NULL,
+  name_en     TEXT NOT NULL,
+  description TEXT,
+  sort_order  INTEGER DEFAULT 0,
+  active      INTEGER DEFAULT 1
+);
+
+INSERT OR IGNORE INTO nlem_list_types (id, name_th, name_en, description, sort_order, active) VALUES
+  ('b','บัญชีพื้นฐาน','Basic','ยาพื้นฐานที่จำเป็น',1,1),
+  ('ex','บัญชีเฉพาะ','Exclusive','ยาเฉพาะกลุ่มโรค',2,1),
+  ('s','บัญชีพิเศษ','Special','ยาพิเศษ',3,1),
+  ('R1','บัญชีจำกัด 1','Restricted 1','ยาจำกัดการใช้ระดับ 1',4,1),
+  ('R2','บัญชีจำกัด 2','Restricted 2','ยาจำกัดการใช้ระดับ 2',5,1);
+
 CREATE TABLE IF NOT EXISTS drugs (
   id               INTEGER PRIMARY KEY AUTOINCREMENT,
   category_id      TEXT NOT NULL REFERENCES categories(id),
@@ -35,6 +52,7 @@ CREATE TABLE IF NOT EXISTS drugs (
   nn_civil_servant   INTEGER NOT NULL DEFAULT 0,   -- 1 = เกี่ยวข้องสิทธิข้าราชการ
   nn_doc_required    INTEGER NOT NULL DEFAULT 0,   -- 1 = ต้องมีเอกสารประกอบ
   nn_ocpa            INTEGER NOT NULL DEFAULT 0,   -- 1 = ต้องลงทะเบียน OCPA
+  nlem_list_type_id  TEXT REFERENCES nlem_list_types(id),  -- บัญชีย่อยใหม่ b/ex/s/R1/R2 (ว่างได้ถ้ายังไม่จัด)
   active           INTEGER DEFAULT 1,
   sort_order       INTEGER DEFAULT 0
 );

@@ -77,6 +77,7 @@ header p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 .group-select { font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--input-bg); color: var(--muted); font-family: var(--font); cursor: pointer; outline: none; max-width: 220px; }
 .group-select:focus { border-color: var(--teal); color: var(--text); }
 .group-select.active { border-color: var(--teal); background: var(--teal-bg); color: var(--teal-text); }
+.nlem-lt-badge { font-size: 0.68rem; font-weight: 700; opacity: 0.88; margin-right: 5px; vertical-align: middle; color: var(--muted); }
 
 /* มือถือ: ซ่อนปุ่ม pill แสดง dropdown */
 .filter-mobile { display: none; }
@@ -258,24 +259,40 @@ html.dark .doc-form-btn.pdf   { background: #3f1f1f; color: #fecaca; border-colo
 html.dark .doc-form-btn.forms { background: #1e3a5f; color: #bfdbfe; border-color: #1d4ed8; }
 html.dark .chip { background: var(--gray); border-color: var(--border); color: var(--muted); }
 
-/* คำอธิบายบัญชียา NLEM (สไตล์อินโฟกราฟิก) */
+/* คำอธิบายบัญชียา NLEM — โครงสร้างใหม่ (ปี 2569: b · s · ex · R1 · R2) */
 .nlem-info { max-width: 900px; margin: 0.75rem auto 1rem; padding: 0 1rem; }
+.nlem-info-banner {
+  font-size: 0.867rem; font-weight: 600; color: var(--coral-text);
+  background: var(--coral-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 11px 14px; margin-bottom: 12px; line-height: 1.45; text-align: center;
+}
 .nlem-info-title { font-size: 1.05rem; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 4px; line-height: 1.35; }
 .nlem-info-note { font-size: 0.75rem; color: var(--muted); text-align: center; margin-bottom: 14px; line-height: 1.45; }
+.nlem-info-note strong { color: var(--text); font-weight: 600; }
 .nlem-info-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 .nlem-info-cell { display: grid; grid-template-columns: 68px 1fr; gap: 10px; align-items: stretch; min-height: 72px; }
 .nlem-info-badge {
   width: 64px; height: 64px; border-radius: 999px; border: 2px solid #94a3b8;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.85rem; font-weight: 800; color: #c41e3a; background: var(--surface);
+  font-size: 1.65rem; font-weight: 800; color: var(--text); background: var(--surface);
   box-shadow: 0 1px 2px rgba(0,0,0,.06); flex-shrink: 0; margin: auto 0;
 }
-.nlem-info-badge .sub { font-size: 1.1rem; font-weight: 800; vertical-align: baseline; }
+.nlem-info-badge .sub { font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; }
+.nlem-info-badge.nlem-badge-b { border-color: #16a34a; color: #15803d; background: var(--green-bg); }
+.nlem-info-badge.nlem-badge-s { border-color: #2563eb; color: #1d4ed8; background: var(--blue-bg); }
+.nlem-info-badge.nlem-badge-ex { border-color: #9333ea; color: #6d28d9; background: var(--purple-bg); }
+.nlem-info-badge.nlem-badge-r { border-color: #dc2626; color: #b91c1c; background: var(--coral-bg); }
 .nlem-info-desc {
-  background: #1d4ed8; color: #fff; border-radius: 10px; padding: 12px 14px;
+  background: var(--surface); color: var(--text); border-radius: 10px; padding: 12px 14px;
   font-size: 0.867rem; line-height: 1.5; display: flex; align-items: center;
-  box-shadow: 0 4px 12px rgba(29,78,216,.18);
+  border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
+.nlem-info-desc .nlem-info-desc-title { font-weight: 700; display: block; margin-bottom: 6px; font-size: 0.9rem; }
+.nlem-info-desc .nlem-info-desc-old { font-size: 0.75rem; color: var(--muted); margin-top: 6px; display: block; }
+.nlem-info-desc.desc-b { border-left: 4px solid #16a34a; }
+.nlem-info-desc.desc-s { border-left: 4px solid #2563eb; }
+.nlem-info-desc.desc-ex { border-left: 4px solid #9333ea; }
+.nlem-info-desc.desc-r { border-left: 4px solid #dc2626; }
 .nlem-info-non {
   margin-top: 14px; padding: 14px 16px; border-radius: 12px;
   border: 1px solid var(--border); background: var(--surface);
@@ -289,8 +306,12 @@ html.dark .chip { background: var(--gray); border-color: var(--border); color: v
 .nlem-info-non strong { color: var(--teal); font-weight: 600; }
 html.dark .nlem-info-non strong.non-scheme-title,
 html.dark .nlem-info-non strong { color: var(--teal-text); }
-html.dark .nlem-info-badge { border-color: #64748b; color: #f87171; background: var(--surface); }
-html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+html.dark .nlem-info-banner { border-color: var(--border); }
+html.dark .nlem-info-badge.nlem-badge-b { border-color: #22c55e; color: #86efac; background: rgba(34,197,94,.12); }
+html.dark .nlem-info-badge.nlem-badge-s { border-color: #3b82f6; color: #93c5fd; background: rgba(59,130,246,.14); }
+html.dark .nlem-info-badge.nlem-badge-ex { border-color: #a855f7; color: #d8b4fe; background: rgba(168,85,247,.12); }
+html.dark .nlem-info-badge.nlem-badge-r { border-color: #ef4444; color: #fca5a5; background: rgba(239,68,68,.12); }
+html.dark .nlem-info-desc { background: var(--surface); border-color: var(--border); box-shadow: none; }
 @media (max-width: 400px) {
   .nlem-info-cell { grid-template-columns: 56px 1fr; }
   .nlem-info-badge { width: 52px; height: 52px; font-size: 1.45rem; }
@@ -322,34 +343,62 @@ html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0
 </div>
 
 <section class="nlem-info" id="nlem-info" aria-labelledby="nlem-info-title">
-  <h2 id="nlem-info-title" class="nlem-info-title">บัญชียาหลักแห่งชาติ (NLEM) — ความหมายโดยสังเขป</h2>
-  <p class="nlem-info-note">สรุปเพื่อความเข้าใจเบื้องต้น — รายละเอียดและเกณฑ์การใช้ยาตามประกาศ / คู่มือ สธ. · สปสช. ฉบับที่ใช้บังคับ</p>
+  <p class="nlem-info-banner" role="status">📢 อัปเดตด่วน — สรุปการปรับปรุง <strong>บัญชียาหลักแห่งชาติ ปี 2569</strong> &nbsp;·&nbsp; โครงสร้างชื่อบัญชียาใหม่ (สอดคล้องประกาศ / คู่มือ สธ. · สปสช.)</p>
+  <h2 id="nlem-info-title" class="nlem-info-title">บัญชียาหลักแห่งชาติ (NLEM) — แบ่งบัญชีใหม่</h2>
+  <p class="nlem-info-note">ไม่ได้เรียกแบบเดิมว่า <strong>ก · ข · ค · ง · จ</strong> แล้ว — ปรับเป็นรหัส <strong>b · s · ex · R1 · R2</strong> ตามด้านล่าง (การ์ดยาในหน้านี้ยังแสดงบัญชี ก–จ เป็นหมวดหลัก — ดูป้ายย่อบนชื่อยาสำหรับบัญชีย่อยใหม่)</p>
   <div class="nlem-info-grid">
     <div class="nlem-info-cell">
-      <div class="nlem-info-badge" aria-hidden="true">ก</div>
-      <div class="nlem-info-desc">ยาจำเป็นพื้นฐาน ใช้ได้ในสถานพยาบาลทุกระดับ มักเป็นตัวเลือกแรกตามข้อบ่งชี้ทางการแพทย์</div>
+      <div class="nlem-info-badge nlem-badge-b" aria-hidden="true">b</div>
+      <div class="nlem-info-desc desc-b">
+        <span>
+          <span class="nlem-info-desc-title">1. บัญชียาพื้นฐาน (Basic list)</span>
+          ยาจำเป็นพื้นฐานและทางเลือกหลักตามข้อบ่งชี้ — ครอบคลุมบทบาทเดิมของบัญชี <strong>ก</strong> และ <strong>ข</strong>
+          <span class="nlem-info-desc-old">เดิม = ก + ข</span>
+        </span>
+      </div>
     </div>
     <div class="nlem-info-cell">
-      <div class="nlem-info-badge" aria-hidden="true">ข</div>
-      <div class="nlem-info-desc">ยาที่ใช้เมื่อยาในบัญชี ก ใช้ไม่ได้ ไม่เหมาะสม ไม่ได้ผล หรือมีความจำเป็นตามดุลยพินิจของแพทย์</div>
+      <div class="nlem-info-badge nlem-badge-s" aria-hidden="true">s</div>
+      <div class="nlem-info-desc desc-s">
+        <span>
+          <span class="nlem-info-desc-title">2. บัญชียาทางเลือก (Supplemental list)</span>
+          ยาสำหรับการดูแลขั้นสูงหรือโรคเฉพาะทาง ใช้ภายใต้การดูแลของแพทย์เฉพาะทางหรือตามที่โรงพยาบาลกำหนด — เดิมคือบัญชี <strong>ค</strong>
+          <span class="nlem-info-desc-old">เดิม = ค</span>
+        </span>
+      </div>
     </div>
     <div class="nlem-info-cell">
-      <div class="nlem-info-badge" aria-hidden="true">ค</div>
-      <div class="nlem-info-desc">ยาสำหรับโรคเฉพาะทาง / การดูแลขั้นสูง ใช้ภายใต้การดูแลของแพทย์เฉพาะทางหรือตามที่โรงพยาบาลกำหนด</div>
+      <div class="nlem-info-badge nlem-badge-ex" aria-hidden="true">ex</div>
+      <div class="nlem-info-desc desc-ex">
+        <span>
+          <span class="nlem-info-desc-title">3. บัญชียาเฉพาะโรค (Exclusive list)</span>
+          ยาที่มีข้อบ่งชี้เฉพาะหรือมูลค่าสูง มักต้องขออนุมัติล่วงหน้าและมีการติดตามการใช้ยา — เดิมคือบัญชี <strong>ง</strong>
+          <span class="nlem-info-desc-old">เดิม = ง</span>
+        </span>
+      </div>
     </div>
     <div class="nlem-info-cell">
-      <div class="nlem-info-badge" aria-hidden="true">ง</div>
-      <div class="nlem-info-desc">ยาที่มีข้อบ่งชี้เฉพาะหรือมูลค่าสูง มักต้องขออนุมัติล่วงหน้าและมีการติดตามการใช้ยา (เช่น Prior Authorization / DUE)</div>
+      <div class="nlem-info-badge nlem-badge-r" aria-hidden="true"><span class="sub">R1</span></div>
+      <div class="nlem-info-desc desc-r">
+        <span>
+          <span class="nlem-info-desc-title">บัญชียาพิเศษ — R1 (Restricted list 1)</span>
+          ยาสมุนไพรที่ผ่านการรับรอง มีหลักฐานประสิทธิภาพและความปลอดภัยตามเกณฑ์ — อยู่ภายใต้หมวดบัญชียาพิเศษ (Special lists) เดิมบัญชี <strong>จ₁</strong>
+          <span class="nlem-info-desc-old">เดิม = จ1</span>
+        </span>
+      </div>
     </div>
     <div class="nlem-info-cell">
-      <div class="nlem-info-badge" aria-hidden="true"><span class="sub">จ</span>₁</div>
-      <div class="nlem-info-desc">ยาสมุนไพรที่ผ่านการรับรอง มีหลักฐานประสิทธิภาพและความปลอดภัยตามเกณฑ์ที่กำหนด</div>
-    </div>
-    <div class="nlem-info-cell">
-      <div class="nlem-info-badge" aria-hidden="true"><span class="sub">จ</span>₂</div>
-      <div class="nlem-info-desc">ยาภายใต้โครงการพิเศษของ สปสช. ต้องเข้าเกณฑ์/ลงทะเบียนตามโครงการก่อนได้รับยา</div>
+      <div class="nlem-info-badge nlem-badge-r" aria-hidden="true"><span class="sub">R2</span></div>
+      <div class="nlem-info-desc desc-r">
+        <span>
+          <span class="nlem-info-desc-title">บัญชียาพิเศษ — R2 (Restricted list 2)</span>
+          ยาภายใต้โครงการพิเศษของ สปสช. ต้องเข้าเกณฑ์หรือลงทะเบียนตามโครงการก่อนได้รับยา — อยู่ภายใต้หมวดบัญชียาพิเศษ (Special lists) เดิมบัญชี <strong>จ₂</strong>
+          <span class="nlem-info-desc-old">เดิม = จ2</span>
+        </span>
+      </div>
     </div>
   </div>
+  <p class="nlem-info-note" style="margin-bottom:0;margin-top:4px">หมวด <strong>บัญชียาพิเศษ (Special lists)</strong> ในโครงสร้างใหม่รวม <strong>R1</strong> และ <strong>R2</strong> แทนการแบ่ง <strong>จ₁ · จ₂</strong> แบบเดิม — รายละเอียดการเบิกจ่ายตามประกาศและคู่มือที่ใช้บังคับ</p>
   <div class="nlem-info-non">
     <h3>กลุ่มยานอกบัญชียาหลักแห่งชาติ (Non-NLEM)</h3>
     <p><strong class="non-scheme-title">สิทธิข้าราชการ</strong> อาจมีสิทธิได้ใช้ยานอกบัญชียาหลัก (Non-NLEM) ได้ ขึ้นกับแพทย์ผู้รักษา ซึ่งต้องมีการให้เหตุผลทางคลินิกที่สามารถตรวจสอบย้อนหลังกับกรมบัญชีกลางได้ — ในสิทธินี้ <strong>อาจมีเอกสารพิเศษ หรือต้องลงทะเบียน OCPA</strong> ตามเกณฑ์ของแต่ละโรงพยาบาล</p>
@@ -381,6 +430,11 @@ html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0
       <button type="button" class="pill active" data-listing="ALL" onclick="setListing(this,'ALL')">ทั้งหมด</button>
       <button type="button" class="pill" data-listing="nlem" onclick="setListing(this,'nlem')">ในบัญชียาหลัก (NLEM)</button>
       <button type="button" class="pill" data-listing="non_nlem" onclick="setListing(this,'non_nlem')">นอกบัญชียาหลัก</button>
+    </div>
+    <div class="filter-row" data-filter-row="nlem-list" id="filter-nlem-list-row">
+      <span class="filter-label">บัญชีย่อย NLEM:</span>
+      <button type="button" class="pill active" data-nlem-list="ALL" onclick="setNlemListFilter('ALL')">ทั้งหมด</button>
+      <span id="filter-nlem-list-pills"></span>
     </div>
     <div class="filter-row">
       <span class="filter-label">กรองกลุ่มยา:</span>
@@ -417,6 +471,12 @@ html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0
         <option value="ALL">ทั้งหมด</option>
         <option value="nlem">ในบัญชียาหลัก (NLEM)</option>
         <option value="non_nlem">นอกบัญชียาหลัก</option>
+      </select>
+    </div>
+    <div class="filter-m-field" id="filter-m-nlem-field">
+      <label for="filter-m-nlem-list">บัญชีย่อย NLEM</label>
+      <select id="filter-m-nlem-list" class="m-filter-select" onchange="onMobileNlemListChange()">
+        <option value="ALL">ทั้งหมด</option>
       </select>
     </div>
     <div class="filter-m-field">
@@ -545,6 +605,11 @@ function drugDetailBlock(d) {
     }
   }
   if (d.drug_group) rows.push(`<div class="dd-row"><span class="dd-k">กลุ่มยา</span> ${escChipText(d.drug_group)}</div>`);
+  if (d.nlem_list_type_id) {
+    const lt = (nlemListTypes || []).find(x => String(x.id) === String(d.nlem_list_type_id));
+    const ltLab = lt ? `${lt.name_th} (${d.nlem_list_type_id})` : d.nlem_list_type_id;
+    rows.push(`<div class="dd-row"><span class="dd-k">บัญชีย่อย NLEM</span> ${escChipText(ltLab)}</div>`);
+  }
   rows.push(`<div class="dd-row"><span class="dd-k">สถานะคลัง</span> ${escChipText(FSTATUS_LABEL[fs] || fs)}</div>`);
   const dr = (d.rights || '').split(',').map(s => s.trim()).filter(Boolean);
   if (dr.length) {
@@ -585,7 +650,8 @@ const SYNTH_NON_CATEGORY = {
 function wrapDrugChip(d, innerHtml) {
   const hay = drugSearchHaystack(d);
   const ls = drugListingTag(d);
-  return `<span class="drug-chip-wrap" data-listing="${ls}" data-haystack="${escDataAttr(hay)}">${innerHtml}${drugDetailBlock(d)}</span>`;
+  const nl = d.nlem_list_type_id ? escDataAttr(String(d.nlem_list_type_id)) : '';
+  return `<span class="drug-chip-wrap" data-listing="${ls}" data-nlem-list="${nl}" data-haystack="${escDataAttr(hay)}">${innerHtml}${drugDetailBlock(d)}</span>`;
 }
 /** สิทธิจริงของรายยา: มี rights รายยา → ใช้นั้น ไม่มี → ตามบัญชี */
 function drugEffectiveRightsArr(d, catRightList) {
@@ -601,10 +667,11 @@ function drugRightsSuffixHtml(d) {
   return ` <span class="drug-rt-wrap" title="สิทธิเฉพาะรายยา">${tags}</span>`;
 }
 
-let cats = [], drugs = [], links = [], drugGroups = [];
+let cats = [], drugs = [], links = [], drugGroups = [], nlemListTypes = [];
 let activeRight = 'ALL';
 let activeStock = 'ALL';
 let activeListing = 'ALL';
+let activeNlemList = 'ALL';
 let activeGroup = '';
 
 const LINK_ICONS = {
@@ -618,16 +685,24 @@ const LINK_ICONS = {
 
 async function load() {
   try {
-    [cats, drugs, links, drugGroups] = await Promise.all([
+    const packs = await Promise.all([
       fetch('/api/categories').then(r => r.json()),
       fetch('/api/drugs').then(r => r.json()),
       fetch('/api/links').then(r => r.json()),
       fetch('/api/drug-groups').then(r => r.json()),
+      fetch('/api/nlem-list-types').then(r => r.json()).catch(() => []),
     ]);
+    cats = packs[0];
+    drugs = packs[1];
+    links = packs[2];
+    drugGroups = packs[3];
+    nlemListTypes = Array.isArray(packs[4]) ? packs[4] : [];
     populateGroupFilter();
+    populateNlemListFilter();
     syncRightUi();
     syncStockUi();
     syncListingUi();
+    syncNlemListUi();
     renderAll();
     renderLinks();
   } catch (e) {
@@ -645,6 +720,28 @@ function populateGroupFilter() {
     sel.innerHTML = opts;
     sel.value = activeGroup;
   });
+}
+
+function populateNlemListFilter() {
+  const span = document.getElementById('filter-nlem-list-pills');
+  const row = document.getElementById('filter-nlem-list-row');
+  const m = document.getElementById('filter-m-nlem-list');
+  const mfield = document.getElementById('filter-m-nlem-field');
+  const list = nlemListTypes || [];
+  if (span) {
+    span.innerHTML = list.map(t => {
+      const id = String(t.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      return `<button type="button" class="pill" data-nlem-list="${String(t.id).replace(/"/g, '&quot;')}" onclick="setNlemListFilter('${id}')">${escChipText(t.id)} · ${escChipText(t.name_th)}</button>`;
+    }).join('');
+  }
+  if (m) {
+    m.innerHTML = '<option value="ALL">ทั้งหมด</option>' +
+      list.map(t => `<option value="${String(t.id).replace(/"/g, '&quot;')}">${escChipText(t.id)} · ${escChipText(t.name_th)}</option>`).join('');
+    m.value = activeNlemList;
+  }
+  const show = list.length > 0;
+  if (row) row.style.display = show ? '' : 'none';
+  if (mfield) mfield.style.display = show ? '' : 'none';
 }
 
 function syncRightUi() {
@@ -668,6 +765,20 @@ function syncListingUi() {
   const m = document.getElementById('filter-m-listing');
   if (m) m.value = activeListing;
 }
+function syncNlemListUi() {
+  document.querySelectorAll('[data-filter-row="nlem-list"] .pill').forEach(p => {
+    const v = p.dataset.nlemList || 'ALL';
+    p.classList.toggle('active', v === activeNlemList);
+  });
+  const m = document.getElementById('filter-m-nlem-list');
+  if (m && m.options.length) m.value = activeNlemList;
+}
+function setNlemListFilter(val) {
+  if (val !== 'ALL' && activeNlemList === val) activeNlemList = 'ALL';
+  else activeNlemList = val;
+  syncNlemListUi();
+  filterCards();
+}
 function onMobileRightChange() {
   activeRight = document.getElementById('filter-m-right').value;
   syncRightUi();
@@ -681,6 +792,11 @@ function onMobileStockChange() {
 function onMobileListingChange() {
   activeListing = document.getElementById('filter-m-listing').value;
   syncListingUi();
+  filterCards();
+}
+function onMobileNlemListChange() {
+  activeNlemList = document.getElementById('filter-m-nlem-list').value;
+  syncNlemListUi();
   filterCards();
 }
 
@@ -770,19 +886,22 @@ function buildApprovalBtns(d, fs) {
 function buildDrugChip(d) {
   const nnMark = (d.listing_scope === 'non_nlem' || d.category_id === 'NON')
     ? '<span class="nn-chip-mark" title="นอกบัญชียาหลักแห่งชาติ">📎 </span>' : '';
+  const nlBadge = d.nlem_list_type_id
+    ? `<span class="nlem-lt-badge" title="บัญชีย่อย NLEM">${escChipText(d.nlem_list_type_id)}</span> `
+    : '';
   const label = d.name_th ? `${d.name_en} (${d.name_th})` : d.name_en;
   const fs    = d.formulary_status || 'non_formulary';
 
   if (fs === 'non_formulary') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
     const btn   = buildApprovalBtns(d, fs);
-    return wrapDrugChip(d, `<span class="chip chip-nonform"${title}>🔴 ${nnMark}${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
+    return wrapDrugChip(d, `<span class="chip chip-nonform"${title}>🔴 ${nnMark}${nlBadge}${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
   }
 
   if (fs === 'special_order') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
     const btn   = buildApprovalBtns(d, fs);
-    return wrapDrugChip(d, `<span class="chip chip-special"${title}>🟠 ${nnMark}${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
+    return wrapDrugChip(d, `<span class="chip chip-special"${title}>🟠 ${nnMark}${nlBadge}${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
   }
 
   // in_stock — doc_url (NLEM) + ลิงก์เอกสาร/OCPA (non-NLEM ผ่าน approval_doc_url)
@@ -794,9 +913,9 @@ function buildDrugChip(d) {
     try { urls = JSON.parse(d.doc_url); if (!Array.isArray(urls)) urls = [d.doc_url]; }
     catch { urls = [d.doc_url]; }
     if (urls.length === 1) {
-      return wrapDrugChip(d, `<span class="chip chip-link chip-doc-stack">📄 <a href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">${nnMark}${label}${drugRightsSuffixHtml(d)}</a>${apprNn}</span>`);
+      return wrapDrugChip(d, `<span class="chip chip-link chip-doc-stack">📄 <a href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">${nnMark}${nlBadge}${label}${drugRightsSuffixHtml(d)}</a>${apprNn}</span>`);
     }
-    let html = `<span class="chip chip-multi">📄 ${nnMark}${label}${drugRightsSuffixHtml(d)}`;
+    let html = `<span class="chip chip-multi">📄 ${nnMark}${nlBadge}${label}${drugRightsSuffixHtml(d)}`;
     urls.forEach((u, i) => {
       html += `<a href="${u}" target="_blank" rel="noopener" class="multi-doc-link">เอกสาร ${i + 1}</a>`;
     });
@@ -804,10 +923,10 @@ function buildDrugChip(d) {
   }
 
   if (apprNn) {
-    return wrapDrugChip(d, `<span class="chip chip-nn-attach">${nnMark}${label}${drugRightsSuffixHtml(d)}${apprNn}</span>`);
+    return wrapDrugChip(d, `<span class="chip chip-nn-attach">${nnMark}${nlBadge}${label}${drugRightsSuffixHtml(d)}${apprNn}</span>`);
   }
 
-  return wrapDrugChip(d, `<span class="chip">${nnMark}${label}${drugRightsSuffixHtml(d)}</span>`);
+  return wrapDrugChip(d, `<span class="chip">${nnMark}${nlBadge}${label}${drugRightsSuffixHtml(d)}</span>`);
 }
 
 function renderAll() {
@@ -875,6 +994,7 @@ function renderAll() {
     const hasSorder    = catDrugs.some(d => d.formulary_status === 'special_order');
     const hasNlemDrug  = catDrugs.some(d => drugListingTag(d) === 'nlem');
     const hasNonDrug   = catDrugs.some(d => drugListingTag(d) === 'non_nlem');
+    const nlemLtUnion  = [...new Set(catDrugs.map(d => d.nlem_list_type_id).filter(Boolean))];
 
     const rightsUnion = new Set();
     catDrugs.forEach(d => drugEffectiveRightsArr(d, rightList).forEach(r => rightsUnion.add(r)));
@@ -895,6 +1015,7 @@ function renderAll() {
     card.dataset.sorder  = hasSorder  ? '1' : '0';
     card.dataset.hasNlem = hasNlemDrug ? '1' : '0';
     card.dataset.hasNon  = hasNonDrug  ? '1' : '0';
+    card.dataset.nlemtypes = nlemLtUnion.join('||');
     if (cardBorder) card.style.cssText = cardBorder;
 
     const sampleBelowDivider = emptyNon
@@ -976,6 +1097,12 @@ function chipMatchesListing(wrap) {
   return (wrap.getAttribute('data-listing') || 'nlem') === activeListing;
 }
 
+function chipMatchesNlemList(wrap) {
+  if (activeNlemList === 'ALL') return true;
+  const nl = wrap.getAttribute('data-nlem-list') || '';
+  return nl === activeNlemList;
+}
+
 function applySearchDrugUi(qRaw) {
   const q = (qRaw || '').trim().toLowerCase();
   const grid = document.getElementById('card-grid');
@@ -988,7 +1115,7 @@ function applySearchDrugUi(qRaw) {
     if (!q) {
       card.querySelectorAll('.drug-chip-wrap').forEach(w => {
         w.classList.remove('search-match');
-        const show = !hidden && chipMatchesListing(w);
+        const show = !hidden && chipMatchesListing(w) && chipMatchesNlemList(w);
         w.style.display = show ? '' : 'none';
       });
       card.querySelectorAll('.drug-group-label').forEach(lab => {
@@ -1015,7 +1142,7 @@ function applySearchDrugUi(qRaw) {
     card.querySelectorAll('.drug-chip-wrap').forEach(wrap => {
       const h = (wrap.getAttribute('data-haystack') || '').toLowerCase();
       const matchQ = h.includes(q);
-      const ok = matchQ && chipMatchesListing(wrap);
+      const ok = matchQ && chipMatchesListing(wrap) && chipMatchesNlemList(wrap);
       wrap.classList.toggle('search-match', ok);
       wrap.style.display = ok ? '' : 'none';
       if (ok) anyMatch = true;
@@ -1070,7 +1197,13 @@ function filterCards() {
     if (activeListing === 'nlem') lm = hn;
     else if (activeListing === 'non_nlem') lm = hx;
 
-    if (rm && sm && gm && qm && lm) { card.classList.remove('hidden'); visible++; }
+    let nm = true;
+    if (activeNlemList !== 'ALL') {
+      const parts = (card.dataset.nlemtypes || '').split('||').filter(Boolean);
+      nm = parts.includes(activeNlemList);
+    }
+
+    if (rm && sm && gm && qm && lm && nm) { card.classList.remove('hidden'); visible++; }
     else                             { card.classList.add('hidden'); }
   });
   applySearchDrugUi(document.getElementById('search').value);

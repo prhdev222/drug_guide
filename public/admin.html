@@ -267,8 +267,8 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>บัญชี</th><th>NLEM</th><th>ชื่อยา (EN)</th><th>ชื่อยา (TH)</th><th>กลุ่มยา</th><th>คลัง</th><th>แบบฟอร์ม</th><th>สถานะ</th><th></th></tr></thead>
-          <tbody id="drugs-tbody"><tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
+          <thead><tr><th>บัญชี</th><th>NLEM</th><th>บัญชีย่อย</th><th>ชื่อยา (EN)</th><th>ชื่อยา (TH)</th><th>กลุ่มยา</th><th>คลัง</th><th>แบบฟอร์ม</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody id="drugs-tbody"><tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -366,6 +366,11 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
       <select id="drug-cat" title="เลือกบัญชียาหลักแห่งชาติ — ถ้าเป็น non-NLEM ระบบตั้งเป็น NON ให้อัตโนมัติ"></select>
       <p class="form-hint" id="drug-cat-subhint"></p>
       <p class="form-hint" id="drug-cat-rights-hint"></p>
+    </div>
+    <div class="form-row" id="drug-nlem-lt-row">
+      <label for="drug-nlem-lt">บัญชีย่อย NLEM (b · ex · s · R1 · R2)</label>
+      <select id="drug-nlem-lt"></select>
+      <p class="form-hint">ใช้เมื่อรายการอยู่ในบัญชียาหลักแห่งชาติ — ตามประกาศรายชื่อยาหลักแห่งชาติ</p>
     </div>
     <div class="form-row">
       <label>สิทธิที่ใช้ยานี้ได้ <span style="font-size:0.75rem;color:var(--muted);font-weight:400">(ไม่บังคับ — เลือกได้หลายสิทธิ)</span></label>
@@ -491,7 +496,7 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
 
 <script>
 let API_KEY = '';
-let cats = [], drugs = [], links = [], groups = [];
+let cats = [], drugs = [], links = [], groups = [], nlemListTypes = [];
 
 const FONT = { min: 13, max: 22, def: 15 };
 
@@ -572,6 +577,18 @@ function asArray(x) {
   return Array.isArray(x) ? x : [];
 }
 
+function populateNlemLtSelect() {
+  const sel = document.getElementById('drug-nlem-lt');
+  if (!sel) return;
+  let html = '<option value="">— ไม่ระบุ —</option>';
+  (nlemListTypes || []).forEach(t => {
+    const id = escMini(String(t.id));
+    const nm = escMini(String(t.name_th || t.id));
+    html += `<option value="${id}">${id} · ${nm}</option>`;
+  });
+  sel.innerHTML = html;
+}
+
 /** ถ้า Turso ยังไม่มีแถว NON — ยังต้องมีตัวเลือกใน dropdown ตอนเลือก non-NLEM */
 function ensureNonCategory(list) {
   const out = list.filter(Boolean);
@@ -638,6 +655,18 @@ async function loadAll() {
     return `<option value="${c.id}" data-doc="${c.doc_level || 'none'}" data-rights="${rEsc}">${c.id} — ${c.name_th}</option>`;
   }).join('') : '');
   populateGroupSelect();
+  try {
+    const r = await fetch('/api/nlem-list-types');
+    if (r.ok) {
+      const j = await r.json();
+      nlemListTypes = Array.isArray(j) ? j : [];
+    } else {
+      nlemListTypes = [];
+    }
+  } catch (_) {
+    nlemListTypes = [];
+  }
+  populateNlemLtSelect();
 }
 
 function updateDrugCatSubhint() {
@@ -729,6 +758,16 @@ function updateListingScopeUi(fromUserToggle) {
       document.getElementById('nn-doc').checked = false;
       document.getElementById('nn-ocpa').checked = false;
       if (catSel.value === 'NON') catSel.value = 'ก';
+    }
+  }
+  const nlemRow = document.getElementById('drug-nlem-lt-row');
+  const nlemSel = document.getElementById('drug-nlem-lt');
+  if (nlemRow && nlemSel) {
+    if (scope === 'non_nlem') {
+      nlemRow.hidden = true;
+      if (fromT) nlemSel.value = '';
+    } else {
+      nlemRow.hidden = false;
     }
   }
   updateCatRightsHint();
@@ -923,10 +962,15 @@ function renderDrugs() {
     const scopeCell = (d.listing_scope === 'non_nlem' || d.category_id === 'NON')
       ? '<span title="นอกบัญชียาหลักแห่งชาติ">non-NLEM</span>'
       : 'NLEM';
+    const isNlemListing = !(d.listing_scope === 'non_nlem' || d.category_id === 'NON');
+    const nlemLtCell = isNlemListing && d.nlem_list_type_id
+      ? `<span title="บัญชีย่อย NLEM">${escMini(d.nlem_list_type_id)}</span>`
+      : '—';
     return `
     <tr class="${d.active ? '' : 'inactive'}">
       <td><span class="badge-cat">${d.category_id}</span></td>
       <td style="font-size:0.75rem">${scopeCell}</td>
+      <td style="font-size:0.75rem">${nlemLtCell}</td>
       <td>${d.name_en}</td>
       <td>${d.name_th || '—'}</td>
       <td>${d.drug_group || '—'}</td>
@@ -941,7 +985,7 @@ function renderDrugs() {
           : `<button class="act-btn restore" onclick="toggleDrug(${d.id},1)">เปิด</button>`}
       </td>
     </tr>`;
-  }).join('') || '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted)">ไม่พบรายการ</td></tr>';
+  }).join('') || '<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--muted)">ไม่พบรายการ</td></tr>';
 }
 
 function applyDrugFilters() { renderDrugs(); }
@@ -1006,6 +1050,8 @@ function openDrugModal(id) {
   setDocUrls('');
   document.getElementById('drug-order').value = '';
   document.getElementById('drug-modal-title').textContent = 'เพิ่มยาใหม่';
+  const nlemLtEl = document.getElementById('drug-nlem-lt');
+  if (nlemLtEl) nlemLtEl.value = '';
   if (id) {
     const d = drugs.find(x => x.id === id);
     if (d) {
@@ -1029,6 +1075,7 @@ function openDrugModal(id) {
       document.getElementById('nn-civil').checked = !!(d.nn_civil_servant && Number(d.nn_civil_servant));
       document.getElementById('nn-doc').checked = !!(d.nn_doc_required && Number(d.nn_doc_required));
       document.getElementById('nn-ocpa').checked = !!(d.nn_ocpa && Number(d.nn_ocpa));
+      if (nlemLtEl) nlemLtEl.value = d.nlem_list_type_id || '';
     }
   } else {
     const cat = document.getElementById('drug-cat');
@@ -1046,6 +1093,7 @@ async function saveDrug() {
   const listingScope = document.querySelector('input[name="drug-listing-scope"]:checked')?.value || 'nlem';
   let catId = document.getElementById('drug-cat').value;
   if (listingScope === 'non_nlem') catId = 'NON';
+  const nlemLtRaw = (document.getElementById('drug-nlem-lt')?.value || '').trim();
   const payload = {
     category_id:      catId,
     name_en:          document.getElementById('drug-name-en').value.trim(),
@@ -1059,6 +1107,7 @@ async function saveDrug() {
     notes:            document.getElementById('drug-notes').value.trim() || null,
     doc_url:          getDocUrls(),
     listing_scope:    listingScope,
+    nlem_list_type_id: listingScope === 'non_nlem' ? null : (nlemLtRaw || null),
     nn_civil_servant: listingScope === 'non_nlem' && document.getElementById('nn-civil').checked ? 1 : 0,
     nn_doc_required:  listingScope === 'non_nlem' && document.getElementById('nn-doc').checked ? 1 : 0,
     nn_ocpa:          listingScope === 'non_nlem' && document.getElementById('nn-ocpa').checked ? 1 : 0,
