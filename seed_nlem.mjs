@@ -1,8 +1,44 @@
 import { createClient } from "@libsql/client";
+import { readFileSync, existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = join(__dirname);
+
+/** โหลด .env ที่โฟลเดอร์โปรเจกต์ — Node ไม่โหลดให้อัตโนมัติ */
+if (existsSync(join(root, ".env"))) {
+  const raw = readFileSync(join(root, ".env"), "utf8");
+  for (const line of raw.split("\n")) {
+    const t = line.trim();
+    if (!t || t.startsWith("#")) continue;
+    const eq = t.indexOf("=");
+    if (eq === -1) continue;
+    const k = t.slice(0, eq).trim();
+    let v = t.slice(eq + 1).trim();
+    if (
+      (v.startsWith('"') && v.endsWith('"')) ||
+      (v.startsWith("'") && v.endsWith("'"))
+    )
+      v = v.slice(1, -1);
+    if (k && !process.env[k]) process.env[k] = v;
+  }
+}
+
+const tursoUrl = process.env.TURSO_URL;
+const tursoTok = process.env.TURSO_AUTH_TOKEN || process.env.TURSO_TOKEN;
+
+if (!tursoUrl || !tursoTok) {
+  console.error(
+    "❌ ไม่มี TURSO_URL หรือ TURSO_AUTH_TOKEN — ใส่ในไฟล์ .env ที่โฟลเดอร์โปรเจกต์\n" +
+      "   หรือ PowerShell: $env:TURSO_URL=\"libsql://....turso.io\"; $env:TURSO_AUTH_TOKEN=\"...\""
+  );
+  process.exit(1);
+}
 
 const client = createClient({
-  url: process.env.TURSO_URL, // e.g. libsql://....turso.io
-  authToken: process.env.TURSO_AUTH_TOKEN || process.env.TURSO_TOKEN,
+  url: tursoUrl,
+  authToken: tursoTok,
 });
 
 async function seed() {
