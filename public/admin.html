@@ -214,8 +214,8 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>บัญชี</th><th>ชื่อยา (EN)</th><th>ชื่อยา (TH)</th><th>กลุ่มยา</th><th>คลัง</th><th>แบบฟอร์ม</th><th>สถานะ</th><th></th></tr></thead>
-          <tbody id="drugs-tbody"><tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
+          <thead><tr><th>บัญชี</th><th>NLEM</th><th>ชื่อยา (EN)</th><th>ชื่อยา (TH)</th><th>กลุ่มยา</th><th>คลัง</th><th>แบบฟอร์ม</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody id="drugs-tbody"><tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted)">กำลังโหลด...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -279,6 +279,23 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
     <h3 id="drug-modal-title">เพิ่มยาใหม่</h3>
     <input type="hidden" id="drug-id">
     <div class="form-row">
+      <label>ประเภทรายการ *</label>
+      <div class="rights-check-row" style="margin-top:4px">
+        <label class="rights-inline"><input type="radio" name="drug-listing-scope" value="nlem" checked onchange="updateListingScopeUi(1)"> ในบัญชียาหลักแห่งชาติ (NLEM)</label>
+        <label class="rights-inline"><input type="radio" name="drug-listing-scope" value="non_nlem" onchange="updateListingScopeUi(1)"> นอกบัญชียาหลักแห่งชาติ (non-NLEM)</label>
+      </div>
+      <p class="form-hint">non-NLEM = ยาที่โรงพยาบาลบันทึกนอกบัญชียาหลัก — เลือกเกณฑ์ด้านสิทธิ/เอกสารด้านล่าง</p>
+    </div>
+    <div class="form-row" id="non-nlem-block" style="display:none">
+      <label>ข้อมูล non-NLEM</label>
+      <div class="rights-check-row">
+        <label class="rights-inline"><input type="checkbox" id="nn-civil"> เกี่ยวข้องสิทธิข้าราชการ (CSMBS)</label>
+        <label class="rights-inline"><input type="checkbox" id="nn-doc"> ต้องมีเอกสารประกอบ</label>
+        <label class="rights-inline"><input type="checkbox" id="nn-ocpa"> ต้องลงทะเบียน OCPA — <a href="https://www.rama.mahidol.ac.th/cancer_center/th/OCPA_from/form" target="_blank" rel="noopener" onclick="event.stopPropagation()">แบบฟอร์มศูนย์มะเร็ง รามาธิบดี</a></label>
+      </div>
+      <p class="form-hint">ใช้คู่กับช่องสิทธิรายยาด้านล่างเมื่อต้องการจำกัดเฉพาะบางสิทธิ</p>
+    </div>
+    <div class="form-row" id="drug-cat-row">
       <label>บัญชี *</label>
       <select id="drug-cat"></select>
       <p class="form-hint" id="drug-cat-rights-hint"></p>
@@ -494,7 +511,16 @@ async function loadAll() {
   renderLinks();
   renderCats();
   renderGroups();
-  const opts = cats.map(c => {
+  const catOrder = ['ก','ข','ค','ง','จ1','จ2','NON'];
+  const sortedCats = [...cats].sort((a, b) => {
+    const ia = catOrder.indexOf(a.id);
+    const ib = catOrder.indexOf(b.id);
+    if (ia === -1 && ib === -1) return String(a.id).localeCompare(String(b.id), 'th');
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+  const opts = sortedCats.map(c => {
     const rEsc = String(c.rights || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
     return `<option value="${c.id}" data-doc="${c.doc_level || 'none'}" data-rights="${rEsc}">${c.id} — ${c.name_th}</option>`;
   }).join('');
@@ -522,6 +548,11 @@ function updateCatRightsHint() {
   const sel = document.getElementById('drug-cat');
   const hint = document.getElementById('drug-cat-rights-hint');
   if (!sel || !hint) return;
+  const scope = document.querySelector('input[name="drug-listing-scope"]:checked')?.value || 'nlem';
+  if (scope === 'non_nlem') {
+    hint.textContent = 'รายการนอกบัญชียาหลักแห่งชาติ — จัดเก็บในมุม NON (หมายเหตุและสิทธิรายยายังใช้ได้ตามที่ตั้ง)';
+    return;
+  }
   const opt = sel.options[sel.selectedIndex];
   const raw = opt?.getAttribute('data-rights') || '';
   if (!raw) {
@@ -529,6 +560,36 @@ function updateCatRightsHint() {
     return;
   }
   hint.textContent = 'สิทธิ NLEM ของบัญชีนี้: ' + raw.replace(/,/g, ', ') + ' — ไม่ติ๊กรายยา = ยาตัวนี้ใช้ได้ครบทุกสิทธิข้างต้น';
+}
+
+/** toggle non-NLEM: fromUserToggle=1 เมื่อผู้ใช้เปลี่ยนวิทยุ — จะล้างช่อง non-NLEM และดึงบัญชีกลับจาก NON */
+function updateListingScopeUi(fromUserToggle) {
+  const r = document.querySelector('input[name="drug-listing-scope"]:checked');
+  const scope = r ? r.value : 'nlem';
+  const catSel = document.getElementById('drug-cat');
+  const block = document.getElementById('non-nlem-block');
+  const fromT = !!fromUserToggle;
+  if (scope === 'non_nlem') {
+    block.style.display = '';
+    catSel.value = 'NON';
+    catSel.disabled = true;
+    if (fromT) {
+      document.getElementById('nn-civil').checked = false;
+      document.getElementById('nn-doc').checked = false;
+      document.getElementById('nn-ocpa').checked = false;
+    }
+  } else {
+    block.style.display = 'none';
+    catSel.disabled = false;
+    if (fromT) {
+      document.getElementById('nn-civil').checked = false;
+      document.getElementById('nn-doc').checked = false;
+      document.getElementById('nn-ocpa').checked = false;
+      if (catSel.value === 'NON') catSel.value = 'ก';
+    }
+  }
+  updateCatRightsHint();
+  updateDocUrlVisibility();
 }
 function clearDrugRightsChecks() {
   document.querySelectorAll('#drug-rights-row input[type="checkbox"]').forEach(c => { c.checked = false; });
@@ -714,9 +775,13 @@ function renderDrugs() {
     } else if (d.formulary_status !== 'in_stock') {
       formCell = '<span style="font-size:0.733rem;color:var(--muted)">ยังไม่มี link</span>';
     }
+    const scopeCell = (d.listing_scope === 'non_nlem' || d.category_id === 'NON')
+      ? '<span title="นอกบัญชียาหลักแห่งชาติ">non-NLEM</span>'
+      : 'NLEM';
     return `
     <tr class="${d.active ? '' : 'inactive'}">
       <td><span class="badge-cat">${d.category_id}</span></td>
+      <td style="font-size:0.75rem">${scopeCell}</td>
       <td>${d.name_en}</td>
       <td>${d.name_th || '—'}</td>
       <td>${d.drug_group || '—'}</td>
@@ -731,7 +796,7 @@ function renderDrugs() {
           : `<button class="act-btn restore" onclick="toggleDrug(${d.id},1)">เปิด</button>`}
       </td>
     </tr>`;
-  }).join('') || '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">ไม่พบรายการ</td></tr>';
+  }).join('') || '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted)">ไม่พบรายการ</td></tr>';
 }
 
 function applyDrugFilters() { renderDrugs(); }
@@ -782,6 +847,12 @@ function openDrugModal(id) {
   document.getElementById('drug-name-th').value = '';
   document.getElementById('drug-group').value = '';
   clearDrugRightsChecks();
+  document.querySelector('input[name="drug-listing-scope"][value="nlem"]').checked = true;
+  document.getElementById('nn-civil').checked = false;
+  document.getElementById('nn-doc').checked = false;
+  document.getElementById('nn-ocpa').checked = false;
+  document.getElementById('non-nlem-block').style.display = 'none';
+  document.getElementById('drug-cat').disabled = false;
   document.getElementById('drug-notes').value = '';
   document.getElementById('drug-formulary').value = 'in_stock';
   document.getElementById('drug-fda-reg').value = '';
@@ -794,6 +865,8 @@ function openDrugModal(id) {
     const d = drugs.find(x => x.id === id);
     if (d) {
       document.getElementById('drug-id').value = d.id;
+      const nonNlem = d.listing_scope === 'non_nlem' || d.category_id === 'NON';
+      document.querySelector(`input[name="drug-listing-scope"][value="${nonNlem ? 'non_nlem' : 'nlem'}"]`).checked = true;
       document.getElementById('drug-cat').value = d.category_id;
       document.getElementById('drug-name-en').value = d.name_en;
       document.getElementById('drug-name-th').value = d.name_th || '';
@@ -808,8 +881,15 @@ function openDrugModal(id) {
       document.getElementById('drug-order').value =
         d.sort_order != null && d.sort_order !== '' ? String(d.sort_order) : '';
       document.getElementById('drug-modal-title').textContent = 'แก้ไขยา';
+      document.getElementById('nn-civil').checked = !!(d.nn_civil_servant && Number(d.nn_civil_servant));
+      document.getElementById('nn-doc').checked = !!(d.nn_doc_required && Number(d.nn_doc_required));
+      document.getElementById('nn-ocpa').checked = !!(d.nn_ocpa && Number(d.nn_ocpa));
     }
+  } else {
+    const cat = document.getElementById('drug-cat');
+    if (cat && cat.options.length) cat.selectedIndex = 0;
   }
+  updateListingScopeUi();
   updateApprovalVisibility();
   updateDocUrlVisibility();
   updateCatRightsHint();
@@ -818,8 +898,11 @@ function openDrugModal(id) {
 async function saveDrug() {
   const id      = document.getElementById('drug-id').value;
   const orderRaw = document.getElementById('drug-order').value.trim();
+  const listingScope = document.querySelector('input[name="drug-listing-scope"]:checked')?.value || 'nlem';
+  let catId = document.getElementById('drug-cat').value;
+  if (listingScope === 'non_nlem') catId = 'NON';
   const payload = {
-    category_id:      document.getElementById('drug-cat').value,
+    category_id:      catId,
     name_en:          document.getElementById('drug-name-en').value.trim(),
     name_th:          document.getElementById('drug-name-th').value.trim() || null,
     drug_group:       document.getElementById('drug-group').value || null,
@@ -830,6 +913,10 @@ async function saveDrug() {
     approval_criteria:document.getElementById('drug-approval-criteria').value.trim() || null,
     notes:            document.getElementById('drug-notes').value.trim() || null,
     doc_url:          getDocUrls(),
+    listing_scope:    listingScope,
+    nn_civil_servant: listingScope === 'non_nlem' && document.getElementById('nn-civil').checked ? 1 : 0,
+    nn_doc_required:  listingScope === 'non_nlem' && document.getElementById('nn-doc').checked ? 1 : 0,
+    nn_ocpa:          listingScope === 'non_nlem' && document.getElementById('nn-ocpa').checked ? 1 : 0,
   };
   if (!id) {
     if (orderRaw === '') payload.sort_order = null;

@@ -16,12 +16,17 @@ export async function onRequest({ request, env }) {
     const category = url.searchParams.get('category');
     const group    = url.searchParams.get('group');
     const q        = url.searchParams.get('q');
+    const scope    = url.searchParams.get('listing_scope'); // nlem | non_nlem
 
     let sql  = 'SELECT * FROM drugs WHERE active = 1';
     const args = [];
 
     if (category) { sql += ' AND category_id = ?'; args.push(category); }
     if (group)    { sql += ' AND drug_group = ?';   args.push(group); }
+    if (scope === 'nlem' || scope === 'non_nlem') {
+      sql += ' AND listing_scope = ?';
+      args.push(scope);
+    }
     if (q)        { sql += ' AND (name_en LIKE ? OR name_th LIKE ?)';
                     args.push(`%${q}%`, `%${q}%`); }
 

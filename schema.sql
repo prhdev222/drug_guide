@@ -29,6 +29,11 @@ CREATE TABLE IF NOT EXISTS drugs (
   approval_doc_url TEXT,   -- URL เดียว (เดิม) หรือ JSON array [{title,url},...] หลายลิงก์
   approval_criteria TEXT,  -- เกณฑ์/เงื่อนไขการอนุมัติ
   fda_reg_no       TEXT,   -- เลขทะเบียน อย. (ไม่บังคับ)
+  -- NLEM vs นอกบัญชียาหลัก + ข้อมูลเสริมเมื่อเป็น non-NLEM
+  listing_scope      TEXT NOT NULL DEFAULT 'nlem',  -- 'nlem'|'non_nlem'
+  nn_civil_servant   INTEGER NOT NULL DEFAULT 0,   -- 1 = เกี่ยวข้องสิทธิข้าราชการ
+  nn_doc_required    INTEGER NOT NULL DEFAULT 0,   -- 1 = ต้องมีเอกสารประกอบ
+  nn_ocpa            INTEGER NOT NULL DEFAULT 0,   -- 1 = ต้องลงทะเบียน OCPA
   active           INTEGER DEFAULT 1,
   sort_order       INTEGER DEFAULT 0
 );
@@ -78,7 +83,10 @@ INSERT OR IGNORE INTO categories VALUES
    'UC,SSO,CSMBS','none','green','ตามที่แต่ละรายการกำหนด',1),
   ('จ2','บัญชี จ2','Special Program Medicines',
    'ยาภายใต้โครงการพิเศษ สปสช. ต้องลงทะเบียนเข้าร่วมโครงการก่อนรับยา',
-   'UC,SSO,CSMBS','required','coral','เฉพาะ รพ.ที่ได้รับอนุมัติจาก สปสช.',1);
+   'UC,SSO,CSMBS','required','coral','เฉพาะ รพ.ที่ได้รับอนุมัติจาก สปสช.',1),
+  ('NON','นอกบัญชียาหลักแห่งชาติ','Non-NLEM / Hospital list',
+   'ยาไม่อยู่ในบัญชียาหลักแห่งชาติ — ระเบียบขึ้นกับโรงพยาบาลและสิทธิการรักษา',
+   'UC,SSO,CSMBS','none','slate','ตามนโยบาย รพ.',1);
 
 -- =============================================================
 -- SEED: Drugs
@@ -203,6 +211,11 @@ INSERT OR IGNORE INTO links (category_id, title, url, description, sort_order) V
 -- ALTER TABLE drugs ADD COLUMN approval_criteria TEXT;
 -- ALTER TABLE drugs ADD COLUMN fda_reg_no TEXT;
 -- ALTER TABLE drugs ADD COLUMN rights TEXT;
+-- ALTER TABLE drugs ADD COLUMN listing_scope TEXT NOT NULL DEFAULT 'nlem';
+-- ALTER TABLE drugs ADD COLUMN nn_civil_servant INTEGER NOT NULL DEFAULT 0;
+-- ALTER TABLE drugs ADD COLUMN nn_doc_required INTEGER NOT NULL DEFAULT 0;
+-- ALTER TABLE drugs ADD COLUMN nn_ocpa INTEGER NOT NULL DEFAULT 0;
+-- INSERT OR IGNORE INTO categories VALUES ('NON','นอกบัญชียาหลักแห่งชาติ','Non-NLEM / Hospital list','ยาไม่อยู่ในบัญชียาหลักแห่งชาติ — ระเบียบขึ้นกับโรงพยาบาลและสิทธิการรักษา','UC,SSO,CSMBS','none','slate','ตามนโยบาย รพ.',1);
 -- อัปเดตสิทธิบัญชียา (เพิ่ม SSO) สำหรับ DB เดิม:
 -- UPDATE categories SET rights = 'UC,SSO,CSMBS' WHERE id IN ('ค','ง','จ1','จ2');
 -- CREATE TABLE IF NOT EXISTS approval_forms (

@@ -143,6 +143,7 @@ html.dark .m-filter-select { background-image: url("data:image/svg+xml,%3Csvg xm
 .drug-group-label { font-size: 0.733rem; color: var(--muted); margin: 6px 0 3px; }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; align-items: flex-start; }
 .drug-chip-wrap { display: inline-flex; flex-direction: column; align-items: flex-start; max-width: 100%; vertical-align: top; }
+.nn-chip-mark { opacity: 0.92; user-select: none; }
 .grid.search-active .chips { gap: 8px 10px; row-gap: 10px; }
 .drug-hit-detail { display: none; width: 100%; max-width: 100%; box-sizing: border-box; margin-top: 6px; padding: 8px 10px; font-size: 0.767rem; background: var(--gray); border-radius: 8px; border: 1px solid var(--border); line-height: 1.45; text-align: left; color: var(--text); }
 .grid.search-active .drug-chip-wrap.search-match .drug-hit-detail { display: block; font-size: 0.98rem; padding: 11px 14px; line-height: 1.55; }
@@ -151,6 +152,8 @@ html.dark .m-filter-select { background-image: url("data:image/svg+xml,%3Csvg xm
 .dd-k { color: var(--muted); font-weight: 600; font-size: 0.7rem; margin-right: 6px; }
 .grid.search-active .drug-hit-detail .dd-k { font-size: 0.82rem; }
 html.dark .drug-hit-detail { background: var(--gray); border-color: var(--border); }
+.drug-hit-detail .dd-row a { color: var(--teal-text); text-decoration: underline; text-underline-offset: 2px; word-break: break-word; }
+html.dark .drug-hit-detail .dd-row a { filter: brightness(1.15); }
 
 /* โหมดค้นหา: ข้อความชื่อยา + รายละเอียดใหญ่ขึ้น อ่านง่าย */
 .grid.search-active .drug-group-label { font-size: 0.82rem; font-weight: 600; }
@@ -245,6 +248,40 @@ html.dark .chip-special { background: #3d2e10; color: #fac775; border-color: #7a
 html.dark .doc-form-btn.pdf   { background: #3f1f1f; color: #fecaca; border-color: #991b1b; }
 html.dark .doc-form-btn.forms { background: #1e3a5f; color: #bfdbfe; border-color: #1d4ed8; }
 html.dark .chip { background: var(--gray); border-color: var(--border); color: var(--muted); }
+
+/* คำอธิบายบัญชียา NLEM (สไตล์อินโฟกราฟิก) */
+.nlem-info { max-width: 900px; margin: 0.75rem auto 1rem; padding: 0 1rem; }
+.nlem-info-title { font-size: 1.05rem; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 4px; line-height: 1.35; }
+.nlem-info-note { font-size: 0.75rem; color: var(--muted); text-align: center; margin-bottom: 14px; line-height: 1.45; }
+.nlem-info-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.nlem-info-cell { display: grid; grid-template-columns: 68px 1fr; gap: 10px; align-items: stretch; min-height: 72px; }
+.nlem-info-badge {
+  width: 64px; height: 64px; border-radius: 999px; border: 2px solid #94a3b8;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.85rem; font-weight: 800; color: #c41e3a; background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0,0,0,.06); flex-shrink: 0; margin: auto 0;
+}
+.nlem-info-badge .sub { font-size: 1.1rem; font-weight: 800; vertical-align: baseline; }
+.nlem-info-desc {
+  background: #1d4ed8; color: #fff; border-radius: 10px; padding: 12px 14px;
+  font-size: 0.867rem; line-height: 1.5; display: flex; align-items: center;
+  box-shadow: 0 4px 12px rgba(29,78,216,.18);
+}
+.nlem-info-non {
+  margin-top: 14px; padding: 14px 16px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--surface);
+  box-shadow: 0 2px 10px rgba(0,0,0,.04);
+}
+.nlem-info-non h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 10px; line-height: 1.35; }
+.nlem-info-non p { font-size: 0.833rem; color: var(--text); line-height: 1.55; margin-bottom: 10px; }
+.nlem-info-non p:last-child { margin-bottom: 0; }
+.nlem-info-non strong { color: var(--teal); font-weight: 600; }
+html.dark .nlem-info-badge { border-color: #64748b; color: #f87171; background: var(--surface); }
+html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+@media (max-width: 400px) {
+  .nlem-info-cell { grid-template-columns: 56px 1fr; }
+  .nlem-info-badge { width: 52px; height: 52px; font-size: 1.45rem; }
+}
 </style>
 </head>
 <body>
@@ -270,6 +307,42 @@ html.dark .chip { background: var(--gray); border-color: var(--border); color: v
 <div class="controls">
   <input type="text" id="search" placeholder="ค้นหายา เช่น imatinib, warfarin, ฟ้าทะลายโจร..." oninput="filterCards()">
 </div>
+
+<section class="nlem-info" id="nlem-info" aria-labelledby="nlem-info-title">
+  <h2 id="nlem-info-title" class="nlem-info-title">บัญชียาหลักแห่งชาติ (NLEM) — ความหมายโดยสังเขป</h2>
+  <p class="nlem-info-note">สรุปเพื่อความเข้าใจเบื้องต้น — รายละเอียดและเกณฑ์การใช้ยาตามประกาศ / คู่มือ สธ. · สปสช. ฉบับที่ใช้บังคับ</p>
+  <div class="nlem-info-grid">
+    <div class="nlem-info-cell">
+      <div class="nlem-info-badge" aria-hidden="true">ก</div>
+      <div class="nlem-info-desc">ยาจำเป็นพื้นฐาน ใช้ได้ในสถานพยาบาลทุกระดับ มักเป็นตัวเลือกแรกตามข้อบ่งชี้ทางการแพทย์</div>
+    </div>
+    <div class="nlem-info-cell">
+      <div class="nlem-info-badge" aria-hidden="true">ข</div>
+      <div class="nlem-info-desc">ยาที่ใช้เมื่อยาในบัญชี ก ใช้ไม่ได้ ไม่เหมาะสม ไม่ได้ผล หรือมีความจำเป็นตามดุลยพินิจของแพทย์</div>
+    </div>
+    <div class="nlem-info-cell">
+      <div class="nlem-info-badge" aria-hidden="true">ค</div>
+      <div class="nlem-info-desc">ยาสำหรับโรคเฉพาะทาง / การดูแลขั้นสูง ใช้ภายใต้การดูแลของแพทย์เฉพาะทางหรือตามที่โรงพยาบาลกำหนด</div>
+    </div>
+    <div class="nlem-info-cell">
+      <div class="nlem-info-badge" aria-hidden="true">ง</div>
+      <div class="nlem-info-desc">ยาที่มีข้อบ่งชี้เฉพาะหรือมูลค่าสูง มักต้องขออนุมัติล่วงหน้าและมีการติดตามการใช้ยา (เช่น Prior Authorization / DUE)</div>
+    </div>
+    <div class="nlem-info-cell">
+      <div class="nlem-info-badge" aria-hidden="true"><span class="sub">จ</span>₁</div>
+      <div class="nlem-info-desc">ยาสมุนไพรที่ผ่านการรับรอง มีหลักฐานประสิทธิภาพและความปลอดภัยตามเกณฑ์ที่กำหนด</div>
+    </div>
+    <div class="nlem-info-cell">
+      <div class="nlem-info-badge" aria-hidden="true"><span class="sub">จ</span>₂</div>
+      <div class="nlem-info-desc">ยาภายใต้โครงการพิเศษของ สปสช. ต้องเข้าเกณฑ์/ลงทะเบียนตามโครงการก่อนได้รับยา</div>
+    </div>
+  </div>
+  <div class="nlem-info-non">
+    <h3>กลุ่มยานอกบัญชียาหลักแห่งชาติ (Non-NLEM)</h3>
+    <p><strong>สิทธิข้าราชการ</strong> อาจมีสิทธิได้ใช้ยานอกบัญชียาหลัก (Non-NLEM) ได้ ขึ้นกับแพทย์ผู้รักษา ซึ่งต้องมีการให้เหตุผลทางคลินิกที่สามารถตรวจสอบย้อนหลังกับกรมบัญชีกลางได้</p>
+    <p><strong>บัตรทอง / ประกันสังคม</strong> หากต้องการยานอกบัญชียาหลักแห่งชาติ โดยทั่วไปจะต้องยอมรับค่าใช้จ่ายเอง (ชำระเงินเอง) ตามนโยบายสิทธิที่เกี่ยวข้อง</p>
+  </div>
+</section>
 
 <section class="filters-panel" aria-label="ตัวกรอง">
   <div class="filter-desktop">
@@ -392,6 +465,7 @@ const COLOR_BADGE = {
   amber:  { bg: '#FAC775', color: '#633806' },
   green:  { bg: '#C0DD97', color: '#27500A' },
   coral:  { bg: '#F5C4B3', color: '#712B13' },
+  slate:  { bg: '#C9D4E0', color: '#1E2D3D' },
 };
 const DOC_BADGE = {
   none:     { cls: 'doc-none',     label: 'ไม่ต้องมีเอกสารพิเศษ' },
@@ -409,12 +483,35 @@ function escDataAttr(s) {
   return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 }
 function drugSearchHaystack(d) {
-  return [d.name_en, d.name_th, d.drug_group, d.notes, d.approval_criteria, d.fda_reg_no]
+  const extra = [];
+  if (d.listing_scope === 'non_nlem' || d.category_id === 'NON') {
+    extra.push('non-NLEM', 'นอกบัญชียาหลัก');
+    if (Number(d.nn_civil_servant)) extra.push('ข้าราชการ', 'CSMBS');
+    if (Number(d.nn_doc_required)) extra.push('เอกสาร');
+    if (Number(d.nn_ocpa)) extra.push('OCPA', 'รามาธิบดี', 'rama.mahidol');
+  }
+  return [d.name_en, d.name_th, d.drug_group, d.notes, d.approval_criteria, d.fda_reg_no, extra.join(' ')]
     .filter(Boolean).join(' ').toLowerCase();
 }
 function drugDetailBlock(d) {
   const fs = d.formulary_status || 'in_stock';
   const rows = [];
+  const isNonNlem = d.listing_scope === 'non_nlem' || d.category_id === 'NON';
+  if (isNonNlem) {
+    rows.push(`<div class="dd-row"><span class="dd-k">ประเภท</span> นอกบัญชียาหลักแห่งชาติ (non-NLEM)</div>`);
+    const OCPA_FORM_URL = 'https://www.rama.mahidol.ac.th/cancer_center/th/OCPA_from/form';
+    const bits = [];
+    if (Number(d.nn_civil_servant)) bits.push('เกี่ยวข้องสิทธิข้าราชการ (CSMBS)');
+    if (Number(d.nn_doc_required)) bits.push('ต้องมีเอกสารประกอบ');
+    const textLine = bits.length ? escChipText(bits.join(' · ')) : '';
+    const ocpaLine = Number(d.nn_ocpa)
+      ? `<a href="${OCPA_FORM_URL}" target="_blank" rel="noopener">ต้องลงทะเบียน OCPA — แบบฟอร์ม/แนวทาง (ศูนย์มะเร็ง รพ.รามาธิบดี)</a>`
+      : '';
+    const nnParts = [textLine, ocpaLine].filter(Boolean);
+    if (nnParts.length) {
+      rows.push(`<div class="dd-row dd-nn-rules"><span class="dd-k">เกณฑ์ non-NLEM</span> ${nnParts.join(' · ')}</div>`);
+    }
+  }
   if (d.drug_group) rows.push(`<div class="dd-row"><span class="dd-k">กลุ่มยา</span> ${escChipText(d.drug_group)}</div>`);
   rows.push(`<div class="dd-row"><span class="dd-k">สถานะคลัง</span> ${escChipText(FSTATUS_LABEL[fs] || fs)}</div>`);
   const dr = (d.rights || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -604,19 +701,21 @@ function buildApprovalBtns(d, fs) {
 }
 
 function buildDrugChip(d) {
+  const nnMark = (d.listing_scope === 'non_nlem' || d.category_id === 'NON')
+    ? '<span class="nn-chip-mark" title="นอกบัญชียาหลักแห่งชาติ">📎 </span>' : '';
   const label = d.name_th ? `${d.name_en} (${d.name_th})` : d.name_en;
   const fs    = d.formulary_status || 'in_stock';
 
   if (fs === 'non_formulary') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
     const btn   = buildApprovalBtns(d, fs);
-    return wrapDrugChip(d, `<span class="chip chip-nonform"${title}>🔴 ${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
+    return wrapDrugChip(d, `<span class="chip chip-nonform"${title}>🔴 ${nnMark}${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
   }
 
   if (fs === 'special_order') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
     const btn   = buildApprovalBtns(d, fs);
-    return wrapDrugChip(d, `<span class="chip chip-special"${title}>🟠 ${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
+    return wrapDrugChip(d, `<span class="chip chip-special"${title}>🟠 ${nnMark}${label}${drugRightsSuffixHtml(d)}${btn}</span>`);
   }
 
   // in_stock — check NLEM doc_url
@@ -625,23 +724,33 @@ function buildDrugChip(d) {
     try { urls = JSON.parse(d.doc_url); if (!Array.isArray(urls)) urls = [d.doc_url]; }
     catch { urls = [d.doc_url]; }
     if (urls.length === 1) {
-      return wrapDrugChip(d, `<a class="chip chip-link" href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">📄 ${label}${drugRightsSuffixHtml(d)}</a>`);
+      return wrapDrugChip(d, `<a class="chip chip-link" href="${urls[0]}" target="_blank" rel="noopener" title="ดูเอกสาร / แบบฟอร์ม">📄 ${nnMark}${label}${drugRightsSuffixHtml(d)}</a>`);
     }
-    let html = `<span class="chip chip-multi">📄 ${label}${drugRightsSuffixHtml(d)}`;
+    let html = `<span class="chip chip-multi">📄 ${nnMark}${label}${drugRightsSuffixHtml(d)}`;
     urls.forEach((u, i) => {
       html += `<a href="${u}" target="_blank" rel="noopener" class="multi-doc-link">เอกสาร ${i + 1}</a>`;
     });
     return wrapDrugChip(d, html + '</span>');
   }
 
-  return wrapDrugChip(d, `<span class="chip">${label}${drugRightsSuffixHtml(d)}</span>`);
+  return wrapDrugChip(d, `<span class="chip">${nnMark}${label}${drugRightsSuffixHtml(d)}</span>`);
 }
 
 function renderAll() {
   const grid = document.getElementById('card-grid');
   grid.innerHTML = '';
 
-  cats.forEach(cat => {
+  const catOrder = ['ก','ข','ค','ง','จ1','จ2','NON'];
+  const sortedCats = [...cats].sort((a, b) => {
+    const ia = catOrder.indexOf(a.id);
+    const ib = catOrder.indexOf(b.id);
+    if (ia === -1 && ib === -1) return String(a.id).localeCompare(String(b.id), 'th');
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+
+  sortedCats.forEach(cat => {
     const catDrugs  = drugs.filter(d => d.category_id === cat.id);
     const badge     = COLOR_BADGE[cat.color] || COLOR_BADGE.teal;
     const doc       = DOC_BADGE[cat.doc_level] || DOC_BADGE.none;
