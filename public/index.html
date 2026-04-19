@@ -138,6 +138,7 @@ html.dark .m-filter-select { background-image: url("data:image/svg+xml,%3Csvg xm
 .doc-form-btn.forms { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
 .toggle-btn { font-size: 0.8rem; background: none; border: none; cursor: pointer; color: var(--muted); margin-top: 6px; padding: 0; font-family: var(--font); }
 .toggle-btn:hover { color: var(--text); }
+.card-empty-hint { font-size: 0.8rem; color: var(--muted); margin: 6px 0 0; line-height: 1.45; padding: 8px 10px; background: var(--gray); border-radius: 8px; border: 1px dashed var(--border); }
 .drug-list { display: none; margin-top: 8px; }
 .drug-list.open { display: block; }
 .drug-group-label { font-size: 0.733rem; color: var(--muted); margin: 6px 0 3px; }
@@ -825,9 +826,9 @@ function renderAll() {
     return ia - ib;
   };
 
-  const hasAnyNonNlem = drugs.some(isNonNlemDrug);
   let sortedCats = [...cats].sort(cmpCat);
-  if (hasAnyNonNlem && !sortedCats.some(c => c.id === 'NON')) {
+  /** ให้มีการ์ด NON เสมอถ้ายังไม่มีใน /api/categories — แม้ยังไม่มียาใน DB (มิฉะนั้นนับได้แค่ 6 หมวด ก–จ₂) */
+  if (!sortedCats.some(c => c.id === 'NON')) {
     sortedCats.push({ ...SYNTH_NON_CATEGORY });
     sortedCats.sort(cmpCat);
   }
@@ -839,7 +840,7 @@ function renderAll() {
         ? isNonNlemDrug(d)
         : d.category_id === cat.id && !isNonNlemDrug(d)
     );
-    if (catDrugs.length === 0) return;
+    if (catDrugs.length === 0 && cat.id !== 'NON') return;
 
     const badge     = COLOR_BADGE[cat.color] || COLOR_BADGE.teal;
     const doc       = DOC_BADGE[cat.doc_level] || DOC_BADGE.none;
@@ -853,12 +854,15 @@ function renderAll() {
       groups[g].push(d);
     });
 
+    const emptyNon = catDrugs.length === 0 && cat.id === 'NON';
     let drugHtml = '';
-    Object.entries(groups).forEach(([g, list]) => {
-      drugHtml += `<p class="drug-group-label">${g}</p><div class="chips">`;
-      list.forEach(d => { drugHtml += buildDrugChip(d); });
-      drugHtml += '</div>';
-    });
+    if (!emptyNon) {
+      Object.entries(groups).forEach(([g, list]) => {
+        drugHtml += `<p class="drug-group-label">${g}</p><div class="chips">`;
+        list.forEach(d => { drugHtml += buildDrugChip(d); });
+        drugHtml += '</div>';
+      });
+    }
 
     const searchText = [cat.name_th, cat.name_en, cat.description,
       catDrugs.map(d => `${d.name_en} ${d.name_th || ''} ${d.drug_group || ''} ${d.rights || ''}`).join(' ')
@@ -873,6 +877,9 @@ function renderAll() {
 
     const rightsUnion = new Set();
     catDrugs.forEach(d => drugEffectiveRightsArr(d, rightList).forEach(r => rightsUnion.add(r)));
+    if (!rightsUnion.size && cat.id === 'NON' && rightList.length) {
+      rightList.forEach(r => rightsUnion.add(r));
+    }
     const drugHaystackAll = catDrugs.map(d => drugSearchHaystack(d)).join(' ');
 
     const card = document.createElement('div');
@@ -889,6 +896,11 @@ function renderAll() {
     card.dataset.hasNon  = hasNonDrug  ? '1' : '0';
     if (cardBorder) card.style.cssText = cardBorder;
 
+    const sampleBelowDivider = emptyNon
+      ? `<p class="card-empty-hint">ยังไม่มีรายการยาตัวอย่างในหมวดนี้ — เพิ่มผ่าน Admin หรือรัน seed เข้า Turso</p>`
+      : `<button class="toggle-btn" onclick="toggleDrugs(this)">▸ ตัวอย่างยาในบัญชีนี้ (${catDrugs.length} รายการ)</button>
+      <div class="drug-list">${drugHtml}</div>`;
+
     card.innerHTML = `
       <div class="card-header">
         <div class="badge" style="background:${badge.bg};color:${badge.color}">${cat.id}</div>
@@ -902,8 +914,7 @@ function renderAll() {
         ${rightList.map(r => `<span class="right-tag ${RIGHTS_CLS[r] || ''}">${RIGHTS_MAP[r] || r}</span>`).join('')}
       </div>
       <hr class="divider">
-      <button class="toggle-btn" onclick="toggleDrugs(this)">▸ ตัวอย่างยาในบัญชีนี้ (${catDrugs.length} รายการ)</button>
-      <div class="drug-list">${drugHtml}</div>
+      ${sampleBelowDivider}
       <div class="doc-form-row">
         <span class="doc-badge ${doc.cls}">${doc.label}</span>
         ${cat.doc_url ? `
