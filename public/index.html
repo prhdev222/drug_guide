@@ -498,7 +498,7 @@ function escDataAttr(s) {
 }
 function drugSearchHaystack(d) {
   const extra = [];
-  if (d.listing_scope === 'non_nlem' || d.category_id === 'NON') {
+  if (isNonNlemDrug(d)) {
     extra.push('non-NLEM', 'นอกบัญชียาหลัก');
     if (Number(d.nn_civil_servant)) extra.push('ข้าราชการ', 'CSMBS');
     if (Number(d.nn_doc_required)) extra.push('เอกสาร');
@@ -510,7 +510,7 @@ function drugSearchHaystack(d) {
 function drugDetailBlock(d) {
   const fs = d.formulary_status || 'in_stock';
   const rows = [];
-  const isNonNlem = d.listing_scope === 'non_nlem' || d.category_id === 'NON';
+  const isNonNlem = isNonNlemDrug(d);
   if (isNonNlem) {
     rows.push(`<div class="dd-row"><span class="dd-k">ประเภท</span> นอกบัญชียาหลักแห่งชาติ (non-NLEM)</div>`);
     const OCPA_FORM_URL = 'https://www.rama.mahidol.ac.th/cancer_center/th/OCPA_from/form';
@@ -544,9 +544,26 @@ function drugDetailBlock(d) {
   }
   return `<div class="drug-hit-detail">${rows.join('')}</div>`;
 }
-function drugListingTag(d) {
-  return (d.listing_scope === 'non_nlem' || d.category_id === 'NON') ? 'non_nlem' : 'nlem';
+/** ยานอกบัญชียาหลัก: ตาม listing_scope หรือหมวด NON (รองรับ DB ที่ยังไม่มีคอลัมน์ listing_scope) */
+function isNonNlemDrug(d) {
+  return d.listing_scope === 'non_nlem' || d.category_id === 'NON';
 }
+function drugListingTag(d) {
+  return isNonNlemDrug(d) ? 'non_nlem' : 'nlem';
+}
+
+/** เมื่อ Turso ยังไม่มีแถว categories id=NON แต่มียา — ต้องมีการ์ด NON เพื่อไม่ให้ยาหาย */
+const SYNTH_NON_CATEGORY = {
+  id: 'NON',
+  name_th: 'นอกบัญชียาหลักแห่งชาติ',
+  name_en: 'Non-NLEM / Hospital list',
+  description: 'ยาที่ไม่อยู่ในบัญชียาหลักแห่งชาติ — ระเบียบขึ้นกับโรงพยาบาลและสิทธิการรักษา',
+  rights: 'UC,SSO,CSMBS',
+  doc_level: 'none',
+  color: 'slate',
+  level_desc: 'ตามนโยบาย รพ.',
+  active: 1,
+};
 function wrapDrugChip(d, innerHtml) {
   const hay = drugSearchHaystack(d);
   const ls = drugListingTag(d);
@@ -773,17 +790,31 @@ function renderAll() {
   grid.innerHTML = '';
 
   const catOrder = ['ก','ข','ค','ง','จ1','จ2','NON'];
-  const sortedCats = [...cats].sort((a, b) => {
+  const cmpCat = (a, b) => {
     const ia = catOrder.indexOf(a.id);
     const ib = catOrder.indexOf(b.id);
     if (ia === -1 && ib === -1) return String(a.id).localeCompare(String(b.id), 'th');
     if (ia === -1) return 1;
     if (ib === -1) return -1;
     return ia - ib;
-  });
+  };
+
+  const hasAnyNonNlem = drugs.some(isNonNlemDrug);
+  let sortedCats = [...cats].sort(cmpCat);
+  if (hasAnyNonNlem && !sortedCats.some(c => c.id === 'NON')) {
+    sortedCats.push({ ...SYNTH_NON_CATEGORY });
+    sortedCats.sort(cmpCat);
+  }
 
   sortedCats.forEach(cat => {
-    const catDrugs  = drugs.filter(d => d.category_id === cat.id);
+    /** ยา non-NLEM แสดงเฉพาะในการ์ด NON — การ์ด ก–จ ไม่ซ้ำ */
+    const catDrugs = drugs.filter(d =>
+      cat.id === 'NON'
+        ? isNonNlemDrug(d)
+        : d.category_id === cat.id && !isNonNlemDrug(d)
+    );
+    if (catDrugs.length === 0) return;
+
     const badge     = COLOR_BADGE[cat.color] || COLOR_BADGE.teal;
     const doc       = DOC_BADGE[cat.doc_level] || DOC_BADGE.none;
     const rightList = (cat.rights || '').split(',').filter(Boolean);
