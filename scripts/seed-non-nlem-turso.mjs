@@ -42,6 +42,37 @@ if (!TURSO_URL || !TURSO_TOKEN) {
 
 const base = TURSO_URL.replace('libsql://', 'https://').replace('wss://', 'https://');
 
+/** Turso `/v2/pipeline` ต้องการ args แบบ typed — เหมือน `functions/_utils/db.js` (ส่งค่าดิบแล้ว INSERT อาจไม่เข้าจริง) */
+function encodeArg(v) {
+  if (v === null || v === undefined) return { type: 'null' };
+  if (typeof v === 'number' && Number.isInteger(v)) return { type: 'integer', value: String(v) };
+  if (typeof v === 'number') return { type: 'float', value: String(v) };
+  return { type: 'text', value: String(v) };
+}
+
+function stmtPayload(sql, args = []) {
+  if (!args.length) return { sql };
+  return { sql, args: args.map(encodeArg) };
+}
+
+/** แปลงผล SELECT จาก pipeline → array of objects */
+function rowsFromResult(result) {
+  const rr = result?.response?.result;
+  if (!rr?.cols || !rr?.rows) return [];
+  const names = rr.cols.map((c) => c.name);
+  return rr.rows.map((row) =>
+    Object.fromEntries(
+      names.map((name, i) => {
+        const cell = row[i];
+        if (!cell || cell.type === 'null') return [name, null];
+        if (cell.type === 'integer') return [name, parseInt(cell.value, 10)];
+        if (cell.type === 'float') return [name, parseFloat(cell.value)];
+        return [name, cell.value];
+      }),
+    ),
+  );
+}
+
 async function exec(sql, args = []) {
   const res = await fetch(`${base}/v2/pipeline`, {
     method: 'POST',
@@ -51,15 +82,29 @@ async function exec(sql, args = []) {
     },
     body: JSON.stringify({
       requests: [
-        { type: 'execute', stmt: args.length ? { sql, args } : { sql } },
+        { type: 'execute', stmt: stmtPayload(sql, args) },
         { type: 'close' },
       ],
     }),
   });
-  const data = await res.json();
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(`Turso HTTP ${res.status}: ไม่ใช่ JSON — ${text.slice(0, 200)}`);
+  }
+  if (!res.ok) {
+    throw new Error(`Turso HTTP ${res.status}: ${text.slice(0, 500)}`);
+  }
   const result = data.results?.[0];
   if (result?.type === 'error') throw new Error(result.error.message);
   return result;
+}
+
+async function queryAll(sql, args = []) {
+  const r = await exec(sql, args);
+  return rowsFromResult(r);
 }
 
 async function tryAlter(sql) {
@@ -72,7 +117,15 @@ async function tryAlter(sql) {
   }
 }
 
+let host = '';
+try {
+  host = new URL(base).hostname;
+} catch {
+  host = '(parse URL ไม่ได้)';
+}
 console.log('🔌 เชื่อมต่อ Turso …');
+console.log(`   เป้าหมาย: ${host}`);
+console.log('   (ต้องตรงกับ TURSO_URL ใน Cloudflare Pages — ถ้าคนละ database เว็บจะไม่เห็นข้อมูลที่ seed)');
 
 for (const sql of [
   `ALTER TABLE drugs ADD COLUMN listing_scope TEXT NOT NULL DEFAULT 'nlem'`,
@@ -245,6 +298,16 @@ WHERE NOT EXISTS (
     r.name_en,
   ]);
   console.log(`✓ ${r.name_en}`);
+}
+
+try {
+  const cnt = await queryAll(`SELECT COUNT(*) AS n FROM drugs WHERE category_id = 'NON'`);
+  const n = cnt[0]?.n ?? '?';
+  console.log(`\n📊 ตรวจใน DB นี้: drugs หมวด NON = ${n} แถว`);
+  const cats = await queryAll(`SELECT id FROM categories WHERE id = 'NON'`);
+  console.log(`   หมวด NON ใน categories: ${cats.length ? 'มี' : 'ไม่มี'} (ควรมี)`);
+} catch (e) {
+  console.warn('\n⚠️ ตรวจจำนวนหลัง seed ไม่ได้:', e.message);
 }
 
 console.log('\n✅ เสร็จแล้ว — เปิดหน้าแรก / Admin ควรเห็นยาตัวอย่างในหมวด NON');
