@@ -120,7 +120,14 @@ html.dark .modal { box-shadow: 0 24px 48px rgba(0,0,0,.45); }
   width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px;
   font-size: 0.867rem; font-family: var(--font); background: var(--input-bg); color: var(--text); transition: border-color .15s, box-shadow .15s; }
 .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(29,158,117,.18); }
-.form-row select:disabled { opacity: 0.72; cursor: not-allowed; background: var(--gray); }
+.form-row select:disabled {
+  cursor: not-allowed;
+  background: var(--gray);
+  color: var(--text);
+  opacity: 1;
+  -webkit-text-fill-color: var(--text);
+}
+html.dark .form-row select:disabled { background: #333330; color: var(--text); }
 .form-row textarea { resize: vertical; min-height: 60px; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.25rem; }
 .modal--drug .modal-actions { padding-top: 1rem; border-top: 1px solid var(--border); }
@@ -354,8 +361,9 @@ html.dark .modal-actions .btn-cancel { color: var(--text); }
       <p class="form-hint">ใช้คู่กับช่อง<strong>สิทธิรายยา</strong>ด้านล่าง เมื่อต้องการจำกัดเฉพาะสิทธิบางประเภท — ถ้าไม่ติ๊กช่องสิทธิรายยา = ถือว่าใช้ได้ครบทุกสิทธิที่หมวด NON มี</p>
     </div>
     <div class="form-row" id="drug-cat-row">
-      <label>บัญชี *</label>
-      <select id="drug-cat"></select>
+      <label for="drug-cat">บัญชียา NLEM (ก–จ) / หมวด NON *</label>
+      <select id="drug-cat" title="เลือกบัญชียาหลักแห่งชาติ — ถ้าเป็น non-NLEM ระบบตั้งเป็น NON ให้อัตโนมัติ"></select>
+      <p class="form-hint" id="drug-cat-subhint"></p>
       <p class="form-hint" id="drug-cat-rights-hint"></p>
     </div>
     <div class="form-row">
@@ -557,20 +565,52 @@ function api(path, method = 'GET', body) {
   }).then(r => r.json());
 }
 
+function asArray(x) {
+  return Array.isArray(x) ? x : [];
+}
+
+/** ถ้า Turso ยังไม่มีแถว NON — ยังต้องมีตัวเลือกใน dropdown ตอนเลือก non-NLEM */
+function ensureNonCategory(list) {
+  const out = list.filter(Boolean);
+  if (out.some(c => c.id === 'NON')) return out;
+  out.push({
+    id: 'NON',
+    name_th: 'นอกบัญชียาหลักแห่งชาติ',
+    doc_level: 'none',
+    rights: 'UC,SSO,CSMBS',
+  });
+  return out;
+}
+
 async function loadAll() {
-  [cats, drugs, links, groups] = await Promise.all([
-    api('/api/admin/categories'),
-    api('/api/admin/drugs'),
-    api('/api/admin/links'),
-    api('/api/admin/drug-groups'),
-  ]);
+  try {
+    const raw = await Promise.all([
+      api('/api/admin/categories'),
+      api('/api/admin/drugs'),
+      api('/api/admin/links'),
+      api('/api/admin/drug-groups'),
+    ]);
+    if (!Array.isArray(raw[0])) {
+      cats = [];
+      const msg = raw[0] && raw[0].error ? String(raw[0].error) : '';
+      showToast(msg ? ('โหลดบัญชียาไม่สำเร็จ: ' + msg) : 'โหลดบัญชียาไม่สำเร็จ — ตรวจสอบ Turso / API Key');
+    } else {
+      cats = raw[0];
+    }
+    drugs = asArray(raw[1]);
+    links = asArray(raw[2]);
+    groups = asArray(raw[3]);
+  } catch (e) {
+    showToast('โหลดข้อมูลไม่สำเร็จ: ' + (e.message || e));
+    cats = []; drugs = []; links = []; groups = [];
+  }
   renderDrugs();
   renderNformList();
   renderLinks();
   renderCats();
   renderGroups();
   const catOrder = ['ก','ข','ค','ง','จ1','จ2','NON'];
-  const sortedCats = [...cats].sort((a, b) => {
+  let sortedCats = ensureNonCategory([...cats]).sort((a, b) => {
     const ia = catOrder.indexOf(a.id);
     const ib = catOrder.indexOf(b.id);
     if (ia === -1 && ib === -1) return String(a.id).localeCompare(String(b.id), 'th');
@@ -578,15 +618,36 @@ async function loadAll() {
     if (ib === -1) return -1;
     return ia - ib;
   });
-  const opts = sortedCats.map(c => {
+  let opts = sortedCats.map(c => {
     const rEsc = String(c.rights || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-    return `<option value="${c.id}" data-doc="${c.doc_level || 'none'}" data-rights="${rEsc}">${c.id} — ${c.name_th}</option>`;
+    const idEsc = String(c.id).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    const nameEsc = String(c.name_th || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    return `<option value="${idEsc}" data-doc="${c.doc_level || 'none'}" data-rights="${rEsc}">${idEsc} — ${nameEsc}</option>`;
   }).join('');
+  if (!opts) {
+    opts = '<option value="" disabled>— ไม่มีรายการบัญชียา — ตรวจสอบ Turso / API —</option>';
+  }
   const drugCat = document.getElementById('drug-cat');
   drugCat.innerHTML = opts;
-  drugCat.onchange = () => { updateDocUrlVisibility(); updateCatRightsHint(); };
-  document.getElementById('link-cat').innerHTML = '<option value="">— ทั่วไป —</option>' + opts;
+  drugCat.onchange = () => { updateDocUrlVisibility(); updateCatRightsHint(); updateDrugCatSubhint(); };
+  document.getElementById('link-cat').innerHTML = '<option value="">— ทั่วไป —</option>' + (sortedCats.length ? sortedCats.map(c => {
+    const rEsc = String(c.rights || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    return `<option value="${c.id}" data-doc="${c.doc_level || 'none'}" data-rights="${rEsc}">${c.id} — ${c.name_th}</option>`;
+  }).join('') : '');
   populateGroupSelect();
+}
+
+function updateDrugCatSubhint() {
+  const el = document.getElementById('drug-cat-subhint');
+  if (!el) return;
+  const scope = document.querySelector('input[name="drug-listing-scope"]:checked')?.value || 'nlem';
+  if (scope === 'non_nlem') {
+    el.textContent = 'เลือก non-NLEM แล้วระบบตั้งเป็น NON อัตโนมัติ — ช่องนี้ถูกล็อก (ปกติ)';
+    el.style.display = '';
+  } else {
+    el.textContent = 'เลือกบัญชียาหลักแห่งชาติ ก · ข · ค · ง · จ₁ · จ₂ ให้ตรงกับรายการใน NLEM';
+    el.style.display = '';
+  }
 }
 
 // ---- Approval visibility ----
@@ -648,6 +709,7 @@ function updateListingScopeUi(fromUserToggle) {
   }
   updateCatRightsHint();
   updateDocUrlVisibility();
+  updateDrugCatSubhint();
 }
 function clearDrugRightsChecks() {
   document.querySelectorAll('#drug-rights-row input[type="checkbox"]').forEach(c => { c.checked = false; });
