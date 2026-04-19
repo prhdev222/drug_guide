@@ -1,3 +1,11 @@
+/**
+ * Turso SQL Editor — ถ้าจะลบตาราง staging เก่าด้วยมือ (ลำดับสำคัญ):
+ *
+ *   DROP TABLE IF EXISTS nlem_drugs;
+ *   DROP TABLE IF EXISTS nlem_subcategories;
+ *
+ * (สคริปต์ seed ก็รัน DROP เหล่านี้อยู่แล้วเมื่อรัน node seed_nlem.mjs)
+ */
 import { createClient } from "@libsql/client";
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -41,61 +49,230 @@ const client = createClient({
   authToken: tursoTok,
 });
 
-async function seed() {
-  // 1. Create tables
-  await client.executeMultiple(`
-    CREATE TABLE IF NOT EXISTS nlem_subcategories (
-      id TEXT PRIMARY KEY,
-      name_th TEXT NOT NULL,
-      name_en TEXT NOT NULL,
-      description TEXT
-    );
-    INSERT OR IGNORE INTO nlem_subcategories VALUES
-      ('b','บัญชีพื้นฐาน','Basic','ยาพื้นฐานที่จำเป็น'),
-      ('ex','บัญชีเฉพาะ','Exclusive','ยาเฉพาะกลุ่มโรค'),
-      ('s','บัญชีพิเศษ','Special','ยาพิเศษ'),
-      ('R1','บัญชีจำกัด 1','Restricted 1','ยาจำกัดการใช้ระดับ 1'),
-      ('R2','บัญชีจำกัด 2','Restricted 2','ยาจำกัดการใช้ระดับ 2');
-    CREATE TABLE IF NOT EXISTS nlem_drugs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      group_name TEXT NOT NULL,
-      subgroup1 TEXT, subgroup2 TEXT, subgroup3 TEXT,
-      no INTEGER, generic_name TEXT NOT NULL,
-      dosage TEXT, strength_salt TEXT,
-      subcategory_old TEXT,
-      subcategory_new TEXT REFERENCES nlem_subcategories(id),
-      conditions TEXT, warnings TEXT, notes TEXT, other_info TEXT,
-      gazette_date TEXT, change_code TEXT, change_detail TEXT
-    );
-    CREATE INDEX IF NOT EXISTS idx_nlem_generic ON nlem_drugs(generic_name);
-    CREATE INDEX IF NOT EXISTS idx_nlem_group ON nlem_drugs(group_name);
-  `);
-  console.log("Tables created");
-
-  // 2. Insert data in batches of 20
-  const sql = `INSERT INTO nlem_drugs
-    (group_name,subgroup1,subgroup2,subgroup3,no,generic_name,dosage,strength_salt,
-     subcategory_old,subcategory_new,conditions,warnings,notes,other_info,
-     gazette_date,change_code,change_detail)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
-
-  let count = 0;
-  for (const row of DATA) {
-    await client.execute({ sql, args: row });
-    count++;
-    if (count % 100 === 0) console.log(`Inserted ${count} rows...`);
+/** คอลัมน์ "บัญชีย่อยเดิม" (ก ข ค …) → category_id ในตาราง drugs — สอดคล้องกับ scripts/import-nlem-from-xlsx.py */
+function mapNlemCategory(raw) {
+  if (raw == null) return null;
+  const s0 = String(raw).trim();
+  if (!s0 || s0 === "-" || s0 === "เพิ่ม") return null;
+  const parts = s0
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
+  const out = [];
+  for (const s of parts) {
+    let one = null;
+    if (s === "ก") one = "ก";
+    else if (s === "ข") one = "ข";
+    else if (s === "ค") one = "ค";
+    else if (s === "ง") one = "ง";
+    else if (s === "จ(1)" || s === "จ1") one = "จ1";
+    else if (s === "จ(2)" || s === "จ2") one = "จ2";
+    if (!one) return null;
+    if (!out.includes(one)) out.push(one);
   }
-  console.log(`Done: ${count} rows total`);
+  return out.length ? out : null;
+}
+
+function buildNameEn(genericName, dosage, strengthSalt) {
+  const base = genericName != null ? String(genericName).trim() : "";
+  if (!base) return null;
+  const extras = [];
+  const k = dosage != null ? String(dosage).trim() : "";
+  const ell = strengthSalt != null ? String(strengthSalt).trim() : "";
+  if (k && k !== "-") extras.push(k);
+  if (ell && ell !== "-") extras.push(ell);
+  if (extras.length) return `${base} — ${extras.join(" · ")}`;
+  return base;
+}
+
+function buildDrugGroup(g, sg1, sg2, sg3) {
+  const parts = [g, sg1, sg2, sg3]
+    .map((x) => (x != null ? String(x).trim() : ""))
+    .filter((v) => v && v !== "-");
+  return parts.length ? parts.join(" · ") : null;
+}
+
+function buildNotes(conditions, warnings, notes, otherInfo) {
+  const chunks = [];
+  for (const [lab, v] of [
+    ["เงื่อนไข", conditions],
+    ["คำเตือน", warnings],
+    ["หมายเหตุ", notes],
+    ["อื่นๆ", otherInfo],
+  ]) {
+    const t = v != null ? String(v).trim() : "";
+    if (t && t !== "-") chunks.push(`${lab}: ${t}`);
+  }
+  return chunks.length ? chunks.join("\n") : null;
+}
+
+/** ชื่อกลุ่มยาไม่ซ้ำ — ต้องตรงกับค่าที่จะใส่ใน drugs.drug_group (ใช้หลัง const DATA โหลดแล้ว) */
+function collectDistinctDrugGroupsFromDATA() {
+  const names = [];
+  const seen = new Set();
+  for (const row of DATA) {
+    if (!Array.isArray(row) || row.length !== 17) continue;
+    const cats = mapNlemCategory(row[8]);
+    const nameEn = buildNameEn(row[5], row[6], row[7]);
+    if (!cats?.length || !nameEn) continue;
+    const dg = buildDrugGroup(row[0], row[1], row[2], row[3]);
+    if (!dg || seen.has(dg)) continue;
+    seen.add(dg);
+    names.push(dg);
+  }
+  return names;
+}
+
+/** /api/drug-groups — ตารางอาจไม่มีใน DB เก่า */
+async function ensureDrugGroupsTable(libsql) {
+  await libsql.execute(`
+    CREATE TABLE IF NOT EXISTS drug_groups (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL UNIQUE,
+      sort_order INTEGER DEFAULT 0,
+      active INTEGER DEFAULT 1
+    )
+  `);
+}
+
+/** Turso/local DB เก่าอาจมีแค่คอลัมน์ยุคแรกของตาราง drugs — เติมให้ใกล้เคียง schema.sql */
+async function migrateDrugsTableColumns(libsql) {
+  const rs = await libsql.execute({
+    sql: "SELECT name FROM pragma_table_info('drugs')",
+  });
+  const rows = rs.rows ?? [];
+  const existing = new Set();
+  for (const r of rows) {
+    let n = null;
+    if (r && typeof r === "object") {
+      n = "name" in r ? r.name : Object.values(r)[0];
+    }
+    if (n != null && n !== "") existing.add(String(n));
+  }
+  /** [ชื่อคอลัมน์, นิพจน์หลัง ADD COLUMN — ต้องมี DEFAULT ถ้าต้องการค่าเริ่มต้นในแถวเดิม] */
+  const additions = [
+    ["rights", "TEXT"],
+    ["doc_url", "TEXT"],
+    ["formulary_status", "TEXT NOT NULL DEFAULT 'non_formulary'"],
+    ["approval_doc_url", "TEXT"],
+    ["approval_criteria", "TEXT"],
+    ["fda_reg_no", "TEXT"],
+    ["listing_scope", "TEXT NOT NULL DEFAULT 'nlem'"],
+    ["nn_civil_servant", "INTEGER NOT NULL DEFAULT 0"],
+    ["nn_doc_required", "INTEGER NOT NULL DEFAULT 0"],
+    ["nn_ocpa", "INTEGER NOT NULL DEFAULT 0"],
+  ];
+  for (const [col, decl] of additions) {
+    if (existing.has(col)) continue;
+    await libsql.execute(`ALTER TABLE drugs ADD COLUMN ${col} ${decl}`);
+    existing.add(col);
+    console.log(`drugs: เพิ่มคอลัมน์ ${col}`);
+  }
+}
+
+async function seed() {
+  /* เว็บใช้แค่ตาราง drugs — ไม่เก็บ nlem_drugs / nlem_subcategories แล้ว */
+  try {
+    await client.executeMultiple(`
+      DROP TABLE IF EXISTS nlem_drugs;
+      DROP TABLE IF EXISTS nlem_subcategories;
+    `);
+    console.log("ลบตาราง nlem_drugs / nlem_subcategories แล้ว (ถ้ามีใน DB)");
+  } catch (e) {
+    console.warn("ไม่สามารถลบตาราง nlem_*:", e.message);
+  }
+
+  await migrateDrugsTableColumns(client);
+  await ensureDrugGroupsTable(client);
+
+  /* หน้าแรกโหลดแค่หมวดที่ active=1 (functions/api/categories.js)
+     ถ้าบัญชี ก–จ₂ ถูกปิด จะไม่มีการ์ด แม้ /api/drugs จะมียาแล้ว */
+  try {
+    await client.execute(`
+      UPDATE categories SET active = 1
+      WHERE id IN ('ก','ข','ค','ง','จ1','จ2','NON')
+    `);
+    console.log("categories: ตั้ง active=1 สำหรับบัญชี ก–จ₂ และ NON (ให้โผล่หน้าแรกและแอดมิน)");
+  } catch (e) {
+    console.warn("categories: ไม่สามารถอัปเดต active — มีตาราง categories หรือยัง?", e.message);
+  }
+
+  // เคลียร์ยา NLEM เดิมในตาราง drugs (ที่หน้าเว็บ /api/drugs ใช้) — เหมือน import-nlem-from-xlsx.py --replace-nlem
+  await client.execute(`
+    DELETE FROM drugs WHERE listing_scope = 'nlem'
+      AND category_id IN ('ก','ข','ค','ง','จ1','จ2')
+  `);
+
+  const groupNames = collectDistinctDrugGroupsFromDATA();
+  for (let i = 0; i < groupNames.length; i++) {
+    await client.execute({
+      sql: `INSERT OR IGNORE INTO drug_groups (name, sort_order, active) VALUES (?, ?, 1)`,
+      args: [groupNames[i], i + 1],
+    });
+  }
+  console.log(`drug_groups: เติมชื่อกลุ่มไม่ซ้ำ ${groupNames.length} รายการ (INSERT OR IGNORE)`);
+
+  /* formulary_status เริ่มที่ non_formulary = ไม่มีในคลัง (ตาม UI แอดมิน) — หาก รพ. มีจริงให้แก้เป็น in_stock */
+  const insertDrugsSql = `INSERT INTO drugs (
+    category_id, name_en, name_th, drug_group, notes,
+    formulary_status, listing_scope,
+    nn_civil_servant, nn_doc_required, nn_ocpa,
+    active, sort_order
+  ) VALUES (
+    ?, ?, NULL, ?, ?,
+    'non_formulary', 'nlem',
+    0, 0, 0,
+    1, ?
+  )`;
+
+  let skipped = 0;
+  /** ลำดับแยกตามบัญชี — ให้ผลเหมือน Python import */
+  const sortByCat = Object.create(null);
+  let drugRows = 0;
+  let drugSkipped = 0;
+
+  for (const row of DATA) {
+    if (!Array.isArray(row) || row.length !== 17) {
+      skipped++;
+      if (skipped <= 3) {
+        console.warn(
+          "ข้ามแถวที่ไม่ครบ 17 คอลัมน์ (แหล่งข้อมูลแต่ละแถวต้องครบฟิลด์):",
+          row?.length,
+          row?.slice?.(0, 4)
+        );
+      }
+      continue;
+    }
+
+    const cats = mapNlemCategory(row[8]);
+    const nameEn = buildNameEn(row[5], row[6], row[7]);
+    if (!cats?.length || !nameEn) {
+      drugSkipped++;
+      continue;
+    }
+    const dg = buildDrugGroup(row[0], row[1], row[2], row[3]);
+    const notes = buildNotes(row[10], row[11], row[12], row[13]);
+    for (const cid of cats) {
+      sortByCat[cid] = (sortByCat[cid] ?? 0) + 1;
+      const sortOrder = sortByCat[cid];
+      await client.execute({
+        sql: insertDrugsSql,
+        args: [cid, nameEn, dg, notes, sortOrder],
+      });
+      drugRows++;
+    }
+    if (drugRows && drugRows % 500 === 0) console.log(`drugs: แทรกแล้ว ${drugRows} แถว…`);
+  }
+  if (skipped) console.log(`ข้ามรวม ${skipped} แถว (รูปแบบไม่ตรง)`);
+  console.log(`Done drugs: ${drugRows} แถว · ข้าม ${drugSkipped} แถวแหล่งข้อมูล (ไม่มีบัญชีหรือชื่อยา เช่น เพิ่ม)`);
 }
 
 seed().catch(console.error);
 
+/** ประกาศหลัง seed() เพื่อให้โหลดไฟล์เร็ว — seed ทำงานหลัง DATA ถูกกำหนดแล้ว (หลัง await แรก) */
+
 const DATA = [
-  ["b", "บัญชีพื้นฐาน", "Basic", "ยาพื้นฐานที่จำเป็น ใช้ได้ทั่วไป"],
-  ["ex", "บัญชีเฉพาะ", "Exclusive", "ยาเฉพาะกลุ่มโรค มีเงื่อนไขการใช้"],
-  ["s", "บัญชีพิเศษ", "Special", "ยาพิเศษ มีข้อกำหนดเพิ่มเติม"],
-  ["R1", "บัญชีจำกัด 1", "Restricted 1", "ยาจำกัดการใช้ระดับ 1"],
-  ["R2", "บัญชีจำกัด 2", "Restricted 2", "ยาจำกัดการใช้ระดับ 2 — ต้องขออนุมัติ"],
+  /* แต่ละแถว 17 ค่า (รูปแบบแถว NLEM เดิม): group…, generic, dosage, บัญชีเดิม, บัญชีย่อยใหม่, เงื่อนไข… */
   ["1. Gastro-intestinal system", "1.1 Antacids and other drugs for dyspepsia", null, null, 1, "Aluminium hydroxide", "chewable tab", null, "ข", "b", null, null, null, null, "2026-03-30", "C6", "ปรับลำดับ"],
   ["1. Gastro-intestinal system", "1.1 Antacids and other drugs for dyspepsia", null, null, 1, "Aluminium hydroxide", "tab", null, "ข", "b", null, null, null, null, "2026-03-30", "C6", "ปรับลำดับ"],
   ["1. Gastro-intestinal system", "1.1 Antacids and other drugs for dyspepsia", null, null, 1, "Aluminium hydroxide", "susp", null, "ข", "b", null, null, null, null, "2026-03-30", "C6", "ปรับลำดับ"],

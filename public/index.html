@@ -318,7 +318,7 @@ html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0
 </header>
 
 <div class="controls">
-  <input type="text" id="search" placeholder="ค้นหายา เช่น imatinib, warfarin, ฟ้าทะลายโจร..." oninput="filterCards()">
+  <input type="text" id="search" placeholder="ค้นหาชื่อยา (EN/TH) เช่น imatinib, warfarin, ฟ้าทะลายโจร..." oninput="filterCards()">
 </div>
 
 <section class="nlem-info" id="nlem-info" aria-labelledby="nlem-info-title">
@@ -510,19 +510,12 @@ const FSTATUS_LABEL = {
 function escDataAttr(s) {
   return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 }
+/** ค้นหาเฉพาะชื่อยา (EN/TH) — ไม่ค้นในหมายเหตุ/กลุ่มยา/เกณฑ์ เพื่อไม่ให้ชนเคสอ้างอิงชื่อยาอื่นในข้อความ */
 function drugSearchHaystack(d) {
-  const extra = [];
-  if (isNonNlemDrug(d)) {
-    extra.push('non-NLEM', 'นอกบัญชียาหลัก');
-    if (Number(d.nn_civil_servant)) extra.push('ข้าราชการ', 'CSMBS');
-    if (Number(d.nn_doc_required)) extra.push('เอกสาร');
-    if (Number(d.nn_ocpa)) extra.push('OCPA', 'รามาธิบดี', 'rama.mahidol');
-  }
-  return [d.name_en, d.name_th, d.drug_group, d.notes, d.approval_criteria, d.fda_reg_no, extra.join(' ')]
-    .filter(Boolean).join(' ').toLowerCase();
+  return [d.name_en, d.name_th].filter(Boolean).join(' ').toLowerCase();
 }
 function drugDetailBlock(d) {
-  const fs = d.formulary_status || 'in_stock';
+  const fs = d.formulary_status || 'non_formulary';
   const rows = [];
   const isNonNlem = isNonNlemDrug(d);
   if (isNonNlem) {
@@ -778,7 +771,7 @@ function buildDrugChip(d) {
   const nnMark = (d.listing_scope === 'non_nlem' || d.category_id === 'NON')
     ? '<span class="nn-chip-mark" title="นอกบัญชียาหลักแห่งชาติ">📎 </span>' : '';
   const label = d.name_th ? `${d.name_en} (${d.name_th})` : d.name_en;
-  const fs    = d.formulary_status || 'in_stock';
+  const fs    = d.formulary_status || 'non_formulary';
 
   if (fs === 'non_formulary') {
     const title = d.approval_criteria ? ` title="เกณฑ์: ${d.approval_criteria.replace(/"/g, '&quot;')}"` : '';
@@ -873,9 +866,8 @@ function renderAll() {
       });
     }
 
-    const searchText = [cat.name_th, cat.name_en, cat.description,
-      catDrugs.map(d => `${d.name_en} ${d.name_th || ''} ${d.drug_group || ''} ${d.rights || ''}`).join(' ')
-    ].join(' ').toLowerCase();
+    /* ใช้กับ filterCards: ให้การ์ดโผล่เมื่อคำค้นตรงชื่อยาในมวลนี้เท่านั้น (ไม่รวมชื่อหมวด/คำอธิบายหมวด) */
+    const searchText = catDrugs.map(d => `${d.name_en} ${d.name_th || ''}`).join(' ').toLowerCase();
 
     const groupsInCard = [...new Set(catDrugs.map(d => d.drug_group).filter(Boolean))];
     const hasDrugDoc   = catDrugs.some(d => !!d.doc_url);

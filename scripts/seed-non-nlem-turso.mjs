@@ -169,7 +169,7 @@ const rows = [
     sort_order: 2,
     nn_c: 1, nn_d: 1, nn_o: 0,
     notes: 'ตัวอย่าง: เน้นสิทธิข้าราชการและเอกสารตามระเบียบ รพ.',
-    formulary_status: 'in_stock',
+    formulary_status: 'non_formulary',
     approval_criteria: null,
   },
   {
@@ -179,7 +179,7 @@ const rows = [
     sort_order: 3,
     nn_c: 0, nn_d: 0, nn_o: 0,
     notes: 'ตัวอย่าง: บันทึกในฟอร์มูลารีโดยไม่ติ๊กเกณฑ์พิเศษด้านบน',
-    formulary_status: 'in_stock',
+    formulary_status: 'non_formulary',
     approval_criteria: null,
   },
   {
@@ -209,7 +209,7 @@ const rows = [
     sort_order: 6,
     nn_c: 0, nn_d: 0, nn_o: 0,
     notes: 'ตัวอย่าง: ฟอร์มูลารีทั่วไปนอกบัญชียาหลัก',
-    formulary_status: 'in_stock',
+    formulary_status: 'non_formulary',
     approval_criteria: null,
   },
   {
@@ -219,7 +219,7 @@ const rows = [
     sort_order: 7,
     nn_c: 0, nn_d: 0, nn_o: 0,
     notes: 'ตัวอย่าง: ตามบันทึกฟอร์มูลารีโรงพยาบาล',
-    formulary_status: 'in_stock',
+    formulary_status: 'non_formulary',
     approval_criteria: null,
   },
   {
@@ -259,7 +259,7 @@ const rows = [
     sort_order: 11,
     nn_c: 0, nn_d: 0, nn_o: 0,
     notes: 'ตัวอย่าง: ฟอร์มูลารีโรงพยาบาล (นอกบัญชียาหลัก)',
-    formulary_status: 'in_stock',
+    formulary_status: 'non_formulary',
     approval_criteria: null,
   },
   {

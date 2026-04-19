@@ -907,7 +907,7 @@ function renderDrugs() {
     return matchQ && matchF;
   });
   tbody.innerHTML = list.map(d => {
-    const fs = FSTATUS[d.formulary_status] || FSTATUS.in_stock;
+    const fs = FSTATUS[d.formulary_status] || FSTATUS.non_formulary;
     const apprLinks = parseApprovalDocLinks(d.approval_doc_url);
     const hasForm = apprLinks.length > 0;
     let formCell = '—';
@@ -999,7 +999,7 @@ function openDrugModal(id) {
   document.getElementById('non-nlem-block').hidden = true;
   document.getElementById('drug-cat').disabled = false;
   document.getElementById('drug-notes').value = '';
-  document.getElementById('drug-formulary').value = 'in_stock';
+  document.getElementById('drug-formulary').value = 'non_formulary';
   document.getElementById('drug-fda-reg').value = '';
   setApprovalUrls('');
   document.getElementById('drug-approval-criteria').value = '';
@@ -1017,7 +1017,7 @@ function openDrugModal(id) {
       document.getElementById('drug-name-th').value = d.name_th || '';
       populateGroupSelect(d.drug_group || '');
       setDrugRightsFromCsv(d.rights || '');
-      document.getElementById('drug-formulary').value = d.formulary_status || 'in_stock';
+      document.getElementById('drug-formulary').value = d.formulary_status || 'non_formulary';
       document.getElementById('drug-fda-reg').value = d.fda_reg_no || '';
       setApprovalUrls(d.approval_doc_url || '');
       document.getElementById('drug-approval-criteria').value = d.approval_criteria || '';

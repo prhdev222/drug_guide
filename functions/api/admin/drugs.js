@@ -6,7 +6,7 @@ export async function onRequestPost({ request, env }) {
     const body = await request.json();
     const {
       category_id, name_en, name_th, drug_group, rights, notes, doc_url,
-      formulary_status = 'in_stock', approval_doc_url, approval_criteria, fda_reg_no,
+      formulary_status = 'non_formulary', approval_doc_url, approval_criteria, fda_reg_no,
       listing_scope = 'nlem',
       nn_civil_servant = 0, nn_doc_required = 0, nn_ocpa = 0,
     } = body;

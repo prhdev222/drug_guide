@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS drugs (
   notes            TEXT,
   doc_url          TEXT,
   -- v2: Formulary & Approval
-  formulary_status TEXT NOT NULL DEFAULT 'in_stock', -- 'in_stock'|'non_formulary'|'special_order'
+  formulary_status TEXT NOT NULL DEFAULT 'non_formulary', -- 'in_stock'|'non_formulary'|'special_order'
   approval_doc_url TEXT,   -- URL เดียว (เดิม) หรือ JSON array [{title,url},...] หลายลิงก์
   approval_criteria TEXT,  -- เกณฑ์/เงื่อนไขการอนุมัติ
   fda_reg_no       TEXT,   -- เลขทะเบียน อย. (ไม่บังคับ)
@@ -47,6 +47,13 @@ CREATE TABLE IF NOT EXISTS links (
   description TEXT,
   active      INTEGER DEFAULT 1,
   sort_order  INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS drug_groups (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  name        TEXT NOT NULL UNIQUE,
+  sort_order  INTEGER DEFAULT 0,
+  active      INTEGER DEFAULT 1
 );
 
 -- approval_forms: แบบฟอร์มอนุมัติรายยา แยกตามสิทธิ (สำหรับการขยายในอนาคต)
@@ -260,7 +267,7 @@ INSERT OR IGNORE INTO links (category_id, title, url, description, sort_order) V
 -- ถ้าสร้าง database ใหม่จาก schema.sql นี้ ไม่ต้องรัน
 -- =============================================================
 -- ALTER TABLE drugs ADD COLUMN doc_url TEXT;
--- ALTER TABLE drugs ADD COLUMN formulary_status TEXT NOT NULL DEFAULT 'in_stock';
+-- ALTER TABLE drugs ADD COLUMN formulary_status TEXT NOT NULL DEFAULT 'non_formulary';
 -- ALTER TABLE drugs ADD COLUMN approval_doc_url TEXT;
 -- ALTER TABLE drugs ADD COLUMN approval_criteria TEXT;
 -- ALTER TABLE drugs ADD COLUMN fda_reg_no TEXT;

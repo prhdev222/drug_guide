@@ -274,7 +274,7 @@ def main() -> int:
   active, sort_order
 ) VALUES (
   ?, ?, NULL, ?, NULL, ?,
-  'in_stock', 'nlem',
+  'non_formulary', 'nlem',
   0, 0, 0,
   1, ?
 );"""
@@ -294,7 +294,7 @@ def main() -> int:
   active, sort_order
 ) VALUES (
   '{sql_escape(cid)}', '{sql_escape(name_en)}', NULL, {lit(dg)}, NULL, {lit(notes)},
-  'in_stock', 'nlem',
+  'non_formulary', 'nlem',
   0, 0, 0,
   1, {so}
 );"""
