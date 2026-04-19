@@ -897,7 +897,7 @@ function renderAll() {
     if (cardBorder) card.style.cssText = cardBorder;
 
     const sampleBelowDivider = emptyNon
-      ? `<p class="card-empty-hint">ยังไม่มีรายการยาตัวอย่างในหมวดนี้ — เพิ่มผ่าน Admin หรือรัน seed เข้า Turso</p>`
+      ? `<p class="card-empty-hint">ยังไม่มีรายการตัวอย่างในระบบ — เกณฑ์และยานอกบัญชียาหลักขึ้นกับฟอร์มูลารีของแต่ละโรงพยาบาล เจ้าหน้าที่โรงพยาบาลสามารถเพิ่มรายการผ่านหน้าจัดการได้</p>`
       : `<button class="toggle-btn" onclick="toggleDrugs(this)">▸ ตัวอย่างยาในบัญชีนี้ (${catDrugs.length} รายการ)</button>
       <div class="drug-list">${drugHtml}</div>`;
 
