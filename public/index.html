@@ -362,6 +362,12 @@ html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0
       <button type="button" class="pill" data-stock="non_formulary" onclick="setStock(this,'non_formulary')">🔴 ต้องขออนุมัติ</button>
       <button type="button" class="pill" data-stock="special_order" onclick="setStock(this,'special_order')">🟠 สั่งฉุกเฉิน</button>
     </div>
+    <div class="filter-row" data-filter-row="listing">
+      <span class="filter-label">ประเภทรายการ:</span>
+      <button type="button" class="pill active" data-listing="ALL" onclick="setListing(this,'ALL')">ทั้งหมด</button>
+      <button type="button" class="pill" data-listing="nlem" onclick="setListing(this,'nlem')">ในบัญชียาหลัก (NLEM)</button>
+      <button type="button" class="pill" data-listing="non_nlem" onclick="setListing(this,'non_nlem')">นอกบัญชียาหลัก</button>
+    </div>
     <div class="filter-row">
       <span class="filter-label">กรองกลุ่มยา:</span>
       <select id="group-filter" class="group-select" onchange="setGroup(this)">
@@ -389,6 +395,14 @@ html.dark .nlem-info-desc { background: #1e40af; box-shadow: 0 4px 14px rgba(0,0
         <option value="in_stock">มีในคลัง</option>
         <option value="non_formulary">ต้องขออนุมัติ</option>
         <option value="special_order">สั่งฉุกเฉิน</option>
+      </select>
+    </div>
+    <div class="filter-m-field">
+      <label for="filter-m-listing">ประเภทรายการ</label>
+      <select id="filter-m-listing" class="m-filter-select" onchange="onMobileListingChange()">
+        <option value="ALL">ทั้งหมด</option>
+        <option value="nlem">ในบัญชียาหลัก (NLEM)</option>
+        <option value="non_nlem">นอกบัญชียาหลัก</option>
       </select>
     </div>
     <div class="filter-m-field">
@@ -530,9 +544,13 @@ function drugDetailBlock(d) {
   }
   return `<div class="drug-hit-detail">${rows.join('')}</div>`;
 }
+function drugListingTag(d) {
+  return (d.listing_scope === 'non_nlem' || d.category_id === 'NON') ? 'non_nlem' : 'nlem';
+}
 function wrapDrugChip(d, innerHtml) {
   const hay = drugSearchHaystack(d);
-  return `<span class="drug-chip-wrap" data-haystack="${escDataAttr(hay)}">${innerHtml}${drugDetailBlock(d)}</span>`;
+  const ls = drugListingTag(d);
+  return `<span class="drug-chip-wrap" data-listing="${ls}" data-haystack="${escDataAttr(hay)}">${innerHtml}${drugDetailBlock(d)}</span>`;
 }
 /** สิทธิจริงของรายยา: มี rights รายยา → ใช้นั้น ไม่มี → ตามบัญชี */
 function drugEffectiveRightsArr(d, catRightList) {
@@ -551,6 +569,7 @@ function drugRightsSuffixHtml(d) {
 let cats = [], drugs = [], links = [], drugGroups = [];
 let activeRight = 'ALL';
 let activeStock = 'ALL';
+let activeListing = 'ALL';
 let activeGroup = '';
 
 const LINK_ICONS = {
@@ -573,6 +592,7 @@ async function load() {
     populateGroupFilter();
     syncRightUi();
     syncStockUi();
+    syncListingUi();
     renderAll();
     renderLinks();
   } catch (e) {
@@ -606,6 +626,13 @@ function syncStockUi() {
   const m = document.getElementById('filter-m-stock');
   if (m) m.value = activeStock;
 }
+function syncListingUi() {
+  document.querySelectorAll('[data-filter-row="listing"] .pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.listing === activeListing);
+  });
+  const m = document.getElementById('filter-m-listing');
+  if (m) m.value = activeListing;
+}
 function onMobileRightChange() {
   activeRight = document.getElementById('filter-m-right').value;
   syncRightUi();
@@ -614,6 +641,11 @@ function onMobileRightChange() {
 function onMobileStockChange() {
   activeStock = document.getElementById('filter-m-stock').value;
   syncStockUi();
+  filterCards();
+}
+function onMobileListingChange() {
+  activeListing = document.getElementById('filter-m-listing').value;
+  syncListingUi();
   filterCards();
 }
 
@@ -779,6 +811,8 @@ function renderAll() {
     const hasDrugDoc   = catDrugs.some(d => !!d.doc_url);
     const hasNform     = catDrugs.some(d => d.formulary_status === 'non_formulary');
     const hasSorder    = catDrugs.some(d => d.formulary_status === 'special_order');
+    const hasNlemDrug  = catDrugs.some(d => drugListingTag(d) === 'nlem');
+    const hasNonDrug   = catDrugs.some(d => drugListingTag(d) === 'non_nlem');
 
     const rightsUnion = new Set();
     catDrugs.forEach(d => drugEffectiveRightsArr(d, rightList).forEach(r => rightsUnion.add(r)));
@@ -794,6 +828,8 @@ function renderAll() {
     card.dataset.drugdoc = hasDrugDoc ? '1' : '0';
     card.dataset.nform   = hasNform   ? '1' : '0';
     card.dataset.sorder  = hasSorder  ? '1' : '0';
+    card.dataset.hasNlem = hasNlemDrug ? '1' : '0';
+    card.dataset.hasNon  = hasNonDrug  ? '1' : '0';
     if (cardBorder) card.style.cssText = cardBorder;
 
     card.innerHTML = `
@@ -849,6 +885,13 @@ function setStock(el, val) {
   filterCards();
 }
 
+function setListing(el, val) {
+  if (val !== 'ALL' && activeListing === val) val = 'ALL';
+  activeListing = val;
+  syncListingUi();
+  filterCards();
+}
+
 function setGroup(sel) {
   activeGroup = sel.value;
   const twinId = sel.id === 'group-filter' ? 'group-filter-m' : 'group-filter';
@@ -857,6 +900,11 @@ function setGroup(sel) {
   document.getElementById('group-filter')?.classList.toggle('active', !!activeGroup);
   document.getElementById('group-filter-m')?.classList.toggle('active', !!activeGroup);
   filterCards();
+}
+
+function chipMatchesListing(wrap) {
+  if (activeListing === 'ALL') return true;
+  return (wrap.getAttribute('data-listing') || 'nlem') === activeListing;
 }
 
 function applySearchDrugUi(qRaw) {
@@ -871,9 +919,15 @@ function applySearchDrugUi(qRaw) {
     if (!q) {
       card.querySelectorAll('.drug-chip-wrap').forEach(w => {
         w.classList.remove('search-match');
-        w.style.display = '';
+        const show = !hidden && chipMatchesListing(w);
+        w.style.display = show ? '' : 'none';
       });
-      card.querySelectorAll('.drug-group-label').forEach(l => { l.style.display = ''; });
+      card.querySelectorAll('.drug-group-label').forEach(lab => {
+        const chips = lab.nextElementSibling;
+        if (!chips || !chips.classList.contains('chips')) return;
+        const anyVisible = [...chips.querySelectorAll('.drug-chip-wrap')].some(w => w.style.display !== 'none');
+        lab.style.display = anyVisible ? '' : 'none';
+      });
       if (list && btn) {
         list.classList.remove('open');
         const count = btn.textContent.match(/\d+/)?.[0] || '';
@@ -891,10 +945,11 @@ function applySearchDrugUi(qRaw) {
     let anyMatch = false;
     card.querySelectorAll('.drug-chip-wrap').forEach(wrap => {
       const h = (wrap.getAttribute('data-haystack') || '').toLowerCase();
-      const match = h.includes(q);
-      wrap.classList.toggle('search-match', match);
-      wrap.style.display = match ? '' : 'none';
-      if (match) anyMatch = true;
+      const matchQ = h.includes(q);
+      const ok = matchQ && chipMatchesListing(wrap);
+      wrap.classList.toggle('search-match', ok);
+      wrap.style.display = ok ? '' : 'none';
+      if (ok) anyMatch = true;
     });
     card.querySelectorAll('.drug-group-label').forEach(lab => {
       const chips = lab.nextElementSibling;
@@ -940,8 +995,14 @@ function filterCards() {
     const drugHay = (card.dataset.drugHaystack || '').toLowerCase();
     const qm = !q || text.includes(q) || drugHay.includes(q);
 
-    if (rm && sm && gm && qm) { card.classList.remove('hidden'); visible++; }
-    else                      { card.classList.add('hidden'); }
+    let lm = true;
+    const hn = card.dataset.hasNlem === '1';
+    const hx = card.dataset.hasNon === '1';
+    if (activeListing === 'nlem') lm = hn;
+    else if (activeListing === 'non_nlem') lm = hx;
+
+    if (rm && sm && gm && qm && lm) { card.classList.remove('hidden'); visible++; }
+    else                             { card.classList.add('hidden'); }
   });
   applySearchDrugUi(document.getElementById('search').value);
   document.getElementById('count-label').textContent = `แสดง ${visible} บัญชี`;
